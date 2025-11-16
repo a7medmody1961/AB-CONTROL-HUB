@@ -1,0 +1,33 @@
+name: Deploy to GitHub Pages
+
+# خليه يشتغل أوتوماتيك مع أي "push" على الـ main branch
+on:
+  push:
+    branches:
+      - main # أو 'master' حسب اسم الـ branch الرئيسي عندك
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # هيشتغل على سيرفر لينكس
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3 # خطوة 1: بيجيب الكود بتاعك
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # استخدم إصدار نود حديث
+
+      - name: Install Dependencies
+        run: npm install # <-- هيشغل npm install
+        working-directory: ./AB # <-- *** أهم خطوة: هيدخل جوه مجلد AB الأول ***
+
+      - name: Build Project
+        run: npm run build:prod # <-- هيشغل أمر البناء
+        working-directory: ./AB # <-- *** هيشغله جوه مجلد AB ***
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./AB/dist # <-- *** هيقوله يرفع المجلد ده ***
