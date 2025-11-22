@@ -1,5 +1,5 @@
 // اسم الكيش بتاعنا، لو غيرت أي ملفات أساسية، غيّر الرقم ده عشان تجبره يحدث
-const CACHE_NAME = 'ab-control-hub-v1';
+const CACHE_NAME = 'ab-control-hub-v2';
 
 // الملفات الأساسية اللي عاوزينها تشتغل أوفلاين
 const urlsToCache = [
