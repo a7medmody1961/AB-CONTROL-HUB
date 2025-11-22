@@ -29,8 +29,16 @@ export function lang_init(appState, handleLanguageChangeCb, welcomeModalCb) {
   }
   translationState.lang_orig_text[".title"] = document.title;
   
+  // Check URL parameters for language first
+  const urlParams = new URLSearchParams(window.location.search);
+  const langFromUrl = urlParams.get('lang');
   const force_lang = readCookie("force_lang");
-  if (force_lang != null) {
+
+  if (langFromUrl && available_langs[langFromUrl]) {
+     lang_set(langFromUrl, true).catch(error => {
+      console.error("Failed to set language from URL:", error);
+    });
+  } else if (force_lang != null) {
     lang_set(force_lang, true).catch(error => {
       console.error("Failed to set forced language:", error);
     });
@@ -44,7 +52,6 @@ export function lang_init(appState, handleLanguageChangeCb, welcomeModalCb) {
       });
     }
   }
-  
 }
 
 async function lang_set(lang, skip_modal=false) {
@@ -58,11 +65,22 @@ async function lang_set(lang, skip_modal=false) {
   
   await handleLanguageChange(lang);
   createCookie("force_lang", lang);
+
+  // Update URL without reloading page
+  const url = new URL(window.location);
+  if (lang === 'ar_ar') {
+      url.searchParams.set('lang', 'ar_ar');
+  } else {
+      url.searchParams.delete('lang');
+  }
+  window.history.pushState({}, '', url);
+
   if(!skip_modal && welcomeModal) {
     createCookie("welcome_accepted", "0");
     welcomeModal();
   }
 }
+
 export function toggle_lang() {
   const currentLang = readCookie("force_lang") || "en_us";
   const newLang = (currentLang === "en_us") ? "ar_ar" : "en_us";
@@ -81,7 +99,7 @@ function lang_reset_page() {
   for(let item of items) {
     $(item).html(lang_orig_text[item.id]);
   };
-  $("#authorMsg").html("");
+  // Removed old authorMsg logic as it is now handled via normal translation keys
   $("#curLang").html("English");
   document.title = lang_orig_text[".title"];
 }
@@ -147,10 +165,12 @@ function lang_translate(target_file, target_lang, target_direction) {
         }
 
         const old_title = lang_orig_text[".title"];
-        document.title = lang_cur[old_title];
-        if(lang_cur[".authorMsg"]) {
-          $("#authorMsg").html(lang_cur[".authorMsg"]);
+        // Check if title translation exists
+        const [translatedTitle] = lang_cur[old_title] || [];
+        if (translatedTitle) {
+             document.title = translatedTitle;
         }
+
         $("#curLang").html(available_langs[target_lang]["name"]);
 
         resolve();
