@@ -458,7 +458,7 @@ body {
 .modal-body .alert {
   background-color: rgba(0, 240, 240, 0.1);
   border-color: var(--border-color);
-  color: var(--text-light);
+  color: var(--bs-white);
 }
 
 /* تعديل الـ Buttons اللي جوه الـ Modals */
