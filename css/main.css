@@ -603,7 +603,7 @@ dl.row dd {
 .calib-step-counter {
   font-family: var(--font-hud);
   font-size: 1.2rem;
-  color: #888;
+  color: #000;
 }
 
 .calib-wizard-content {
@@ -626,7 +626,7 @@ dl.row dd {
 
 .calib-wizard-content p {
   font-size: 1.1rem;
-  color: var(--text-light);
+  color: var(--bg-dark);
   max-width: 90%;
 }
 
@@ -725,7 +725,7 @@ dl.row dd {
   font-family: var(--font-hud);
   font-size: 1.1rem;
   font-weight: 500;
-  color: var(--text-light);
+  color: var(--bs-white);
   opacity: 0.7;
   margin-left: 1.5rem; /* مسافة من اسم الدراع */
 }
