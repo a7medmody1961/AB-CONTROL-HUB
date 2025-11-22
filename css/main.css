@@ -353,8 +353,8 @@ body {
   width: 100%;
   text-transform: uppercase;
   
-  color: var(--glow-danger);
-  border-color: var(--glow-danger);
+  color: var(--glow-cyan);
+    border-color: var(--glow-cyan);
 }
 .btn-glow-danger:hover {
   color: var(--bg-dark);
