@@ -286,8 +286,8 @@ body {
 }
 .btn-glow-primary:hover {
   color: var(--bg-dark);
-  background: var(--glow-cyan);
-  box-shadow: 0 0 10px var(--glow-cyan), 0 0 20px var(--glow-cyan);
+  background: var(--glow-danger);
+  box-shadow: 0 0 10px var(--glow-danger), 0 0 20px var(--glow-danger);
 }
 
 /* أزرار ثانوية (Test / Info) */
@@ -358,8 +358,8 @@ body {
 }
 .btn-glow-danger:hover {
   color: var(--bg-dark);
-  background: var(--glow-danger);
-  box-shadow: 0 0 10px var(--glow-danger), 0 0 20px var(--glow-danger);
+  background: var(--glow-cyan);
+  box-shadow: 0 0 10px var(--glow-cyan), 0 0 20px var(--glow-cyan);
 }
 
 
