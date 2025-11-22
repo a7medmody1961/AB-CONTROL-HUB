@@ -24,7 +24,6 @@ body {
   color: var(--text-light);
   
   /* --- صورة الخلفية --- */
-  /* === تم تعديل المسار هنا === */
   background-image: linear-gradient(rgba(10, 10, 26, 0.92), rgba(10, 10, 26, 0.98)), url('../background.png');
   background-size: cover;
   background-position: center;
@@ -212,7 +211,6 @@ body {
 
 /* زرار الكونكت */
 .btn-glow-connect {
-  /* composes: btn-glow-base; <-- تم الحذف */
   font-family: var(--font-hud);
   font-size: 1.2rem;
   font-weight: 500;
@@ -240,7 +238,6 @@ body {
 
 /* زرار الفصل */
 .btn-glow-disconnect {
-  /* composes: btn-glow-base; <-- تم الحذف */
   font-family: var(--font-hud);
   font-size: 1.2rem;
   font-weight: 500;
@@ -266,9 +263,8 @@ body {
   box-shadow: 0 0 10px var(--glow-danger);
 }
 
-/* أزرار أساسية */
+/* أزرار أساسية (تم التصحيح: رجعناها سماوي) */
 .btn-glow-primary {
-  /* composes: btn-glow-base; <-- تم الحذف */
   font-family: var(--font-hud);
   font-size: 1.2rem;
   font-weight: 500;
@@ -281,18 +277,17 @@ body {
   width: 100%;
   text-transform: uppercase;
   
-  color: var(--glow-danger);
-    border-color: var(--glow-danger);
+  color: var(--glow-cyan);
+  border-color: var(--glow-cyan);
 }
 .btn-glow-primary:hover {
   color: var(--bg-dark);
-  background: var(--glow-danger);
-  box-shadow: 0 0 10px var(--glow-danger), 0 0 20px var(--glow-danger);
+  background: var(--glow-cyan);
+  box-shadow: 0 0 10px var(--glow-cyan), 0 0 20px var(--glow-cyan);
 }
 
 /* أزرار ثانوية (Test / Info) */
 .btn-glow-secondary {
-  /* composes: btn-glow-base; <-- تم الحذف */
   font-family: var(--font-hud);
   font-size: 1.2rem;
   font-weight: 500;
@@ -316,7 +311,6 @@ body {
 
 /* أزرار الحفظ (Success) */
 .btn-glow-success {
-  /* composes: btn-glow-base; <-- تم الحذف */
   font-family: var(--font-hud);
   font-size: 1.2rem;
   font-weight: 500;
@@ -338,9 +332,8 @@ body {
   box-shadow: 0 0 10px var(--glow-green), 0 0 20px var(--glow-green);
 }
 
-/* أزرار الخطر (Reboot) */
+/* أزرار الخطر (تم التصحيح: رجعناها أحمر) */
 .btn-glow-danger {
-  /* composes: btn-glow-base; <-- تم الحذف */
   font-family: var(--font-hud);
   font-size: 1.2rem;
   font-weight: 500;
@@ -353,13 +346,87 @@ body {
   width: 100%;
   text-transform: uppercase;
   
-  color: var(--glow-cyan);
-    border-color: var(--glow-cyan);
+  color: var(--glow-danger);
+  border-color: var(--glow-danger);
 }
 .btn-glow-danger:hover {
   color: var(--bg-dark);
-  background: var(--glow-cyan);
-  box-shadow: 0 0 10px var(--glow-cyan), 0 0 20px var(--glow-cyan);
+  background: var(--glow-danger);
+  box-shadow: 0 0 10px var(--glow-danger), 0 0 20px var(--glow-danger);
+}
+
+/* +++ إضافات جديدة للأزرار المخصصة (أحمر، أزرق، أبيض) +++ */
+
+/* زرار الليد الأحمر */
+.btn-glow-red {
+  font-family: var(--font-hud);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border-radius: 5px;
+  border: 2px solid;
+  background: transparent;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-transform: uppercase;
+  
+  color: #ff0000;
+  border-color: #ff0000;
+  text-shadow: 0 0 5px #ff0000;
+}
+.btn-glow-red:hover {
+  color: var(--bg-dark);
+  background: #ff0000;
+  box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+}
+
+/* زرار الليد الأزرق */
+.btn-glow-blue {
+  font-family: var(--font-hud);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border-radius: 5px;
+  border: 2px solid;
+  background: transparent;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-transform: uppercase;
+  
+  color: #2979ff; 
+  border-color: #2979ff;
+  text-shadow: 0 0 5px #2979ff;
+}
+.btn-glow-blue:hover {
+  color: var(--bg-dark);
+  background: #2979ff;
+  box-shadow: 0 0 10px #2979ff, 0 0 20px #2979ff;
+}
+
+/* زرار الإيقاف (أبيض) */
+.btn-glow-white {
+  font-family: var(--font-hud);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border-radius: 5px;
+  border: 2px solid;
+  background: transparent;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-transform: uppercase;
+  
+  color: #ffffff;
+  border-color: #ffffff;
+  text-shadow: 0 0 5px #ffffff;
+}
+.btn-glow-white:hover {
+  color: var(--bg-dark);
+  background: #ffffff;
+  box-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff;
 }
 
 
@@ -378,7 +445,7 @@ body {
   border-top: 1px solid var(--border-color);
 }
 .modal-body {
-  color: black; /* <-- تم التعديل هنا */
+  color: black;
 }
 .modal-body .list-group-item {
   border-color: rgba(0, 240, 240, 0.2);
@@ -396,7 +463,6 @@ body {
 
 /* تعديل الـ Buttons اللي جوه الـ Modals */
 .modal-footer .btn-primary {
-  /* composes: btn-glow-primary; <-- تم الحذف */
   font-family: var(--font-hud);
   font-size: 1.1rem;
   font-weight: 500;
@@ -419,7 +485,6 @@ body {
 }
 
 .modal-footer .btn-outline-secondary {
-    /* composes: btn-glow-secondary; <-- تم الحذف */
     font-family: var(--font-hud);
     font-size: 1.1rem;
     font-weight: 500;
@@ -442,7 +507,6 @@ body {
 }
 
 .modal-footer .btn-secondary {
-    /* composes: btn-glow-base; <-- تم الحذف */
     font-family: var(--font-hud);
     font-size: 1.1rem;
     font-weight: 500;
@@ -501,7 +565,7 @@ dl.row dd {
   grid-column: span 1;
   padding: 1rem 0;
   @media (min-width: 768px) {
-    grid-column: 1 / -1; /* <-- تم التعديل هنا */
+    grid-column: 1 / -1; 
   }
   align-items: center;
   justify-content: center;
@@ -511,9 +575,9 @@ dl.row dd {
   width: 100%;
   max-width: 700px;
   margin: auto;
-  display: flex; /* <-- تم التعديل هنا */
-  justify-content: center; /* <-- تم التعديل هنا */
-  align-items: center; /* <-- تم التعديل هنا */
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
 }
 #controller-svg-placeholder svg {
     width: 100%;
@@ -603,74 +667,6 @@ dl.row dd {
   100% { transform: translate(calc(-50% + 0px), calc(-50% + 0px)); } /* Center */
 }
 
-/* تعديل أزرار المودال عشان تاخد الستايل الجديد */
-.modal-footer .btn-primary {
-  /* composes: btn-glow-primary; <-- تم الحذف */
-  font-family: var(--font-hud);
-  font-size: 1.1rem;
-  font-weight: 500;
-  letter-spacing: 1px;
-  padding: 8px 16px;
-  border-radius: 5px;
-  border: 2px solid;
-  background: transparent;
-  transition: all 0.3s ease;
-  width: auto;
-  text-transform: uppercase;
-  
-  color: var(--glow-cyan);
-  border-color: var(--glow-cyan);
-}
-.modal-footer .btn-primary:hover {
-  color: var(--bg-dark);
-  background: var(--glow-cyan);
-  box-shadow: 0 0 10px var(--glow-cyan), 0 0 20px var(--glow-cyan);
-}
-
-.modal-footer .btn-outline-secondary {
-    /* composes: btn-glow-secondary; <-- تم الحذف */
-    font-family: var(--font-hud);
-    font-size: 1.1rem;
-    font-weight: 500;
-    letter-spacing: 1px;
-    padding: 8px 16px;
-    border-radius: 5px;
-    border: 2px solid;
-    background: transparent;
-    transition: all 0.3s ease;
-    width: auto;
-    text-transform: uppercase;
-    
-    color: var(--glow-magenta);
-    border-color: var(--glow-magenta);
-}
-.modal-footer .btn-outline-secondary:hover {
-  color: var(--bg-dark);
-  background: var(--glow-magenta);
-  box-shadow: 0 0 10px var(--glow-magenta), 0 0 20px var(--glow-magenta);
-}
-
-.modal-footer .btn-secondary {
-    /* composes: btn-glow-base; <-- تم الحذف */
-    font-family: var(--font-hud);
-    font-size: 1.1rem;
-    font-weight: 500;
-    letter-spacing: 1px;
-    padding: 8px 16px;
-    border-radius: 5px;
-    border: 2px solid;
-    background: transparent;
-    transition: all 0.3s ease;
-    width: auto;
-    text-transform: uppercase;
-    
-    color: #999;
-    border-color: #555;
-}
-.modal-footer .btn-secondary:hover {
-    color: #fff;
-    background: #555;
-}
 /* ### Button Test Module Styles ### */
 #digital-buttons-container {
   text-align: center;
