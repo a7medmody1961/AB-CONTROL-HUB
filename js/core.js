@@ -1100,7 +1100,15 @@ function infoAlert(message, duration = 5_000) {
 }
 
 
+$('#ledColorPicker').on('input', function() {
+  const hex = $(this).val();
+  // دالة بسيطة لتحويل الـ Hex لـ RGB
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
 
+  controller.currentController.setLightbarColor(r, g, b);
+});
 
 
 
@@ -1171,18 +1179,14 @@ window.test_led = (color) => {
 
 window.test_trigger = (side, preset) => {
   console.log(`Testing trigger ${side}: ${preset}`);
+  
+  // نرسل "off" للجانب الآخر عشان نضمن إنه ميعملش مشاكل، ونرسل الـ preset المختار للجانب المطلوب
   const params = {
-    left: { mode: 'off', start: 0, end: 0, force: 0 },
-    right: { mode: 'off', start: 0, end: 0, force: 0 }
-  };
-  const presetMap = {
-    'light': { mode: 'single', start: 10, end: 80, force: 150 },
-    'medium': { mode: 'single', start: 15, end: 100, force: 200 },
-    'heavy': { mode: 'single', start: 20, end: 120, force: 255 },
-    'off': { mode: 'off', start: 0, end: 0, force: 0 }
+    left: side === 'left' ? preset : 'off',
+    right: side === 'right' ? preset : 'off'
   };
   
-  params[side] = presetMap[preset];
+  // بنبعت أسماء (Strings) مش Objects
   controller.setAdaptiveTriggerPreset(params);
 }
 
