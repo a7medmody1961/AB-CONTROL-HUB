@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <base href="./">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
@@ -60,7 +59,7 @@
 
     <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
     
-    <script type="module" src="js/core.js?v=10"></script>
+    <script type="module" src="js/core.js?v=12"></script>
 
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -410,7 +409,8 @@
           <script>
           if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-              navigator.serviceWorker.register('./sw.js', { scope: './' })
+              // Simple path registration
+              navigator.serviceWorker.register('sw.js')
                 .then(registration => {
                   console.log('ServiceWorker registration successful with scope: ', registration.scope);
                 })
