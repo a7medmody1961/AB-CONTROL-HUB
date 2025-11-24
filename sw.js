@@ -1,5 +1,5 @@
-// اسم الكيش بتاعنا - تم التحديث للإصدار التاسع لضمان تحميل إصلاحات الدراع
-const CACHE_NAME = 'ab-control-hub-v9-force-fix';
+// اسم الكيش بتاعنا - تم التحديث للإصدار العاشر (v10) لضمان تحميل الإصلاحات
+const CACHE_NAME = 'ab-control-hub-v10-final-android';
 
 // الملفات الأساسية اللي عاوزينها تشتغل أوفلاين
 // تم إضافة المسارات المهمة (./) لضمان العمل داخل مجلدات GitHub
@@ -10,10 +10,13 @@ const urlsToCache = [
   './favicon.ico',
   './background.png',
   // نحدد ملفات الـ JS والـ CSS الأساسية عشان نضمن تحديثها
-  './js/core.js',
+  './js/core.js?v=10',
   './js/utils.js',
   './js/controller-manager.js',
-  './css/main.css'
+  './css/main.css',
+  './css/finetune.css',
+  // ملف اللغة (تأكد من الاسم الصحيح en_us.json)
+  './lang/en_us.json'
 ];
 
 // 1. حدث التثبيت (Install) - بيخزن الملفات الأساسية
