@@ -247,24 +247,18 @@ window.onAndroidDeviceConnected = async function(deviceParams) {
 
         sendFeatureReport: async (reportId, data) => {
             const hexData = [...data].map(b => b.toString(16).padStart(2,'0')).join('');
-            const responseHex = await window.AndroidBridge.sendFeatureReport(reportId, hexData);
-            return; 
+            await window.AndroidBridge.sendFeatureReport(reportId, hexData);
         },
 
         receiveFeatureReport: async (reportId) => {
-            // 1. استقبال البيانات Hex
             const responseHex = await window.AndroidBridge.receiveFeatureReport(reportId);
-            
-            // 2. تحويلها لمصفوفة
             const pairs = responseHex.match(/[\w\d]{2}/g) || [];
             let buffer = new Uint8Array(pairs.map(h => parseInt(h, 16)));
 
-            // 3. الحل الإجباري (Force Slice)
-            // بما أننا على الأندرويد (USB Host)، البيانات دائماً تبدأ برقم التقرير.
-            // والموقع يتوقع البيانات صافية بدون هذا الرقم.
-            // لذلك سنحذفه فوراً وبدون تفكير.
-            if (buffer.length > 0) {
-                // console.log(`[Force Fix] Removed first byte (Report ID) from ${buffer.length} bytes.`);
+            // *** SMART FIX FOR CLONE ISSUE ***
+            // Force strip first byte if it matches Report ID
+            if (buffer.length > 0 && buffer[0] === reportId) {
+                console.log(`[Fix] Stripping Report ID (${reportId})`);
                 buffer = buffer.slice(1);
             }
 
@@ -287,7 +281,7 @@ window.onAndroidDeviceConnected = async function(deviceParams) {
         await setupDeviceUI(virtualDevice);
     } catch (e) {
         console.error("Android Setup Error", e);
-        resetConnectUI(); // Ensure UI is reset on error
+        resetConnectUI();
         await disconnect();
     }
 };
