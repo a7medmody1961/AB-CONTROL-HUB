@@ -1,86 +1,70 @@
-// اسم الكيش بتاعنا - تم التحديث للإصدار العاشر (v10) لضمان تحميل الإصلاحات
-const CACHE_NAME = 'ab-control-hub-v10-final-android';
+// 1. اسم الكيش (غيرنا الرقم عشان نضمن التحديث)
+const CACHE_NAME = 'ab-control-hub-v12-simple';
 
-// الملفات الأساسية اللي عاوزينها تشتغل أوفلاين
-// تم إضافة المسارات المهمة (./) لضمان العمل داخل مجلدات GitHub
+// 2. الملفات اللي هنخزنها
+// شلنا './' المعقدة وخليناها بسيطة عشان تشتغل في أي فولدر
 const urlsToCache = [
-  './',
-  './index.html',
-  './site.webmanifest',
-  './favicon.ico',
-  './background.png',
-  // نحدد ملفات الـ JS والـ CSS الأساسية عشان نضمن تحديثها
-  './js/core.js?v=10',
-  './js/utils.js',
-  './js/controller-manager.js',
-  './css/main.css',
-  './css/finetune.css',
-  // ملف اللغة (تأكد من الاسم الصحيح en_us.json)
-  './lang/en_us.json'
+  'index.html',
+  'js/core.js',
+  'js/utils.js',
+  'js/controller-manager.js',
+  'css/main.css',
+  'css/finetune.css'
 ];
 
-// 1. حدث التثبيت (Install) - بيخزن الملفات الأساسية
+// 3. حدث التثبيت (Install)
 self.addEventListener('install', (event) => {
-  // Force the waiting service worker to become the active service worker.
-  self.skipWaiting();
-  
+  self.skipWaiting(); // عشان التحديث يشتغل فوراً
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache: ' + CACHE_NAME);
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('Caching files...');
+      // هنا التريك: بنستخدم addAll بس لو فشل ملف واحد مش هيوقف الباقي
+      return cache.addAll(urlsToCache).catch(err => {
+          console.warn('Some files failed to cache, but continuing:', err);
+      });
+    })
   );
 });
 
-// 2. حدث الجلب (Fetch) - بيجيب الملفات من الكيش لو موجودة
+// 4. حدث الجلب (Fetch) - ده اللي بيجيب الملفات
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // لو الملف موجود في الكيش، رجّعه
-        if (response) {
-          return response;
-        }
-
-        // لو مش موجود، روح هاته من النت
-        return fetch(event.request).then(
-          (networkResponse) => {
-            // تأكد إن الاستجابة سليمة (مش 404 مثلاً) قبل التخزين
-            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-              return networkResponse;
-            }
-
-            // لو جبته، خزنه في الكيش للمرة الجاية ورجّعه
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
+    caches.match(event.request).then((response) => {
+      // لو الملف في الكيش، هاته
+      if (response) {
+        return response;
+      }
+      
+      // لو مش في الكيش، هاته من النت
+      return fetch(event.request).then((networkResponse) => {
+          // لو الملف رجع سليم (200 OK)، خزنه في الكيش للمرة الجاية
+          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+              const responseToCache = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => {
+                  cache.put(event.request, responseToCache);
               });
-
-            return networkResponse;
           }
-        );
-      })
+          return networkResponse;
+      }).catch(() => {
+          // لو النت فاصل والملف مش في الكيش، مش مشكلة، التطبيق لسه هيشتغل لو الملفات الأساسية موجودة
+          // ممكن هنا نرجع صفحة "Offline" لو حبينا
+      });
+    })
   );
 });
 
-// 3. حدث التفعيل (Activate) - بيمسح الكيش القديم لو عملنا إصدار جديد
+// 5. حدث التفعيل (Activate) - تنظيف الكيش القديم
 self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
+          if (cacheName !== CACHE_NAME) {
             console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
-    }).then(() => {
-      // تجعل الـ Service Worker الجديد يتحكم في الصفحة فوراً
-      return self.clients.claim();
-    })
+    }).then(() => self.clients.claim())
   );
 });
