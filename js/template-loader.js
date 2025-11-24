@@ -1,5 +1,11 @@
 'use strict';
 
+/**
+ * Template Loader
+ * Handles loading of HTML templates and SVG assets.
+ * Refactored to Vanilla JS (ES6+) with parallel loading optimization.
+ */
+
 // Cache for loaded templates
 const templateCache = new Map();
 
@@ -24,18 +30,22 @@ async function loadTemplate(templateName) {
   }
 
   // Fallback to fetching from server (development mode)
-  // Only append .html if the templateName doesn't already have an extension
   const hasExtension = templateName.includes('.');
   const templatePath = hasExtension ? `templates/${templateName}` : `templates/${templateName}.html`;
 
-  const response = await fetch(templatePath);
-  if (!response.ok) {
-    throw new Error(`Failed to load template: ${templateName}`);
-  }
+  try {
+    const response = await fetch(templatePath);
+    if (!response.ok) {
+      throw new Error(`Failed to load template: ${templateName} (${response.status})`);
+    }
 
-  const templateHtml = await response.text();
-  templateCache.set(templateName, templateHtml);
-  return templateHtml;
+    const templateHtml = await response.text();
+    templateCache.set(templateName, templateHtml);
+    return templateHtml;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 /**
@@ -53,43 +63,57 @@ async function loadSvgAsset(assetPath) {
   }
 
   // Fallback to fetching from server (development mode)
-  const response = await fetch(`assets/${assetPath}`);
-  if (!response.ok) {
-    throw new Error(`Failed to load SVG asset: ${assetPath}`);
-  }
+  try {
+    const response = await fetch(`assets/${assetPath}`);
+    if (!response.ok) {
+      throw new Error(`Failed to load SVG asset: ${assetPath} (${response.status})`);
+    }
 
-  return await response.text();
+    return await response.text();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 /**
 * Load all templates and insert them into the DOM
 */
 export async function loadAllTemplates() {
-  // Load SVG icons
-  const iconsHtml = await loadSvgAsset('icons.svg');
-  const iconsContainer = document.createElement('div');
-  iconsContainer.innerHTML = iconsHtml;
-  document.body.prepend(iconsContainer);
+  try {
+    // Load SVG icons
+    const iconsHtml = await loadSvgAsset('icons.svg');
+    const iconsContainer = document.createElement('div');
+    iconsContainer.innerHTML = iconsHtml;
+    document.body.prepend(iconsContainer);
 
-  // Load modals
-  const faqModalHtml = await loadTemplate('faq-modal');
-  const popupModalHtml = await loadTemplate('popup-modal');
-  const finetuneModalHtml = await loadTemplate('finetune-modal');
-  const calibCenterModalHtml = await loadTemplate('calib-center-modal');
-  const autoCalibCenterModalHtml = await loadTemplate('auto-calib-center-modal');
-  const rangeModalHtml = await loadTemplate('range-modal');
-  const edgeProgressModalHtml = await loadTemplate('edge-progress-modal');
-  const edgeModalHtml = await loadTemplate('edge-modal');
-  // const donateModalHtml = await loadTemplate('donate-modal'); // <-- السطر ده اتمسح
-  
-  // *** تم مسح السطر ده ***
-  // const quickTestModalHtml = await loadTemplate('quick-test-modal');
+    // Load modals
+    // Optimization: Load all modals in parallel instead of sequentially
+    const modalNames = [
+      'faq-modal',
+      'popup-modal',
+      'finetune-modal',
+      'calib-center-modal',
+      'auto-calib-center-modal',
+      'range-modal',
+      'edge-progress-modal',
+      'edge-modal',
+      'input-analysis-modal' // <-- New Template Added Here
+    ];
 
-  // Create modals container
-  const modalsContainer = document.createElement('div');
-  modalsContainer.id = 'modals-container';
-  
-  // *** تم مسح 'quickTestModalHtml' من السطر ده ***
-  modalsContainer.innerHTML = faqModalHtml + popupModalHtml + finetuneModalHtml + calibCenterModalHtml + autoCalibCenterModalHtml + rangeModalHtml + edgeProgressModalHtml + edgeModalHtml;
-  document.body.appendChild(modalsContainer);
+    // Create an array of promises
+    const modalPromises = modalNames.map(name => loadTemplate(name));
+    
+    // Wait for all templates to load
+    const modalsHtml = await Promise.all(modalPromises);
+
+    // Create modals container and insert all HTML at once
+    const modalsContainer = document.createElement('div');
+    modalsContainer.id = 'modals-container';
+    modalsContainer.innerHTML = modalsHtml.join('');
+    
+    document.body.appendChild(modalsContainer);
+  } catch (error) {
+    console.error("Error loading templates:", error);
+  }
 }

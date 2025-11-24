@@ -734,3 +734,60 @@ dl.row dd {
   margin-right: 1.5rem;
   opacity: 0.3;
 }
+
+/* ### Input Analysis Tools ### */
+/* استبدال الستايلات الداخلية (Inline Styles) الخاصة بالمودال */
+
+.analysis-stat-card {
+  border: 1px solid;
+  transition: all 0.3s ease;
+}
+.analysis-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* كارت معدل التحديث (Polling Rate) */
+.stat-polling {
+  background-color: rgba(0, 240, 240, 0.05); 
+  border-color: var(--border-color) !important;
+}
+.stat-polling h2 {
+  color: var(--glow-cyan);
+}
+
+/* كارت التأخير (Latency) */
+.stat-latency {
+  background-color: rgba(240, 0, 240, 0.05); 
+  border-color: rgba(240, 0, 240, 0.4) !important;
+}
+.stat-latency h2 {
+  color: var(--glow-magenta);
+}
+
+/* كارت التذبذب (Jitter) */
+.stat-jitter {
+  background-color: rgba(255, 77, 77, 0.05); 
+  border-color: rgba(255, 77, 77, 0.4) !important;
+}
+.stat-jitter h2 {
+  color: var(--glow-danger);
+}
+
+/* الرسم البياني (Canvas Container) */
+.analysis-graph-container {
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border-color);
+}
+.analysis-graph-header {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-color);
+  font-family: var(--font-hud);
+  color: var(--text-light);
+}
+#analysis-overlay {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}

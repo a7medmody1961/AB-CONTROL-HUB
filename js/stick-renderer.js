@@ -4,6 +4,22 @@
 export const CIRCULARITY_DATA_SIZE = 48; // Number of angular positions to sample
 
 /**
+ * Helper function to convert circularity coefficient to HSLA color
+ * Moved outside main function to avoid re-creation on every render frame
+ * @param {number} cc - Circularity coefficient
+ * @returns {number} Hue value
+ */
+function cc_to_color(cc) {
+    const dd = Math.sqrt(Math.pow((1.0 - cc), 2));
+    let hh;
+    if(cc <= 1.0)
+        hh = 220 - 220 * Math.min(1.0, Math.max(0, (dd - 0.05)) / 0.1);
+    else
+        hh = (245 + (360-245) * Math.min(1.0, Math.max(0, (dd - 0.05)) / 0.15)) % 360;
+    return parseInt(hh);
+}
+
+/**
  * Draws analog stick position on a canvas with various visualization options.
  * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
  * @param {number} center_x - X coordinate of stick center
@@ -29,17 +45,6 @@ export function draw_stick_position(ctx, center_x, center_y, sz, stick_x, stick_
     ctx.fill();
     ctx.stroke();
 
-    // Helper function for circularity visualization color
-    function cc_to_color(cc) {
-        const dd = Math.sqrt(Math.pow((1.0 - cc), 2));
-        let hh;
-        if(cc <= 1.0)
-            hh = 220 - 220 * Math.min(1.0, Math.max(0, (dd - 0.05)) / 0.1);
-        else
-            hh = (245 + (360-245) * Math.min(1.0, Math.max(0, (dd - 0.05)) / 0.15)) % 360;
-        return hh;
-    }
-
     // Draw circularity visualization if data provided
     if (circularity_data?.length > 0) {
         const MAX_N = CIRCULARITY_DATA_SIZE;
@@ -48,6 +53,7 @@ export function draw_stick_position(ctx, center_x, center_y, sz, stick_x, stick_
             const kd = circularity_data[i];
             const kd1 = circularity_data[(i+1) % CIRCULARITY_DATA_SIZE];
             if (kd === undefined || kd1 === undefined) continue;
+            
             const ka = i * Math.PI * 2 / MAX_N;
             const ka1 = ((i+1)%MAX_N) * 2 * Math.PI / MAX_N;
 
@@ -65,13 +71,13 @@ export function draw_stick_position(ctx, center_x, center_y, sz, stick_x, stick_
 
             const cc = (kd + kd1) / 2;
             const hh = cc_to_color(cc);
-            ctx.fillStyle = 'hsla(' + parseInt(hh) + ', 100%, 50%, 0.5)';
+            ctx.fillStyle = `hsla(${hh}, 100%, 50%, 0.5)`;
             ctx.fill();
         }
     }
 
     // Draw circularity error text if enough data provided
-    if (circularity_data?.filter(n => n > 0.3).length > 10) {
+    if (circularity_data && circularity_data.filter(n => n > 0.3).length > 10) {
         const circularityError = calculateCircularityError(circularity_data);
 
         ctx.fillStyle = '#fff';

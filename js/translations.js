@@ -19,13 +19,14 @@ export function lang_init(appState, handleLanguageChangeCb, welcomeModalCb) {
   welcomeModal = welcomeModalCb;
   
   let id_iter = 0;
-  const items = document.getElementsByClassName('ds-i18n');
-  for(let item of items) {
-    if (item.id.length == 0) {
+  // Replaced jQuery selector with native querySelectorAll
+  const items = document.querySelectorAll('.ds-i18n');
+  for(const item of items) {
+    if (item.id.length === 0) {
       item.id = `ds-i18n-${id_iter++}`;
     }
     
-    translationState.lang_orig_text[item.id] = $(item).html();
+    translationState.lang_orig_text[item.id] = item.innerHTML;
   }
   translationState.lang_orig_text[".title"] = document.title;
   
@@ -58,12 +59,12 @@ async function lang_set(lang, skip_modal=false) {
   la("lang_set", { l: lang });
   
   lang_reset_page();
-  if(lang != "en_us") {
+  if(lang !== "en_us") {
     const { file, direction } = available_langs[lang];
     await lang_translate(file, lang, direction);
   }
   
-  await handleLanguageChange(lang);
+  if (handleLanguageChange) await handleLanguageChange(lang);
   createCookie("force_lang", lang);
 
   // Update URL without reloading page
@@ -95,30 +96,37 @@ function lang_reset_page() {
   translationState.lang_disabled = true;
 
   const { lang_orig_text } = translationState;
-  const items = document.getElementsByClassName('ds-i18n');
-  for(let item of items) {
-    $(item).html(lang_orig_text[item.id]);
-  };
-  // Removed old authorMsg logic as it is now handled via normal translation keys
-  $("#curLang").html("English");
+  const items = document.querySelectorAll('.ds-i18n');
+  for(const item of items) {
+    if (lang_orig_text[item.id]) {
+      item.innerHTML = lang_orig_text[item.id];
+    }
+  }
+  
+  const curLangEl = document.getElementById("curLang");
+  if(curLangEl) curLangEl.innerHTML = "English";
+  
   document.title = lang_orig_text[".title"];
 }
 
 function lang_set_direction(new_direction, lang_name) {
-  const lang_prefix = lang_name.split("_")[0]
-  $("html").attr("lang", lang_prefix);
+  const lang_prefix = lang_name.split("_")[0];
+  document.documentElement.setAttribute("lang", lang_prefix);
 
   if(new_direction == translationState.lang_cur_direction)
     return;
 
-  if(new_direction == "rtl") {
-    $('#bootstrap-css').attr('integrity', 'sha384-dpuaG1suU0eT09tx5plTaGMLBsfDLzUCCUXOY2j/LSvXYuG6Bqs43ALlhIqAJVRb');
-    $('#bootstrap-css').attr('href', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css');
-  } else {
-    $('#bootstrap-css').attr('integrity', 'sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH');
-    $('#bootstrap-css').attr('href', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css');
+  const bootstrapCss = document.getElementById('bootstrap-css');
+  if (bootstrapCss) {
+    if(new_direction == "rtl") {
+      bootstrapCss.setAttribute('integrity', 'sha384-dpuaG1suU0eT09tx5plTaGMLBsfDLzUCCUXOY2j/LSvXYuG6Bqs43ALlhIqAJVRb');
+      bootstrapCss.setAttribute('href', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css');
+    } else {
+      bootstrapCss.setAttribute('integrity', 'sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH');
+      bootstrapCss.setAttribute('href', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css');
+    }
   }
-  $("html").attr("dir", new_direction);
+  document.documentElement.setAttribute("dir", new_direction);
   translationState.lang_cur_direction = new_direction;
 }
 
@@ -126,60 +134,69 @@ export function l(text) {
   if(!translationState || translationState.lang_disabled)
     return text;
 
-  const [out] = translationState.lang_cur[text] || [];
+  const val = translationState.lang_cur[text];
+  // Handle cases where value might be array (legacy) or string
+  const out = Array.isArray(val) ? val[0] : val;
+  
   if(out) return out;
   
   console.log(`Missing translation for "${text}"`);
   return text;
 }
 
-function lang_translate(target_file, target_lang, target_direction) {
-  return new Promise((resolve, reject) => {
-    $.getJSON("lang/" + target_file)
-      .done(function(data) {
-        const { lang_orig_text, lang_cur } = translationState;
-        lang_set_direction(target_direction, target_lang);
+async function lang_translate(target_file, target_lang, target_direction) {
+  try {
+    // Replaced $.getJSON with fetch
+    const response = await fetch("lang/" + target_file);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
 
-        $.each(data, function( key, val ) {
-          if(lang_cur[key]) {
-            console.log("Warn: already exists " + key);
-          } else {
-            lang_cur[key] = [val];
-          }
-        });
+    const { lang_orig_text, lang_cur } = translationState;
+    lang_set_direction(target_direction, target_lang);
 
-        if(Object.keys(lang_cur).length > 0) {
-          translationState.lang_disabled = false;
-        }
+    // Replaced $.each with Object.entries().forEach
+    Object.entries(data).forEach(([key, val]) => {
+      if(lang_cur[key]) {
+        console.log("Warn: already exists " + key);
+      } else {
+        // Keep array structure for compatibility
+        lang_cur[key] = [val];
+      }
+    });
 
-        const items = document.getElementsByClassName('ds-i18n');
-        for(let item of items) {
-          const originalText = lang_orig_text[item.id];
-          const [translatedText] = lang_cur[originalText] || [];
-          if (translatedText) {
-            $(item).html(translatedText);
-          } else {
-            console.log(`Cannot find mapping for "${originalText}"`);
-            $(item).html(originalText);
-          }
-        }
+    if(Object.keys(lang_cur).length > 0) {
+      translationState.lang_disabled = false;
+    }
 
-        const old_title = lang_orig_text[".title"];
-        // Check if title translation exists
-        const [translatedTitle] = lang_cur[old_title] || [];
-        if (translatedTitle) {
-             document.title = translatedTitle;
-        }
+    const items = document.querySelectorAll('.ds-i18n');
+    for(const item of items) {
+      const originalText = lang_orig_text[item.id];
+      const translationEntry = lang_cur[originalText];
+      const translatedText = Array.isArray(translationEntry) ? translationEntry[0] : translationEntry;
+      
+      if (translatedText) {
+        item.innerHTML = translatedText;
+      } else {
+        console.log(`Cannot find mapping for "${originalText}"`);
+        if(originalText) item.innerHTML = originalText;
+      }
+    }
 
-        $("#curLang").html(available_langs[target_lang]["name"]);
+    const old_title = lang_orig_text[".title"];
+    const titleEntry = lang_cur[old_title];
+    const translatedTitle = Array.isArray(titleEntry) ? titleEntry[0] : titleEntry;
+    
+    if (translatedTitle) {
+         document.title = translatedTitle;
+    }
 
-        resolve();
-      })
-      .fail(function(jqxhr, textStatus, error) {
-        console.error("Failed to load translation file:", target_file, error);
-        reject(error);
-      });
-  });
+    const curLangEl = document.getElementById("curLang");
+    if(curLangEl) curLangEl.innerHTML = available_langs[target_lang]["name"];
+
+  } catch (error) {
+    console.error("Failed to load translation file:", target_file, error);
+    throw error;
+  }
 }
 
 // Make lang_set available globally for onclick handlers in HTML

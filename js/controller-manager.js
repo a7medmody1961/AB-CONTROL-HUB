@@ -5,6 +5,7 @@ import { l } from './translations.js'
 
 /**
 * Controller Manager - Manages the current controller instance and provides unified interface
+* Refactored to Vanilla JS (ES6+)
 */
 class ControllerManager {
   constructor(uiDependencies = {}) {
@@ -45,7 +46,7 @@ class ControllerManager {
 
   /**
   * Set the current controller instance
-  * @param {BaseController} controller Controller instance
+  * @param {BaseController} instance Controller instance
   */
   setControllerInstance(instance) {
     this.currentController = instance;
@@ -88,7 +89,9 @@ class ControllerManager {
   */
   async queryNvStatus() {
     const nv = await this.currentController.queryNvStatus();
-    this.handleNvStatusUpdate(nv);
+    if (this.handleNvStatusUpdate) {
+        this.handleNvStatusUpdate(nv);
+    }
     return nv;
   }
 
@@ -148,11 +151,18 @@ class ControllerManager {
     if (hasChanges === this.has_changes_to_write)
       return;
 
-    const saveBtn = $("#savechanges");
-    saveBtn
-      .prop('disabled', !hasChanges)
-      .toggleClass('btn-success', hasChanges)
-      .toggleClass('btn-outline-secondary', !hasChanges);
+    const saveBtn = document.getElementById("savechanges");
+    if (saveBtn) {
+        saveBtn.disabled = !hasChanges;
+        
+        if (hasChanges) {
+            saveBtn.classList.remove('btn-outline-secondary');
+            saveBtn.classList.add('btn-success');
+        } else {
+            saveBtn.classList.remove('btn-success');
+            saveBtn.classList.add('btn-outline-secondary');
+        }
+    }
 
     this.has_changes_to_write = hasChanges;
   }
@@ -331,13 +341,12 @@ class ControllerManager {
    * @param {Object} customParams - Custom parameters for 'custom' preset {start, end, force}
    * @returns {Promise<Object>} Result object with success status and message
    */
-  async setAdaptiveTriggerPreset({left, right}/* , customParams = {} */) {
+  async setAdaptiveTriggerPreset({left, right}) {
     const presets = {
       'off': { start: 0, end: 0, force: 0, mode: 'off' },
       'light': { start: 10, end: 80, force: 150, mode: 'single'},
       'medium': { start: 15, end: 100, force: 200, mode: 'single' },
       'heavy': { start: 20, end: 120, force: 255, mode: 'single' },
-      // 'custom': customParams
     };
 
     if (!presets[left] || !presets[right]) {
@@ -346,13 +355,6 @@ class ControllerManager {
 
     const leftPreset = presets[left];
     const rightPreset = presets[right];
-
-    // if (preset === 'custom') {
-    //   // Validate custom parameters
-    //   if (typeof start !== 'number' || typeof end !== 'number' || typeof force !== 'number') {
-    //     throw new Error(l("Custom preset requires start, end, and force parameters"));
-    //   }
-    // }
 
     return await this.currentController?.setAdaptiveTrigger(leftPreset, rightPreset);
   }
@@ -519,7 +521,9 @@ class ControllerManager {
       batteryStatus: this.batteryStatus,
     };
 
-    this.inputHandler(result);
+    if (this.inputHandler) {
+        this.inputHandler(result);
+    }
   }
 
   /**

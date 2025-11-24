@@ -9,6 +9,7 @@ import { draw_stick_position, CIRCULARITY_DATA_SIZE } from './stick-renderer.js'
 import { ds5_finetune, isFinetuneVisible, finetune_handle_controller_input } from './modals/finetune-modal.js';
 import { calibrate_stick_centers, auto_calibrate_stick_centers } from './modals/calib-center-modal.js';
 import { calibrate_range } from './modals/calib-range-modal.js';
+import { show_input_analysis_modal, toggle_input_analysis, stop_input_analysis, isInputAnalysisVisible, input_analysis_handle_input } from './modals/input-analysis-modal.js';
 
 
 // Application State - manages app-wide state and UI
@@ -21,14 +22,16 @@ const app = {
 
   // Language and UI state
   lang_orig_text: {},
-  lang_orig_text: {},
   lang_cur: {},
   lang_disabled: true,
   lang_cur_direction: "ltr",
 
   // Session tracking
   gj: 0,
-  gu: 0
+  gu: 0,
+  
+  // Android Bridge Flag
+  isAndroid: false
 };
 
 const ll_data = new Array(CIRCULARITY_DATA_SIZE);
@@ -36,10 +39,36 @@ const rr_data = new Array(CIRCULARITY_DATA_SIZE);
 
 let controller = null;
 
+// Cache for frequently accessed DOM elements to improve performance
+const domCache = {
+  lx_lbl: null,
+  ly_lbl: null,
+  rx_lbl: null,
+  ry_lbl: null,
+  stickCanvas: null,
+  l2_progress: null,
+  r2_progress: null
+};
+
 function gboot() {
   app.gu = crypto.randomUUID();
 
+  // Detect Android WebView Interface
+  if (window.AndroidBridge) {
+      app.isAndroid = true;
+      console.log("Android Bridge Detected");
+  }
+
   async function initializeApp() {
+    // Cache DOM elements after DOM is loaded
+    domCache.lx_lbl = document.getElementById("lx-lbl");
+    domCache.ly_lbl = document.getElementById("ly-lbl");
+    domCache.rx_lbl = document.getElementById("rx-lbl");
+    domCache.ry_lbl = document.getElementById("ry-lbl");
+    domCache.stickCanvas = document.getElementById("stickCanvas");
+    domCache.l2_progress = document.getElementById("l2-progress");
+    domCache.r2_progress = document.getElementById("r2-progress");
+
     window.addEventListener("error", (event) => {
       console.error(event.error?.stack || event.message);
       show_popup(event.error?.message || event.message);
@@ -48,9 +77,7 @@ function gboot() {
     window.addEventListener("unhandledrejection", async (event) => {
       console.error("Unhandled rejection:", event.reason?.stack || event.reason);
       close_all_modals();
-      // show_popup(event.reason?.message || event.reason);
 
-      // Format the error message for better readability
       let errorMessage = "An unexpected error occurred";
       if (event.reason) {
         if (event.reason.message) {
@@ -58,28 +85,11 @@ function gboot() {
         } else if (typeof event.reason === 'string') {
           errorMessage = `<strong>Error:</strong> ${event.reason}`;
         }
-
-        // Collect all stack traces (main error and causes) for a single expandable section
         let allStackTraces = '';
         if (event.reason.stack) {
           const stackTrace = event.reason.stack.replace(/\n/g, '<br>').replace(/ /g, '&nbsp;');
           allStackTraces += `<strong>Main Error Stack:</strong><br>${stackTrace}`;
         }
-
-        // Add error chain information if available (ES2022 error chaining)
-        let currentError = event.reason;
-        let chainLevel = 0;
-        while (currentError?.cause && chainLevel < 5) {
-          chainLevel++;
-          currentError = currentError.cause;
-          if (currentError.stack) {
-            const causeStackTrace = currentError.stack.replace(/\n/g, '<br>').replace(/ /g, '&nbsp;');
-            if (allStackTraces) allStackTraces += '<br><br>';
-            allStackTraces += `<strong>Cause ${chainLevel} Stack:</strong><br>${causeStackTrace}`;
-          }
-        }
-
-        // Add single expandable section if we have any stack traces
         if (allStackTraces) {
           errorMessage += `
             <br>
@@ -92,49 +102,82 @@ function gboot() {
           `;
         }
       }
-
       errorAlert(errorMessage);
-      // Prevent the default browser behavior (logging to console, again)
       event.preventDefault();
     });
 
     await loadAllTemplates();
 
-    initAnalyticsApi(app); // init just with gu for now
+    initAnalyticsApi(app);
     lang_init(app, handleLanguageChange, show_welcome_modal);
 
-    $("input[name='displayMode']").on('change', on_stick_mode_change);
-
-    // Setup edge modal "Don't show again" checkbox
-    $('#edgeModalDontShowAgain').on('change', function() {
-      localStorage.setItem('edgeModalDontShowAgain', this.checked.toString());
+    document.querySelectorAll("input[name='displayMode']").forEach(el => {
+        el.addEventListener('change', on_stick_mode_change);
     });
+
+    const edgeModalCheckbox = document.getElementById('edgeModalDontShowAgain');
+    if (edgeModalCheckbox) {
+        edgeModalCheckbox.addEventListener('change', function() {
+            localStorage.setItem('edgeModalDontShowAgain', this.checked.toString());
+        });
+    }
+    
+    const colorPicker = document.getElementById('ledColorPicker');
+    if (colorPicker) {
+        colorPicker.addEventListener('input', function() {
+            const hex = this.value;
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            
+            if (controller && controller.currentController) {
+                controller.currentController.setLightbarColor(r, g, b);
+            }
+        });
+    }
   }
 
-  // Since modules are deferred, DOM might already be loaded
   if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', initializeApp);
   } else {
-    // DOM is already loaded, run immediately
     initializeApp();
   }
 
-  if (!("hid" in navigator)) {
-    $("#offlinebar").hide();
-    $("#onlinebar").hide();
-    $("#missinghid").show();
+  if (!("hid" in navigator) && !app.isAndroid) {
+    setDisplay('offlinebar', false);
+    setDisplay('onlinebar', false);
+    setDisplay('missinghid', true);
     return;
   }
 
-  $("#offlinebar").show();
-  navigator.hid.addEventListener("disconnect", handleDisconnectedDevice);
+  setDisplay('offlinebar', true);
+  if (!app.isAndroid) {
+      navigator.hid.addEventListener("disconnect", handleDisconnectedDevice);
+  }
+}
+
+function setDisplay(id, show) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = show ? 'block' : 'none';
+}
+
+function toggleElement(id, show) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = show ? '' : 'none';
+}
+
+// Helper to reset connect button UI state
+function resetConnectUI() {
+    const btnConnect = document.getElementById("btnconnect");
+    const connectSpinner = document.getElementById("connectspinner");
+    if (btnConnect) btnConnect.disabled = false;
+    if (connectSpinner) connectSpinner.style.display = 'none';
 }
 
 async function connect() {
   app.gj = crypto.randomUUID();
-  initAnalyticsApi(app); // init with gu and jg
+  initAnalyticsApi(app); 
 
-  // Initialize controller manager with translation function
   controller = initControllerManager({ handleNvStatusUpdate });
   controller.setInputHandler(handleControllerInput);
 
@@ -143,86 +186,158 @@ async function connect() {
   clearAllAlerts();
   await sleep(200);
 
+  const btnConnect = document.getElementById("btnconnect");
+  const connectSpinner = document.getElementById("connectspinner");
+  
+  btnConnect.disabled = true;
+  connectSpinner.style.display = 'inline-block';
+  await sleep(100);
+
   try {
-    $("#btnconnect").prop("disabled", true);
-    $("#connectspinner").show();
-    await sleep(100);
+    if (app.isAndroid) {
+        window.AndroidBridge.requestUsbPermission();
+    } else {
+        const supportedModels = ControllerFactory.getSupportedModels();
+        const requestParams = { filters: supportedModels };
+        let devices = await navigator.hid.getDevices();
+        if (devices.length == 0) {
+          devices = await navigator.hid.requestDevice(requestParams);
+        }
+        if (devices.length == 0) {
+          throw new Error("No device selected");
+        }
 
-    const supportedModels = ControllerFactory.getSupportedModels();
-    const requestParams = { filters: supportedModels };
-    let devices = await navigator.hid.getDevices(); // Already connected?
-    if (devices.length == 0) {
-      devices = await navigator.hid.requestDevice(requestParams);
-    }
-    if (devices.length == 0) {
-      $("#btnconnect").prop("disabled", false);
-      $("#connectspinner").hide();
-      await disconnect();
-      return;
+        if (devices.length > 1) {
+          infoAlert(l("Please connect only one controller at time."));
+          throw new Error("Multiple devices connected");
+        }
+
+        const [device] = devices;
+        if(device.opened) {
+          console.log("Device already opened, closing it before re-opening.");
+          await device.close();
+          await sleep(500);
+        }
+        await device.open();
+
+        la("connect", {"p": device.productId, "v": device.vendorId});
+        device.oninputreport = continue_connection; 
+        await setupDeviceUI(device);
     }
 
-    if (devices.length > 1) { //mm: this should never happen
-      infoAlert(l("Please connect only one controller at time."));
-      $("#btnconnect").prop("disabled", false);
-      $("#connectspinner").hide();
-      await disconnect();
-      return;
-    }
-
-    const [device] = devices;
-    if(device.opened) {
-      console.log("Device already opened, closing it before re-opening.");
-      await device.close();
-      await sleep(500);
-    }
-    await device.open();
-
-    la("connect", {"p": device.productId, "v": device.vendorId});
-    device.oninputreport = continue_connection; // continue below
   } catch(error) {
-    $("#btnconnect").prop("disabled", false);
-    $("#connectspinner").hide();
+    console.error("Connection failed", error);
+    resetConnectUI();
     await disconnect();
-    throw error;
   }
 }
 
-async function continue_connection({data, device}) {
-  try {
-    if (!controller || controller.isConnected()) {
-      device.oninputreport = null;  // this function is called repeatedly if not cleared
-      return;
-    }
+// --- Android Specific Callbacks ---
 
-    // Detect if the controller is connected via USB
-    const reportLen = data.byteLength;
-    if(reportLen != 63) {
-      // throw new Error(l("Please connect the device using a USB cable."));
-      infoAlert(l("The device is connected via Bluetooth. Disconnect and reconnect using a USB cable instead."));
-      await disconnect();
-      return;
-    }
+// Called when user grants permission and connection is ready
+window.onAndroidDeviceConnected = async function(deviceParams) {
+    console.log("Android Device Connected:", deviceParams);
+    
+    const virtualDevice = {
+        vendorId: deviceParams.vendorId,
+        productId: deviceParams.productId,
+        productName: deviceParams.productName || "Android Device",
+        opened: true,
+        oninputreport: null, 
 
-    // Helper to apply basic UI visibility based on device type
+        sendFeatureReport: async (reportId, data) => {
+            const hexData = [...data].map(b => b.toString(16).padStart(2,'0')).join('');
+            const responseHex = await window.AndroidBridge.sendFeatureReport(reportId, hexData);
+            return; 
+        },
+
+        receiveFeatureReport: async (reportId) => {
+            // 1. استقبال البيانات Hex
+            const responseHex = await window.AndroidBridge.receiveFeatureReport(reportId);
+            
+            // 2. تحويلها لمصفوفة
+            const pairs = responseHex.match(/[\w\d]{2}/g) || [];
+            let buffer = new Uint8Array(pairs.map(h => parseInt(h, 16)));
+
+            // 3. الحل الإجباري (Force Slice)
+            // بما أننا على الأندرويد (USB Host)، البيانات دائماً تبدأ برقم التقرير.
+            // والموقع يتوقع البيانات صافية بدون هذا الرقم.
+            // لذلك سنحذفه فوراً وبدون تفكير.
+            if (buffer.length > 0) {
+                // console.log(`[Force Fix] Removed first byte (Report ID) from ${buffer.length} bytes.`);
+                buffer = buffer.slice(1);
+            }
+
+            return new DataView(buffer.buffer);
+        },
+
+        sendReport: async (reportId, data) => {
+             const hexData = [...data].map(b => b.toString(16).padStart(2,'0')).join('');
+             await window.AndroidBridge.sendOutputReport(reportId, hexData);
+        },
+
+        close: async () => {
+            await window.AndroidBridge.closeDevice();
+        }
+    };
+
+    la("connect", {"p": virtualDevice.productId, "v": virtualDevice.vendorId});
+    
+    try {
+        await setupDeviceUI(virtualDevice);
+    } catch (e) {
+        console.error("Android Setup Error", e);
+        resetConnectUI(); // Ensure UI is reset on error
+        await disconnect();
+    }
+};
+
+// Called if connection fails (e.g. no device found or permission denied)
+window.onAndroidConnectFailed = function() {
+    console.log("Android Connection Failed");
+    resetConnectUI();
+};
+
+window.onAndroidInputReport = function(reportId, dataHex) {
+    if (controller && controller.currentController) {
+        const handler = controller.currentController.device.oninputreport;
+        if (handler) {
+            const pairs = dataHex.match(/[\w\d]{2}/g) || [];
+            const buffer = new Uint8Array(pairs.map(h => parseInt(h, 16))).buffer;
+            const dataView = new DataView(buffer);
+            handler({ data: dataView, device: controller.currentController.device, reportId: reportId });
+        }
+    }
+};
+
+window.onAndroidDeviceDetached = async function() {
+    await disconnect();
+};
+// ----------------------------------
+
+async function setupDeviceUI(device) {
+    if (!controller) {
+         controller = initControllerManager({ handleNvStatusUpdate });
+         controller.setInputHandler(handleControllerInput);
+    }
+    
     function applyDeviceUI({ showInfo, showFinetune, showInfoTab, showFourStepCalib, showQuickCalib }) {
-      $("#infoshowall").toggle(!!showInfo);
-      $("#ds5finetune").toggle(!!showFinetune);
-      $("#info-tab").toggle(!!showInfoTab);
-      $("#four-step-center-calib").toggle(!!showFourStepCalib);
-      $("#quick-center-calib").toggle(!!showQuickCalib);
+      toggleElement("infoshowall", showInfo);
+      toggleElement("ds5finetune", showFinetune);
+      toggleElement("info-tab", showInfoTab);
+      toggleElement("four-step-center-calib", showFourStepCalib);
+      toggleElement("quick-center-calib", showQuickCalib);
     }
 
     let controllerInstance = null;
     let info = null;
 
     try {
-      // Create controller instance using factory
       controllerInstance = ControllerFactory.createControllerInstance(device);
       controller.setControllerInstance(controllerInstance);
 
       info = await controllerInstance.getInfo();
 
-      // Initialize output state for DS5 controllers
       if (controllerInstance.initializeCurrentOutputState) {
         await controllerInstance.initializeCurrentOutputState();
       }
@@ -234,87 +349,78 @@ async function continue_connection({data, device}) {
     }
 
     if(!info?.ok) {
-      // Not connected/failed to fetch info
       if(info) console.error(JSON.stringify(info, null, 2));
       throw new Error(`${l("Connected invalid device")}: ${l("Error")}  1`, { cause: info?.error });
     }
 
-    // Get UI configuration and device name
     const ui = ControllerFactory.getUIConfig(device.productId);
     applyDeviceUI(ui);
 
-    // Assign input processor for stream
     console.log("Setting input report handler.");
     device.oninputreport = controller.getInputHandler();
 
     const deviceName = ControllerFactory.getDeviceName(device.productId);
-    $("#devname").text(deviceName + " (" + dec2hex(device.vendorId) + ":" + dec2hex(device.productId) + ")");
+    document.getElementById("devname").textContent = deviceName + " (" + dec2hex(device.vendorId) + ":" + dec2hex(device.productId) + ")";
 
-    $("#offlinebar").hide();
-    $("#onlinebar").show();
-    $("#mainmenu").show();
-    $("#resetBtn").show();
+    setDisplay("offlinebar", false);
+    setDisplay("onlinebar", true);
+    setDisplay("mainmenu", true);
+    toggleElement("resetBtn", true);
 
-    $("#d-nvstatus").text = l("Unknown");
-    $("#d-bdaddr").text = l("Unknown");
-
-    $('#controller-tab').tab('show');
+    const nvStatusEl = document.getElementById("d-nvstatus");
+    if(nvStatusEl) nvStatusEl.textContent = l("Unknown");
+    
+    const triggerEl = document.querySelector('#controller-tab');
+    if(triggerEl) bootstrap.Tab.getOrCreateInstance(triggerEl).show();
 
     const model = controllerInstance.getModel();
 
-    // Initialize SVG controller based on model
     await init_svg_controller(model);
 
-    // استدعاء الدالة الجديدة هنا
     initialize_button_indicators(controller.getInputConfig().buttonMap);
 
-    // Edge-specific: pending reboot check (from nv)
     if (model == "DS5_Edge" && info?.pending_reboot) {
       infoAlert(l("A reboot is needed to continue using this DualSense Edge. Please disconnect and reconnect your controller."));
       await disconnect();
       return;
     }
 
-    // Render info collected from device
     render_info_to_dom(info.infoItems);
 
-    // Render NV status
     if (info.nv) {
       render_nvstatus_to_dom(info.nv);
-      // Optionally try to lock NVS if unlocked
       if (info.nv.locked === false) {
         await nvslock();
       }
     }
 
-    // Apply disable button flags
     if (typeof info.disable_bits === 'number' && info.disable_bits) {
       app.disable_btn |= info.disable_bits;
     }
     if(app.disable_btn != 0) update_disable_btn();
 
-    // DS4 rare notice
     if (model == "DS4" && info?.rare) {
       show_popup("Wow, this is a rare/weird controller! Please write me an email at ds4@the.al or contact me on Discord (the_al)");
     }
 
-    // Edge onboarding modal
     if(model == "DS5_Edge") {
       show_edge_modal();
     }
-  } catch(err) {
-    await disconnect();
-    throw err;
-  } finally {
-    $("#btnconnect").prop("disabled", false);
-    $("#connectspinner").hide();
-  }
+    
+    // Successful connection -> Stop spinner
+    resetConnectUI();
+}
+
+async function continue_connection(event) {
+    if (!controller || controller.isConnected()) return; 
 }
 
 async function disconnect() {
   la("disconnect");
   if(!controller?.isConnected()) {
     controller = null;
+    // Ensure UI is reset even if already disconnected logic
+    resetConnectUI();
     return;
   }
   app.gj = 0;
@@ -322,14 +428,16 @@ async function disconnect() {
   update_disable_btn();
 
   await controller.disconnect();
-  controller = null; // Tear everything down
+  controller = null;
   close_all_modals();
-  $("#offlinebar").show();
-  $("#onlinebar").hide();
-  $("#mainmenu").hide();
+  setDisplay("offlinebar", true);
+  setDisplay("onlinebar", false);
+  setDisplay("mainmenu", false);
+  
+  // Reset connect button state on disconnect
+  resetConnectUI();
 }
 
-// Wrapper function for HTML onclick handlers
 function disconnectSync() {
   disconnect().catch(error => {
     throw new Error("Failed to disconnect", { cause: error });
@@ -347,24 +455,26 @@ function render_nvstatus_to_dom(nv) {
     throw new Error("Invalid NVS status data", { cause: nv?.error });
   }
 
+  const el = document.getElementById("d-nvstatus");
+  if(!el) return;
+
   switch (nv.status) {
     case 'locked':
-      $("#d-nvstatus").html("<font color='green'>" + l("locked") + "</font>");
+      el.innerHTML = "<font color='green'>" + l("locked") + "</font>";
       break;
     case 'unlocked':
-      $("#d-nvstatus").html("<font color='red'>" + l("unlocked") + "</font>");
+      el.innerHTML = "<font color='red'>" + l("unlocked") + "</font>";
       break;
     case 'pending_reboot':
-      // Keep consistent styling with unknown/purple, but indicate reboot pending if possible
       const pendingTxt = nv.raw !== undefined ? ("0x" + dec2hex32(nv.raw)) : String(nv.code ?? '');
-      $("#d-nvstatus").html("<font color='purple'>unk " + pendingTxt + "</font>");
+      el.innerHTML = "<font color='purple'>unk " + pendingTxt + "</font>";
       break;
     case 'unknown':
       const unknownTxt = nv.device === 'ds5' && nv.raw !== undefined ? ("0x" + dec2hex32(nv.raw)) : String(nv.code ?? '');
-      $("#d-nvstatus").html("<font color='purple'>unk " + unknownTxt + "</font>");
+      el.innerHTML = "<font color='purple'>unk " + unknownTxt + "</font>";
       break;
     case 'error':
-      $("#d-nvstatus").html("<font color='red'>" + l("error") + "</font>");
+      el.innerHTML = "<font color='red'>" + l("error") + "</font>";
       break;
   }
 }
@@ -378,75 +488,59 @@ async function refresh_nvstatus() {
 }
 
 function set_edge_progress(score) {
-  $("#dsedge-progress").css({ "width": score + "%" })
+  const el = document.getElementById("dsedge-progress");
+  if(el) el.style.width = score + "%";
 }
 
 function show_welcome_modal() {
-  // Welcome modal is disabled
   return;
 }
  
-
 async function init_svg_controller(model) {
   const svgContainer = document.getElementById('controller-svg-placeholder');
+  if(!svgContainer) return;
 
-  // Determine which SVG to load based on controller model
-  let svgFileName;
-  if (model === 'DS4') {
-    svgFileName = 'dualshock-controller.svg';
-  } else if (model === 'DS5' || model === 'DS5_Edge') {
-    svgFileName = 'dualsense-controller.svg';
-  } else {
-    throw new Error(`Unknown controller model: ${model}`);
+  let svgFileName = (model === 'DS4') ? 'dualshock-controller.svg' : 'dualsense-controller.svg';
+
+  try {
+      // محاولة تحميل الصورة
+      let svgContent;
+      if (window.BUNDLED_ASSETS && window.BUNDLED_ASSETS.svg && window.BUNDLED_ASSETS.svg[svgFileName]) {
+        svgContent = window.BUNDLED_ASSETS.svg[svgFileName];
+      } else {
+        const response = await fetch(`assets/${svgFileName}`);
+        if (!response.ok) throw new Error("SVG Not Found");
+        svgContent = await response.text();
+      }
+      svgContainer.innerHTML = svgContent;
+      
+      // تلوين الصورة
+      const lightBlue = '#7ecbff';
+      const midBlue = '#3399cc';
+      const dualshock = document.getElementById('Controller');
+      set_svg_group_color(dualshock, lightBlue);
+      ['Button_outlines', 'Button_outlines_behind', 'L3_outline', 'R3_outline', 'Trackpad_outline'].forEach(id => {
+        const group = document.getElementById(id);
+        set_svg_group_color(group, midBlue);
+      });
+      
+  } catch (e) {
+      console.warn("Could not load controller image, continuing without it.", e);
+      // لا نوقف التنفيذ، بل نكمل ليظهر باقي الواجهة
+      svgContainer.innerHTML = "<p style='color:white; text-align:center;'>Controller Image Not Loaded</p>";
   }
-
-  let svgContent;
-
-  // Check if we have bundled assets (production mode)
-  if (window.BUNDLED_ASSETS && window.BUNDLED_ASSETS.svg && window.BUNDLED_ASSETS.svg[svgFileName]) {
-    svgContent = window.BUNDLED_ASSETS.svg[svgFileName];
-  } else {
-    // Fallback to fetching from server (development mode)
-    const response = await fetch(`assets/${svgFileName}`);
-    if (!response.ok) {
-      throw new Error(`Failed to load controller SVG: ${svgFileName}`);
-    }
-    svgContent = await response.text();
-  }
-
-  svgContainer.innerHTML = svgContent;
-
-  const lightBlue = '#7ecbff';
-  const midBlue = '#3399cc';
-  const dualshock = document.getElementById('Controller');
-  set_svg_group_color(dualshock, lightBlue);
-
-  ['Button_outlines', 'Button_outlines_behind', 'L3_outline', 'R3_outline', 'Trackpad_outline'].forEach(id => {
-    const group = document.getElementById(id);
-    set_svg_group_color(group, midBlue);
-  });
 }
 
-/**
-* Collects circularity data for both analog sticks during testing mode.
-* This function tracks the maximum distance reached at each angular position
-* around the stick's circular range, creating a polar coordinate map of
-* stick movement capabilities.
-*/
 function collectCircularityData(stickStates, leftData, rightData) {
   const { left, right  } = stickStates || {};
   const MAX_N = CIRCULARITY_DATA_SIZE;
 
   for(const [stick, data] of [[left, leftData], [right, rightData]]) {
-    if (!stick) return; // Skip if no stick changed position
+    if (!stick) return;
 
     const { x, y } = stick;
-    // Calculate distance from center (magnitude of stick position vector)
     const distance = Math.sqrt(x * x + y * y);
-    // Convert cartesian coordinates to angular index (0 to MAX_N-1)
-    // atan2 gives angle in radians, convert to array index with proper wrapping
     const angleIndex = (parseInt(Math.round(Math.atan2(y, x) * MAX_N / 2.0 / Math.PI)) + MAX_N) % MAX_N;
-    // Store maximum distance reached at this angle (for circularity analysis)
     const oldValue = data[angleIndex] ?? 0;
     data[angleIndex] = Math.max(oldValue, distance);
   }
@@ -459,14 +553,17 @@ function clear_circularity() {
 
 function reset_circularity_mode() {
   clear_circularity();
-  $("#normalMode").prop('checked', true);
+  const normalMode = document.getElementById("normalMode");
+  if(normalMode) normalMode.checked = true;
   refresh_stick_pos();
 }
 
 function refresh_stick_pos() {
   if(!controller) return;
 
-  const c = document.getElementById("stickCanvas");
+  const c = domCache.stickCanvas;
+  if(!c) return;
+  
   const ctx = c.getContext("2d");
   const sz = 60;
   const hb = 20 + sz;
@@ -478,6 +575,7 @@ function refresh_stick_pos() {
 
   const enable_zoom_center = center_zoom_checked();
   const enable_circ_test = circ_checked();
+  
   // Draw left stick
   draw_stick_position(ctx, hb, yb, sz, plx, ply, {
     circularity_data: enable_circ_test ? ll_data : null,
@@ -491,75 +589,74 @@ function refresh_stick_pos() {
   });
 
   const precision = enable_zoom_center ? 3 : 2;
-  $("#lx-lbl").text(float_to_str(plx, precision));
-  $("#ly-lbl").text(float_to_str(ply, precision));
-  $("#rx-lbl").text(float_to_str(prx, precision));
-  $("#ry-lbl").text(float_to_str(pry, precision));
+  
+  if(domCache.lx_lbl) domCache.lx_lbl.textContent = float_to_str(plx, precision);
+  if(domCache.ly_lbl) domCache.ly_lbl.textContent = float_to_str(ply, precision);
+  if(domCache.rx_lbl) domCache.rx_lbl.textContent = float_to_str(prx, precision);
+  if(domCache.ry_lbl) domCache.ry_lbl.textContent = float_to_str(pry, precision);
 
   // Move L3 and R3 SVG elements according to stick position
   try {
-    switch(controller.getModel()) {
-      case "DS4":
-        // These values are tuned for the SVG's coordinate system and visual effect
-        const ds4_max_stick_offset = 25;
-        // L3 center in SVG coordinates (from path: cx=295.63, cy=461.03)
-        const ds4_l3_cx = 295.63, ds4_l3_cy = 461.03;
-        // R3 center in SVG coordinates (from path: cx=662.06, cy=419.78)
-        const ds4_r3_cx = 662.06, ds4_r3_cy = 419.78;
+    const model = controller.getModel();
+    let l3_x, l3_y, r3_x, r3_y;
+    let transform_l, transform_r;
 
-        const ds4_l3_x = ds4_l3_cx + plx * ds4_max_stick_offset;
-        const ds4_l3_y = ds4_l3_cy + ply * ds4_max_stick_offset;
-        const ds4_l3_group = document.querySelector('g#L3');
-        ds4_l3_group?.setAttribute('transform', `translate(${ds4_l3_x - ds4_l3_cx},${ds4_l3_y - ds4_l3_cy})`);
+    if (model === "DS4") {
+        const max_offset = 25;
+        const l3_cx = 295.63, l3_cy = 461.03;
+        const r3_cx = 662.06, r3_cy = 419.78;
 
-        const ds4_r3_x = ds4_r3_cx + prx * ds4_max_stick_offset;
-        const ds4_r3_y = ds4_r3_cy + pry * ds4_max_stick_offset;
-        const ds4_r3_group = document.querySelector('g#R3');
-        ds4_r3_group?.setAttribute('transform', `translate(${ds4_r3_x - ds4_r3_cx},${ds4_r3_y - ds4_r3_cy})`);
-        break;
-      case "DS5":
-      case "DS5_Edge":
-        // These values are tuned for the SVG's coordinate system and visual effect
-        const ds5_max_stick_offset = 25;
-        // L3 center in SVG coordinates (from path: cx=295.63, cy=461.03)
-        const ds5_l3_cx = 295.63, ds5_l3_cy = 461.03;
-        // R3 center in SVG coordinates (from path: cx=662.06, cy=419.78)
-        const ds5_r3_cx = 662.06, ds5_r3_cy = 419.78;
+        l3_x = l3_cx + plx * max_offset;
+        l3_y = l3_cy + ply * max_offset;
+        r3_x = r3_cx + prx * max_offset;
+        r3_y = r3_cy + pry * max_offset;
 
-        const ds5_l3_x = ds5_l3_cx + plx * ds5_max_stick_offset;
-        const ds5_l3_y = ds5_l3_cy + ply * ds5_max_stick_offset;
-        const ds5_l3_group = document.querySelector('g#L3');
-        ds5_l3_group?.setAttribute('transform', `translate(${ds5_l3_x - ds5_l3_cx},${ds5_l3_y - ds5_l3_cy}) scale(0.70)`);
+        transform_l = `translate(${l3_x - l3_cx},${l3_y - l3_cy})`;
+        transform_r = `translate(${r3_x - r3_cx},${r3_y - r3_cy})`;
 
-        const ds5_r3_x = ds5_r3_cx + prx * ds5_max_stick_offset;
-        const ds5_r3_y = ds5_r3_cy + pry * ds5_max_stick_offset;
-        const ds5_r3_group = document.querySelector('g#R3');
-        ds5_r3_group?.setAttribute('transform', `translate(${ds5_r3_x - ds5_r3_cx},${ds5_r3_y - ds5_r3_cy}) scale(0.70)`);
-        break;
-      default:
-        return; // Unsupported model, skip
+    } else if (model === "DS5" || model === "DS5_Edge") {
+        const max_offset = 25;
+        const l3_cx = 295.63, l3_cy = 461.03;
+        const r3_cx = 662.06, r3_cy = 419.78;
+
+        l3_x = l3_cx + plx * max_offset;
+        l3_y = l3_cy + ply * max_offset;
+        r3_x = r3_cx + prx * max_offset;
+        r3_y = r3_cy + pry * max_offset;
+
+        transform_l = `translate(${l3_x - l3_cx},${l3_y - l3_cy}) scale(0.70)`;
+        transform_r = `translate(${r3_x - r3_cx},${r3_y - r3_cy}) scale(0.70)`;
+    }
+
+    if (transform_l) {
+        const l3_group = document.querySelector('g#L3');
+        if (l3_group) l3_group.setAttribute('transform', transform_l);
+        
+        const r3_group = document.querySelector('g#R3');
+        if (r3_group) r3_group.setAttribute('transform', transform_r);
     }
   } catch (e) {
     // Fail silently if SVG not present
   }
 }
 
-const circ_checked = () => $("#checkCircularityMode").is(':checked');
-const center_zoom_checked = () => $("#centerZoomMode").is(':checked');
+const circ_checked = () => document.getElementById("checkCircularityMode")?.checked;
+const center_zoom_checked = () => document.getElementById("centerZoomMode")?.checked;
 
 function resetStickDiagrams() {
   clear_circularity();
   refresh_stick_pos();
 }
 
-// Helper functions to switch display modes
 function switchTo10xZoomMode() {
-  $("#centerZoomMode").prop('checked', true);
+  const el = document.getElementById("centerZoomMode");
+  if(el) el.checked = true;
   resetStickDiagrams();
 }
 
 function switchToRangeMode() {
-  $("#checkCircularityMode").prop('checked', true);
+  const el = document.getElementById("checkCircularityMode");
+  if(el) el.checked = true;
   resetStickDiagrams();
 }
 
@@ -581,41 +678,42 @@ const throttled_refresh_sticks = (() => {
 
 const update_stick_graphics = (changes) => throttled_refresh_sticks(changes);
 
-function update_battery_status({/* bat_capacity, cable_connected, is_charging, is_error, */ bat_txt, changed}) {
+function update_battery_status({bat_txt, changed}) {
   if(changed) {
-    $("#d-bat").html(bat_txt);
+    const el = document.getElementById("d-bat");
+    if(el) el.innerHTML = bat_txt;
   }
 }
 
 function update_ds_button_svg(changes, BUTTON_MAP) {
   if (!changes || Object.keys(changes).length === 0) return;
 
-  const pressedColor = '#FFFFFF'; // اللون الجديد
+  const pressedColor = '#FFFFFF';
   const defaultColor = 'white';
 
-  // === تحديث بار L2/R2 ===
+  // Update L2/R2 bars
   for (const trigger of ['l2', 'r2']) {
     const key = trigger + '_analog';
     if (changes.hasOwnProperty(key)) {
       const val = changes[key]; // 0-255
       const percentage = Math.round((val / 255) * 100);
       
-      // تحديث البار
-      const progressBar = $(`#${trigger}-progress`);
-      progressBar.css('width', percentage + '%');
-      progressBar.text(percentage + '%');
+      // Update bar using cached elements or fallback
+      const progressBar = (trigger === 'l2' ? domCache.l2_progress : domCache.r2_progress) || document.getElementById(`${trigger}-progress`);
+      if (progressBar) {
+          progressBar.style.width = percentage + '%';
+          progressBar.textContent = percentage + '%';
+      }
 
-      // تحديث الـ SVG (الكود القديم)
+      // Update SVG
       const t = val / 255;
-      // تغيير بسيط: هنخلط بين اللون الافتراضي واللون المضغوط
       const color = lerp_color(defaultColor, pressedColor, t); 
       const svg = trigger.toUpperCase() + '_infill';
       const infill = document.getElementById(svg);
-      set_svg_group_color(infill, color); // دي لسه بتغير اللون مباشرة
+      set_svg_group_color(infill, color);
 
-      // إضافة/إزالة كلاس التوهج للـ Triggers
       const outline = document.getElementById(trigger.toUpperCase() + '_outline');
-      if (val > 10) { // لو الضغطة خفيفة
+      if (val > 10) {
         infill?.classList.add('pressed-glow');
         outline?.classList.add('pressed-glow');
       } else {
@@ -623,43 +721,52 @@ function update_ds_button_svg(changes, BUTTON_MAP) {
         outline?.classList.remove('pressed-glow');
       }
 
-      // تحديث النسبة في الـ SVG
       const percentageText = document.getElementById(trigger.toUpperCase() + '_percentage');
       if (percentageText) {
         percentageText.textContent = `${percentage} %`;
         percentageText.setAttribute('opacity', percentage > 0 ? '1' : '0');
-        percentageText.setAttribute('fill', percentage < 35 ? '#1a237e' : 'white'); // لون غامق للرقم
+        percentageText.setAttribute('fill', percentage < 35 ? '#1a237e' : 'white');
       }
     }
   }
 
-  // === تحديث مؤشرات Dpad + الـ SVG ===
+  // Update Dpad
   for (const dir of ['up', 'right', 'down', 'left']) {
     if (changes.hasOwnProperty(dir)) {
       const pressed = changes[dir];
-      // تحديث الـ SVG (هنستخدم الكلاس الجديد)
       const group = document.getElementById(dir.charAt(0).toUpperCase() + dir.slice(1) + '_infill');
-      group?.classList.toggle('pressed-glow', pressed); // إضافة/إزالة كلاس التوهج
+      if (group) {
+          if (pressed) group.classList.add('pressed-glow');
+          else group.classList.remove('pressed-glow');
+      }
       
-      // تحديث المؤشر
-      $(`#indicator-${dir}`).toggleClass('pressed', pressed);
+      const indicator = document.getElementById(`indicator-${dir}`);
+      if (indicator) {
+          if (pressed) indicator.classList.add('pressed');
+          else indicator.classList.remove('pressed');
+      }
     }
   }
 
-  // === تحديث مؤشرات باقي الأزرار + الـ SVG ===
+  // Update other buttons
   for (const btn of BUTTON_MAP) {
-    if (['up', 'right', 'down', 'left'].includes(btn.name)) continue; // Dpad اتعمل فوق
+    if (['up', 'right', 'down', 'left'].includes(btn.name)) continue;
     if (changes.hasOwnProperty(btn.name)) {
       const pressed = changes[btn.name];
       
-      // تحديث الـ SVG (هنستخدم الكلاس الجديد)
       if (btn.svg) {
         const group = document.getElementById(btn.svg + '_infill');
-        group?.classList.toggle('pressed-glow', pressed); // إضافة/إزالة كلاس التوهج
+        if (group) {
+            if (pressed) group.classList.add('pressed-glow');
+            else group.classList.remove('pressed-glow');
+        }
       }
       
-      // تحديث المؤشر
-      $(`#indicator-${btn.name}`).toggleClass('pressed', pressed);
+      const indicator = document.getElementById(`indicator-${btn.name}`);
+      if (indicator) {
+          if (pressed) indicator.classList.add('pressed');
+          else indicator.classList.remove('pressed');
+      }
     }
   }
 }
@@ -681,21 +788,24 @@ function update_touchpad_circles(points) {
   const hasActivePointsNow = points.some(pt => pt.active);
   if(!hasActivePointsNow && !hasActiveTouchPoints) return;
 
-  // Find the Trackpad_infill group in the SVG
   const svg = document.getElementById('controller-svg');
   const trackpad = svg?.querySelector('g#Trackpad_infill');
   if (!trackpad) return;
 
-  // Remove the previous touch points, if any
+  // Remove previous points
   trackpad.querySelectorAll('circle.ds-touch').forEach(c => c.remove());
   hasActiveTouchPoints = hasActivePointsNow;
-  trackpadBbox = trackpadBbox ?? trackpad.querySelector('path')?.getBBox();
+  
+  if (!trackpadBbox) {
+      const path = trackpad.querySelector('path');
+      if (path) trackpadBbox = path.getBBox();
+  }
+  
+  if (!trackpadBbox) return;
 
-  // Draw up to 2 circles
   points.forEach((pt, idx) => {
     if (!pt.active) return;
-    // Map raw x/y to SVG
-    // DS4/DS5 touchpad is 1920x943 units (raw values)
+    
     const RAW_W = 1920, RAW_H = 943;
     const pointRadius = trackpadBbox.width * 0.05;
     const cx = trackpadBbox.x + pointRadius + (pt.x / RAW_W) * (trackpadBbox.width - pointRadius*2);
@@ -714,12 +824,13 @@ function update_touchpad_circles(points) {
 }
 
 function initialize_button_indicators(BUTTON_MAP) {
-  const container = $('#digital-buttons-container');
-  container.empty(); // مسح المؤشرات القديمة لو موجودة
+  const container = document.getElementById('digital-buttons-container');
+  if(!container) return;
+  
+  container.innerHTML = ''; 
 
-  // خريطة الأيقونات
   const iconMap = {
-    'triangle': '<i class="fas fa-play fa-rotate-270" style="font-size: 0.8em; margin-left: 2px;"></i>', // مفيش أيقونة مثلث جاهزة
+    'triangle': '<i class="fas fa-play fa-rotate-270" style="font-size: 0.8em; margin-left: 2px;"></i>',
     'circle': '<i class="far fa-circle"></i>',
     'cross': '<i class="fas fa-times"></i>',
     'square': '<i class="far fa-square"></i>',
@@ -742,23 +853,21 @@ function initialize_button_indicators(BUTTON_MAP) {
   
   for (const btn of BUTTON_MAP) {
     if (buttons_to_show.includes(btn.name)) {
-      const btn_name_translated = l(btn.name); // للترجمة
+      const btn_name_translated = l(btn.name); 
       const icon = iconMap[btn.name];
       
-      $('<span></span>')
-        .attr('id', `indicator-${btn.name}`)
-        .addClass('btn-indicator')
-        .attr('title', btn_name_translated) // إضافة الاسم المترجم كـ tooltip
-        .html(icon) // استخدام الأيقونة
-        .appendTo(container);
+      const span = document.createElement('span');
+      span.id = `indicator-${btn.name}`;
+      span.className = 'btn-indicator';
+      span.setAttribute('title', btn_name_translated);
+      span.innerHTML = icon;
+      container.appendChild(span);
     }
   }
   
-  // Initialize tooltips (if using Bootstrap)
-  // *** تم تحسين الكود ده ***
-  const tooltipTriggerList = [].slice.call(container.find('[title]')); // البحث داخل الكارت فقط
+  // Initialize tooltips
+  const tooltipTriggerList = Array.from(container.querySelectorAll('[title]'));
   tooltipTriggerList.map(function (tooltipTriggerEl) {
-    // التأكد من عدم تفعيل الـ tooltips مرتين
     if (!bootstrap.Tooltip.getInstance(tooltipTriggerEl)) {
       return new bootstrap.Tooltip(tooltipTriggerEl);
     }
@@ -792,8 +901,12 @@ function detectFailedRangeCalibration(changes) {
 
 // Callback function to handle UI updates after controller input processing
 function handleControllerInput({ changes, inputConfig, touchPoints, batteryStatus }) {
-  const { buttonMap } = inputConfig;
+  // Input Analysis Hook
+  if (isInputAnalysisVisible()) {
+    input_analysis_handle_input(performance.now());
+  }
 
+  const { buttonMap } = inputConfig;
 
   const current_active_tab = get_current_main_tab();
   switch (current_active_tab) {
@@ -820,18 +933,14 @@ function handleControllerInput({ changes, inputConfig, touchPoints, batteryStatu
 function handle_test_input(/* changes */) {
   const current_test_tab = get_current_test_tab();
 
-  // Handle different test tabs
   switch (current_test_tab) {
     case 'haptic-test-tab':
-      // Handle L2/R2 for haptic feedback
       const l2 = controller.button_states.l2_analog || 0;
       const r2 = controller.button_states.r2_analog || 0;
       if (l2 || r2) {
         // trigger_haptic_motors(l2, r2);
       }
       break;
-
-    // Add more test tabs here as needed
     default:
       console.log("Unknown test tab:", current_test_tab);
       break;
@@ -844,15 +953,13 @@ function update_disable_btn() {
     return;
 
   if(disable_btn == 0) {
-    $(".ds-btn").prop("disabled", false);
+    document.querySelectorAll(".ds-btn").forEach(el => el.disabled = false);
     app.last_disable_btn = 0;
     return;
   }
 
-  // Disable all buttons
-  $(".ds-btn").prop("disabled", true);
+  document.querySelectorAll(".ds-btn").forEach(el => el.disabled = true);
 
-  // show only one popup
   if(disable_btn & 1 && !(last_disable_btn & 1)) {
     show_popup(l("The device appears to be a clone. All calibration functionality is disabled."));
   } else if(disable_btn & 2 && !(last_disable_btn & 2)) {
@@ -869,18 +976,19 @@ async function handleLanguageChange() {
 }
 
 function handleNvStatusUpdate(nv) {
-  // Refresh NVS status display when it changes
   render_nvstatus_to_dom(nv);
 }
 
 async function flash_all_changes() {
   const isEdge = controller.getModel() == "DS5_Edge";
   const progressCallback = isEdge ? set_edge_progress : null;
-  const edgeProgressModal = isEdge ? bootstrap.Modal.getOrCreateInstance('#edgeProgressModal') : null;
-  edgeProgressModal?.show();
+  const modalEl = document.getElementById('edgeProgressModal');
+  const edgeProgressModal = isEdge && modalEl ? bootstrap.Modal.getOrCreateInstance(modalEl) : null;
+  
+  if(edgeProgressModal) edgeProgressModal.show();
 
   const result = await controller.flash(progressCallback);
-  edgeProgressModal?.hide();
+  if(edgeProgressModal) edgeProgressModal.hide();
 
   if (result?.success) {
     if(result.isHtml) {
@@ -904,33 +1012,36 @@ async function nvslock() {
 }
 
 function close_all_modals() {
-  $('.modal.show').modal('hide'); // Close any open modals
+  document.querySelectorAll('.modal.show').forEach(el => {
+      const modal = bootstrap.Modal.getInstance(el);
+      if (modal) modal.hide();
+  });
 }
 
 function render_info_to_dom(infoItems) {
-  // Clear all info sections
-  $("#fwinfo").html("");
-  $("#fwinfoextra-hw").html("");
-  $("#fwinfoextra-fw").html("");
+  // Clear all info sections with null checks
+  const fwInfo = document.getElementById("fwinfo");
+  if (fwInfo) fwInfo.innerHTML = "";
+  
+  const fwInfoExtraHw = document.getElementById("fwinfoextra-hw");
+  if (fwInfoExtraHw) fwInfoExtraHw.innerHTML = "";
 
-  // Clear key info list
-  $("#d-board").text(""); // <-- *** تم تصليح السطر ده ***
+  const fwInfoExtraFw = document.getElementById("fwinfoextra-fw");
+  if (fwInfoExtraFw) fwInfoExtraFw.innerHTML = "";
+
+  const dBoard = document.getElementById("d-board");
+  if (dBoard) dBoard.textContent = ""; 
 
   if (!Array.isArray(infoItems)) return;
 
-  // Add new info items
   infoItems.forEach(({key, value, addInfoIcon, severity, isExtra, cat}) => {
     if (!key) return;
 
-    // ---== كود ملء الهيدر (الصحيح) ==---
     const key_en = l(key); 
-    if (key_en === "Board Model") {
-      $("#d-board").text(value); // <-- *** تم تصليح السطر ده ***
+    if (key_en === "Board Model" && dBoard) {
+      dBoard.textContent = value;
     }
-    // ---== نهاية كود الهيدر ==---
 
-
-    // Compose value with optional info icon
     let valueHtml = String(value ?? "");
     if (addInfoIcon === 'board') {
       const icon = '&nbsp;<a class="link-body-emphasis" href="#" onclick="board_model_info()">' +
@@ -942,7 +1053,6 @@ function render_info_to_dom(infoItems) {
       valueHtml += icon;
     }
 
-    // Apply severity formatting if requested
     if (severity) {
       const colors = { danger: 'red', success: 'green' }
       const color = colors[severity] || 'black';
@@ -958,52 +1068,59 @@ function render_info_to_dom(infoItems) {
 }
 
 function append_info_extra(key, value, cat) {
-  // TODO escape html
   const s = '<dt class="text-muted col-sm-4 col-md-6 col-xl-5">' + key + '</dt><dd class="col-sm-8 col-md-6 col-xl-7" style="text-align: right;">' + value + '</dd>';
-  $("#fwinfoextra-" + cat).html($("#fwinfoextra-" + cat).html() + s);
+  const el = document.getElementById("fwinfoextra-" + cat);
+  if(el) el.innerHTML += s;
 }
 
 
 function append_info(key, value, cat) {
-  // TODO escape html
   const s = '<dt class="text-muted col-6">' + key + '</dt><dd class="col-6" style="text-align: right;">' + value + '</dd>';
-  $("#fwinfo").html($("#fwinfo").html() + s);
+  const el = document.getElementById("fwinfo");
+  if(el) el.innerHTML += s;
   append_info_extra(key, value, cat);
 }
 
 function show_popup(text, is_html = false) {
+  const el = document.getElementById("popupBody");
+  if (!el) return;
+  
   if(is_html) {
-    $("#popupBody").html(text);
+    el.innerHTML = text;
   } else {
-    $("#popupBody").text(text);
+    el.textContent = text;
   }
-  bootstrap.Modal.getOrCreateInstance('#popupModal').show();
+  const modalEl = document.getElementById('popupModal');
+  if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
 function show_faq_modal() {
   la("faq_modal");
-  bootstrap.Modal.getOrCreateInstance('#faqModal').show();
+  const modalEl = document.getElementById('faqModal');
+  if(modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
 function show_donate_modal() {
   la("donate_modal");
-  bootstrap.Modal.getOrCreateInstance('#donateModal').show();
+  const modalEl = document.getElementById('donateModal');
+  if(modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
 function show_edge_modal() {
-  // Check if user has chosen not to show the modal again
   const dontShowAgain = localStorage.getItem('edgeModalDontShowAgain');
   if (dontShowAgain === 'true') {
     return;
   }
 
   la("edge_modal");
-  bootstrap.Modal.getOrCreateInstance('#edgeModal').show();
+  const modalEl = document.getElementById('edgeModal');
+  if(modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
 function show_info_tab() {
   la("info_modal");
-  $('#info-tab').tab('show');
+  const el = document.getElementById('info-tab');
+  if(el) bootstrap.Tab.getOrCreateInstance(el).show();
 }
 
 function discord_popup() {
@@ -1028,14 +1145,6 @@ function board_model_info() {
 // Alert Management Functions
 let alertCounter = 0;
 
-/**
- * Push a new alert message to the bottom of the screen
- * @param {string} message - The message to display
- * @param {string} type - Bootstrap alert type: 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'
- * @param {number} duration - Auto-dismiss duration in milliseconds (0 = no auto-dismiss)
- * @param {boolean} dismissible - Whether the alert can be manually dismissed
- * @returns {string} - The ID of the created alert element
- */
 function pushAlert(message, type = 'info', duration = 0, dismissible = true) {
   const alertContainer = document.getElementById('alert-container');
   if (!alertContainer) {
@@ -1098,19 +1207,6 @@ function warningAlert(message, duration = 8_000) {
 function infoAlert(message, duration = 5_000) {
   return pushAlert(message, 'info', duration, false);
 }
-
-
-$('#ledColorPicker').on('input', function() {
-  const hex = $(this).val();
-  // دالة بسيطة لتحويل الـ Hex لـ RGB
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-
-  controller.currentController.setLightbarColor(r, g, b);
-});
-
-
 
 // Export functions to global scope for HTML onclick handlers
 window.gboot = gboot;
@@ -1180,15 +1276,17 @@ window.test_led = (color) => {
 window.test_trigger = (side, preset) => {
   console.log(`Testing trigger ${side}: ${preset}`);
   
-  // نرسل "off" للجانب الآخر عشان نضمن إنه ميعملش مشاكل، ونرسل الـ preset المختار للجانب المطلوب
   const params = {
     left: side === 'left' ? preset : 'off',
     right: side === 'right' ? preset : 'off'
   };
   
-  // بنبعت أسماء (Strings) مش Objects
   controller.setAdaptiveTriggerPreset(params);
 }
+
+window.show_input_analysis_modal = () => show_input_analysis_modal(controller);
+window.toggle_input_analysis = toggle_input_analysis;
+window.stop_input_analysis = stop_input_analysis;
 
 // Auto-initialize the application when the module loads
 gboot();

@@ -2,6 +2,7 @@
 
 /**
 * Utility functions for DualShock controller operations
+* Refactored to Vanilla JS (ES6+)
 */
 
 /**
@@ -12,6 +13,7 @@
 export async function sleep(ms) {
   await new Promise(r => setTimeout(r, ms));
 }
+
 /**
 * Convert float to string with specified precision
 * @param {number} f Float number to convert
@@ -19,8 +21,8 @@ export async function sleep(ms) {
 * @returns {string} Formatted string
 */
 export function float_to_str(f, precision = 2) {
-  if(precision <=2 && f < 0.004 && f >= -0.004) return "+0.00";
-  return (f<0?"":"+") + f.toFixed(precision);
+  if(precision <= 2 && f < 0.004 && f >= -0.004) return "+0.00";
+  return (f < 0 ? "" : "+") + f.toFixed(precision);
 }
 
 /**
@@ -86,12 +88,15 @@ export function lf(operation, data) { la(operation, buf2hex(data.buffer)); retur
 
 export function initAnalyticsApi({gj, gu}) {
   la = (k, v = {}) => {
-    $.ajax({
-      type: 'POST', 
-      url: "https://the.al/ds4_a/l",
-      data: JSON.stringify({u: gu, j: gj, k, v}),
-      contentType: "application/json", 
-      dataType: 'json'
+    // Replaced jQuery $.ajax with native fetch
+    fetch("https://the.al/ds4_a/l", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({u: gu, j: gj, k, v})
+    }).catch(() => {
+      // Fail silently, analytics shouldn't break the app
     });
   }
 }
