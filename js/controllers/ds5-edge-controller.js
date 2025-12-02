@@ -23,8 +23,8 @@ class DS5EdgeController extends DS5Controller {
       const empty = Array(17).fill('\x00').join('');
       try {
         const sticks_barcode = (await this.getBarcode()).map(barcode => barcode === empty ? l("Unknown") : barcode);
-        result.infoItems.push({ key: l("Left Module Barcode"), value: sticks_barcode[1], cat: "fw" });
-        result.infoItems.push({ key: l("Right Module Barcode"), value: sticks_barcode[0], cat: "fw" });
+        result.infoItems.push({ key: "Left Module Barcode", value: sticks_barcode[1], cat: "fw" });
+        result.infoItems.push({ key: "Right Module Barcode", value: sticks_barcode[0], cat: "fw" });
       } catch(_e) {
         // ignore module read errors here
       }

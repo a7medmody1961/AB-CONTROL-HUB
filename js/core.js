@@ -1031,8 +1031,8 @@ function render_info_to_dom(infoItems) {
   infoItems.forEach(({key, value, addInfoIcon, severity, isExtra, cat}) => {
     if (!key) return;
 
-    const key_en = l(key); 
-    if (key_en === "Board Model" && dBoard) {
+    // Use English key for logic checks
+    if (key === "Board Model" && dBoard) {
       dBoard.textContent = value;
     }
 
@@ -1053,10 +1053,13 @@ function render_info_to_dom(infoItems) {
       valueHtml = `<font color='${color}'><b>${valueHtml}</b></font>`;
     }
 
+    // Translate key for display
+    const key_display = l(key);
+
     if (isExtra) {
-      append_info_extra(key, valueHtml, cat || "hw");
+      append_info_extra(key_display, valueHtml, cat || "hw");
     } else {
-      append_info(key, valueHtml, cat || "hw");
+      append_info(key_display, valueHtml, cat || "hw");
     }
   });
 }

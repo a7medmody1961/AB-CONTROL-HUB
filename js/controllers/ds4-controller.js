@@ -170,18 +170,18 @@ class DS4Controller extends BaseController {
       }
 
       const infoItems = [
-        { key: l("Build Date"), value: `${k1} ${k2}`, cat: "fw" },
-        { key: l("HW Version"), value: `${dec2hex(hw_ver_major)}:${dec2hex(hw_ver_minor)}`, cat: "hw" },
-        { key: l("SW Version"), value: `${dec2hex32(sw_ver_major)}:${dec2hex(sw_ver_minor)}`, cat: "fw" },
-        { key: l("Device Type"), value: deviceTypeText, cat: "hw", severity: is_clone ? 'danger' : undefined },
+        { key: "Build Date", value: `${k1} ${k2}`, cat: "fw" },
+        { key: "HW Version", value: `${dec2hex(hw_ver_major)}:${dec2hex(hw_ver_minor)}`, cat: "hw" },
+        { key: "SW Version", value: `${dec2hex32(sw_ver_major)}:${dec2hex(sw_ver_minor)}`, cat: "fw" },
+        { key: "Device Type", value: deviceTypeText, cat: "hw", severity: is_clone ? 'danger' : undefined },
       ];
 
       if(!is_clone) {
         // Add Board Model (UI will append the info icon)
-        infoItems.push({ key: l("Board Model"), value: this.hwToBoardModel(hw_ver_minor), cat: "hw", addInfoIcon: 'board' });
+        infoItems.push({ key: "Board Model", value: this.hwToBoardModel(hw_ver_minor), cat: "hw", addInfoIcon: 'board' });
 
         const bd_addr = await this.getBdAddr();
-        infoItems.push({ key: l("Bluetooth Address"), value: bd_addr, cat: "hw" });
+        infoItems.push({ key: "Bluetooth Address", value: bd_addr, cat: "hw" });
       }
 
       const nv = await this.queryNvStatus();

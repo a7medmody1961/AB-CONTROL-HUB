@@ -15,37 +15,39 @@
 
         <div class="row text-center mb-4 g-3">
             <div class="col-md-4">
-                <div class="p-3 border rounded" style="background-color: rgba(0, 240, 240, 0.05); border-color: var(--border-color) !important;">
+                <div class="p-3 border rounded analysis-stat-card stat-polling">
                     <h6 class="text-muted mb-2 ds-i18n">Polling Rate</h6>
-                    <h2 class="mb-0" id="stat-polling-rate" style="color: var(--glow-cyan); font-family: var(--font-hud);">0 Hz</h2>
+                    <h2 class="mb-0" id="stat-polling-rate" style="font-family: var(--font-hud);">0 Hz</h2>
                     <small class="text-muted"><span class="ds-i18n">Max</span>: <span id="stat-max-rate">0</span> Hz</small>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="p-3 border rounded" style="background-color: rgba(240, 0, 240, 0.05); border-color: rgba(240, 0, 240, 0.4) !important;">
+                <div class="p-3 border rounded analysis-stat-card stat-latency">
                     <h6 class="text-muted mb-2 ds-i18n">Interval / Latency</h6>
-                    <h2 class="mb-0" id="stat-latency" style="color: var(--glow-magenta); font-family: var(--font-hud);">0.00 ms</h2>
+                    <h2 class="mb-0" id="stat-latency" style="font-family: var(--font-hud);">0.00 ms</h2>
                     <small class="text-muted"><span class="ds-i18n">Avg Interval</span></small>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="p-3 border rounded" style="background-color: rgba(255, 77, 77, 0.05); border-color: rgba(255, 77, 77, 0.4) !important;">
+                <div class="p-3 border rounded analysis-stat-card stat-jitter">
                     <h6 class="text-muted mb-2 ds-i18n">Jitter (Stability)</h6>
-                    <h2 class="mb-0" id="stat-jitter" style="color: var(--glow-danger); font-family: var(--font-hud);">0.00 ms</h2>
+                    <h2 class="mb-0" id="stat-jitter" style="font-family: var(--font-hud);">0.00 ms</h2>
                     <small class="text-muted"><span class="ds-i18n">Variance</span></small>
                 </div>
             </div>
         </div>
 
-        <div class="card" style="background-color: var(--bg-dark); border: 1px solid var(--border-color);">
-            <div class="card-header small ds-i18n" style="background-color: rgba(255,255,255,0.05); border-bottom: 1px solid var(--border-color);">
-                <i class="fas fa-wave-square me-2"></i>Interval Distribution (Live Graph)
+        <div class="card analysis-graph-container">
+            <!-- FIX: Separated icon and text to fix translation key issue -->
+            <div class="card-header small analysis-graph-header">
+                <i class="fas fa-wave-square me-2"></i>
+                <span class="ds-i18n">Interval Distribution (Live Graph)</span>
             </div>
             <div class="card-body p-0 position-relative" style="height: 200px;">
                 <canvas id="analysisCanvas" style="width: 100%; height: 100%; display: block;"></canvas>
-                <div id="analysis-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);">
+                <div id="analysis-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
                     <p class="text-muted ds-i18n">Press Start to begin analysis</p>
                 </div>
             </div>

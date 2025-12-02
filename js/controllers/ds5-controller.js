@@ -298,30 +298,30 @@ class DS5Controller extends BaseController {
       const serial_number = await this.getSystemInfo(1, 19, 17);
       const color = ds5_color(serial_number);
       const infoItems = [
-        { key: l("Serial Number"), value: serial_number, cat: "hw" },
-        { key: l("MCU Unique ID"), value: await this.getSystemInfo(1, 9, 9, false), cat: "hw", isExtra: true },
-        { key: l("PCBA ID"), value: reverse_str(await this.getSystemInfo(1, 17, 14)), cat: "hw", isExtra: true },
-        { key: l("Battery Barcode"), value: await this.getSystemInfo(1, 24, 23), cat: "hw", isExtra: true },
-        { key: l("VCM Left Barcode"), value: await this.getSystemInfo(1, 26, 16), cat: "hw", isExtra: true },
-        { key: l("VCM Right Barcode"), value: await this.getSystemInfo(1, 28, 16), cat: "hw", isExtra: true },
+        { key: "Serial Number", value: serial_number, cat: "hw" },
+        { key: "MCU Unique ID", value: await this.getSystemInfo(1, 9, 9, false), cat: "hw", isExtra: true },
+        { key: "PCBA ID", value: reverse_str(await this.getSystemInfo(1, 17, 14)), cat: "hw", isExtra: true },
+        { key: "Battery Barcode", value: await this.getSystemInfo(1, 24, 23), cat: "hw", isExtra: true },
+        { key: "VCM Left Barcode", value: await this.getSystemInfo(1, 26, 16), cat: "hw", isExtra: true },
+        { key: "VCM Right Barcode", value: await this.getSystemInfo(1, 28, 16), cat: "hw", isExtra: true },
 
-        { key: l("Color"), value: l(color), cat: "hw", addInfoIcon: 'color' },
+        { key: "Color", value: l(color), cat: "hw", addInfoIcon: 'color' },
 
-        ...(is_edge ? [] : [{ key: l("Board Model"), value: this.hwToBoardModel(hwinfo), cat: "hw", addInfoIcon: 'board' }]),
+        ...(is_edge ? [] : [{ key: "Board Model", value: this.hwToBoardModel(hwinfo), cat: "hw", addInfoIcon: 'board' }]),
 
-        { key: l("FW Build Date"), value: build_date + " " + build_time, cat: "fw" },
-        { key: l("FW Type"), value: "0x" + dec2hex(fwtype), cat: "fw", isExtra: true },
-        { key: l("FW Series"), value: "0x" + dec2hex(swseries), cat: "fw", isExtra: true },
-        { key: l("HW Model"), value: "0x" + dec2hex32(hwinfo), cat: "hw", isExtra: true },
-        { key: l("FW Version"), value: "0x" + dec2hex32(fwversion), cat: "fw", isExtra: true },
-        { key: l("FW Update"), value: "0x" + dec2hex(updversion), cat: "fw", isExtra: true },
-        { key: l("FW Update Info"), value: "0x" + dec2hex8(unk), cat: "fw", isExtra: true },
-        { key: l("SBL FW Version"), value: "0x" + dec2hex32(fwversion1), cat: "fw", isExtra: true },
-        { key: l("Venom FW Version"), value: "0x" + dec2hex32(fwversion2), cat: "fw", isExtra: true },
-        { key: l("Spider FW Version"), value: "0x" + dec2hex32(fwversion3), cat: "fw", isExtra: true },
+        { key: "FW Build Date", value: build_date + " " + build_time, cat: "fw" },
+        { key: "FW Type", value: "0x" + dec2hex(fwtype), cat: "fw", isExtra: true },
+        { key: "FW Series", value: "0x" + dec2hex(swseries), cat: "fw", isExtra: true },
+        { key: "HW Model", value: "0x" + dec2hex32(hwinfo), cat: "hw", isExtra: true },
+        { key: "FW Version", value: "0x" + dec2hex32(fwversion), cat: "fw", isExtra: true },
+        { key: "FW Update", value: "0x" + dec2hex(updversion), cat: "fw", isExtra: true },
+        { key: "FW Update Info", value: "0x" + dec2hex8(unk), cat: "fw", isExtra: true },
+        { key: "SBL FW Version", value: "0x" + dec2hex32(fwversion1), cat: "fw", isExtra: true },
+        { key: "Venom FW Version", value: "0x" + dec2hex32(fwversion2), cat: "fw", isExtra: true },
+        { key: "Spider FW Version", value: "0x" + dec2hex32(fwversion3), cat: "fw", isExtra: true },
 
-        { key: l("Touchpad ID"), value: await this.getSystemInfo(5, 2, 8, false), cat: "hw", isExtra: true },
-        { key: l("Touchpad FW Version"), value: await this.getSystemInfo(5, 4, 8, false), cat: "fw", isExtra: true },
+        { key: "Touchpad ID", value: await this.getSystemInfo(5, 2, 8, false), cat: "hw", isExtra: true },
+        { key: "Touchpad FW Version", value: await this.getSystemInfo(5, 4, 8, false), cat: "fw", isExtra: true },
       ];
 
       const old_controller = build_date.search(/ 2020| 2021/);
@@ -333,7 +333,7 @@ class DS5Controller extends BaseController {
 
       const nv = await this.queryNvStatus();
       const bd_addr = await this.getBdAddr();
-      infoItems.push({ key: l("Bluetooth Address"), value: bd_addr, cat: "hw", isExtra: true });
+      infoItems.push({ key: "Bluetooth Address", value: bd_addr, cat: "hw", isExtra: true });
 
       const pending_reboot = (nv?.status === 'pending_reboot');
 

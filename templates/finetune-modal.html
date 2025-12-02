@@ -62,35 +62,35 @@
                     <span class="ds-i18n">Left stick</span>
                   </div>
                   <div class="card-body position-relative">
-                    <button type="button" class="btn btn-secondary position-absolute top-0 end-0 finetune-circularity-mode" id="leftErrorSlackBtn" style="z-index: 10; margin: 0.5rem;">
+                    <button type="button" class="btn btn-secondary position-absolute top-0 end-0 finetune-circularity-mode" id="leftErrorSlackBtn" style="z-index: 10; margin: 0.5rem;" aria-label="Toggle error slack">
                       <svg class="bi" width="32" height="32" style="margin: -15px -8px -12px -8px;"><use xlink:href="#arrows-alt"/></svg>
                     </button>
-                    <button type="button" class="btn btn-warning position-absolute top-0 end-0 finetune-circularity-mode d-none" id="leftErrorSlackUndoBtn" style="z-index: 10; margin: 0.5rem;">
+                    <button type="button" class="btn btn-warning position-absolute top-0 end-0 finetune-circularity-mode d-none" id="leftErrorSlackUndoBtn" style="z-index: 10; margin: 0.5rem;" aria-label="Undo error slack">
                       <i class="fas fa-undo"></i>
                     </button>
                     <div class="container-fluid">
                       <div class="finetune-grid">
                         <div class="finetune-top finetune-center-mode">
-                          <input id="finetuneLY" type="number" class="form-control" min="0" max="65535" value="0">
+                          <input id="finetuneLY" type="number" class="form-control" min="0" max="65535" value="0" aria-label="Left Stick Y Center">
                         </div>
                         <div class="finetune-top finetune-circularity-mode">
-                          <input id="finetuneLT" type="number" class="form-control" min="0" max="65535" value="0">
+                          <input id="finetuneLT" type="number" class="form-control" min="0" max="65535" value="0" aria-label="Left Stick Top">
                         </div>
                         <div class="finetune-left finetune-circularity-mode">
-                          <input id="finetuneLL" type="number" class="form-control" min="0" max="65535" value="0">
+                          <input id="finetuneLL" type="number" class="form-control" min="0" max="65535" value="0" aria-label="Left Stick Left">
                         </div>
                         <div class="finetune-left finetune-center-mode">
-                          <input id="finetuneLX" type="number" class="form-control" min="0" max="65535" value="0">
+                          <input id="finetuneLX" type="number" class="form-control" min="0" max="65535" value="0" aria-label="Left Stick X Center">
                         </div>
                         <div class="finetune-center">
                           <canvas id="finetuneStickCanvasL" width="150px" height="150px"></canvas>
                           <canvas id="finetuneStickCanvasL_large" width="210px" height="210px"></canvas>
                         </div>
                         <div class="finetune-right finetune-circularity-mode">
-                          <input id="finetuneLR" type="number" class="form-control" min="0" max="65535" value="0">
+                          <input id="finetuneLR" type="number" class="form-control" min="0" max="65535" value="0" aria-label="Left Stick Right">
                         </div>
                         <div class="finetune-bottom finetune-circularity-mode">
-                          <input id="finetuneLB" type="number" class="form-control" min="0" max="65535" value="0">
+                          <input id="finetuneLB" type="number" class="form-control" min="0" max="65535" value="0" aria-label="Left Stick Bottom">
                         </div>
                       </div>
                     </div>
@@ -128,35 +128,35 @@
                     <span class="ds-i18n">Right stick</span>
                   </div>
                   <div class="card-body position-relative">
-                    <button type="button" class="btn btn-secondary position-absolute top-0 end-0 finetune-circularity-mode" id="rightErrorSlackBtn" style="z-index: 10; margin: 0.5rem;">
+                    <button type="button" class="btn btn-secondary position-absolute top-0 end-0 finetune-circularity-mode" id="rightErrorSlackBtn" style="z-index: 10; margin: 0.5rem;" aria-label="Toggle error slack">
                       <svg class="bi" width="32" height="32" style="margin: -15px -8px -12px -8px;"><use xlink:href="#arrows-alt"/></svg>
                     </button>
-                    <button type="button" class="btn btn-warning position-absolute top-0 end-0 finetune-circularity-mode d-none" id="rightErrorSlackUndoBtn" style="z-index: 10; margin: 0.5rem;">
+                    <button type="button" class="btn btn-warning position-absolute top-0 end-0 finetune-circularity-mode d-none" id="rightErrorSlackUndoBtn" style="z-index: 10; margin: 0.5rem;" aria-label="Undo error slack">
                       <i class="fas fa-undo"></i>
                     </button>
                     <div class="container-fluid">
                       <div class="finetune-grid">
                         <div class="finetune-top finetune-center-mode">
-                          <input id="finetuneRY" type="number" class="form-control" min="0" max="65535" value="0">
+                          <input id="finetuneRY" type="number" class="form-control" min="0" max="65535" value="0" aria-label="Right Stick Y Center">
                         </div>
                         <div class="finetune-top finetune-circularity-mode">
-                          <input id="finetuneRT" type="number" class="form-control" min="0" max="65535" value="0">
+                          <input id="finetuneRT" type="number" class="form-control" min="0" max="65535" value="0" aria-label="Right Stick Top">
                         </div>
                         <div class="finetune-left finetune-circularity-mode">
-                          <input id="finetuneRL" type="number" class="form-control" min="0" max="65535" value="0">
+                          <input id="finetuneRL" type="number" class="form-control" min="0" max="65535" value="0" aria-label="Right Stick Left">
                         </div>
                         <div class="finetune-left finetune-center-mode">
-                          <input id="finetuneRX" type="number" class="form-control" min="0" max="65535" value="0">
+                          <input id="finetuneRX" type="number" class="form-control" min="0" max="65535" value="0" aria-label="Right Stick X Center">
                         </div>
                         <div class="finetune-center">
                           <canvas id="finetuneStickCanvasR" width="150px" height="150px"></canvas>
                           <canvas id="finetuneStickCanvasR_large" width="210px" height="210px"></canvas>
                         </div>
                         <div class="finetune-right finetune-circularity-mode">
-                          <input id="finetuneRR" type="number" class="form-control" min="0" max="65535" value="0">
+                          <input id="finetuneRR" type="number" class="form-control" min="0" max="65535" value="0" aria-label="Right Stick Right">
                         </div>
                         <div class="finetune-bottom finetune-circularity-mode">
-                          <input id="finetuneRB" type="number" class="form-control" min="0" max="65535" value="0">
+                          <input id="finetuneRB" type="number" class="form-control" min="0" max="65535" value="0" aria-label="Right Stick Bottom">
                         </div>
                       </div>
 

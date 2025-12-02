@@ -1,93 +1,137 @@
-# AB Control Hub
+## 🎮 AB Control Hub
 
-A web-based calibration tool for PlayStation DualShock 4, DualSense, and DualSense Edge controllers using the WebHID API.
+<div align="center">
 
-## Features
+The Ultimate Web-Based Calibration & Testing Tool for PlayStation Controllers
 
-- Controller connection via WebHID API
-- Stick calibration and range calibration
-- Input testing and visualization
-- Battery status display
-- Multi-language support (20+ languages)
-- Progressive Web App capabilities
+Live Demo | Report Bug | Request Feature
 
-## Development
+</div>
 
-### Prerequisites
+## 📖 Overview
 
-- Node.js (v16 or higher)
-- npm or yarn
-- Modern browser with WebHID support (Chrome/Edge)
+AB Control Hub is a powerful, open-source web application designed to diagnose, test, and calibrate Sony PlayStation controllers (DualShock 4, DualSense, and DualSense Edge). Built with modern web technologies and the WebHID API, it allows users to fix analog stick drift, analyze input latency, and customize controller settings directly from the browser without installing third-party software.
 
-### Getting Started
+Developed with ❤️ by Ahmed Badawy.
 
-1. **Install dependencies:**
+## ✨ Key Features
 
-   ```bash
-   npm install
-   ```
+🔌 WebHID Integration: Connect controllers directly via USB or Bluetooth using the browser's native Human Interface Device API.
 
-2. **Build the application:**
+🕹️ Comprehensive Calibration:
 
-   ```bash
-   npm run build
-   ```
+Center Calibration: Fix drift by re-centering analog sticks.
 
-3. **Start the development server:**
+Range Calibration: Correct circularity errors and outer deadzones.
 
-   ```bash
-   npm run start
-   ```
+Finetuning (DS5/Edge): Advanced permanent calibration stored in the controller's firmware.
 
-   The app will be available at `https://localhost:8443`
+## 📊 Advanced Input Analysis:
 
-### Development Scripts
+Real-time Polling Rate measurement (Hz).
 
-- `npm run build` - Build the application for development
-- `npm run build:prod` - Build the application for production
-- `npm run clean` - Clean the dist directory
-- `npm run serve:https` - Serve the built app over HTTPS (required for WebHID)
-- `npm run serve` - Serve the built app over HTTP (WebHID won't work)
-- `npm run start` - Build and serve the app
-- `npm run dev:full` - Build, watch for changes, and serve with auto-reload
-- `npm run watch` - Watch for file changes and rebuild
+Input Latency / Interval monitoring (ms).
 
-### Development Workflow
+Jitter & Stability analysis with live graphs.
 
-For active development with auto-rebuild:
+## 🎮 Output Testing:
 
-```bash
-npm run dev:full
-```
+Test Vibration motors (Heavy/Light).
 
-This will:
+Control LED Lightbar colors.
 
-1. Build the application
-2. Start watching for file changes
-3. Serve the app over HTTPS at `https://localhost:8443`
-4. Automatically rebuild when files change
+Test Adaptive Triggers (DualSense only) with various presets (Resistance, Machine Gun, etc.).
 
-### Important Notes
+ℹ️ Device Insights: Read detailed hardware info including Battery Level, Firmware Version, Board Model, and Serial Number.
 
-- **HTTPS Required**: The WebHID API requires HTTPS. The development server uses self-signed certificates.
-- **Browser Security**: You may need to accept the self-signed certificate warning in your browser.
-- **Controller Support**: Only works in browsers with WebHID support (Chrome, Edge, Opera).
+🌍 Multi-Language Support: Fully localized interface in English and Arabic (العربية).
 
-### Project Structure
+📱 PWA & Offline Support: Works offline and can be installed as a native app on supported devices.
 
-- `js/` - Source JavaScript files
-- `css/` - Source CSS files
-- `templates/` - HTML template files
-- `lang/` - Translation files
-- `assets/` - SVG assets
-- `dist/` - Built application (generated)
+⚡ Responsive Design: Optimized for Desktop and Mobile (via OTG).
 
-### Build System
+## 🎮 Supported Controllers
 
-The project uses Gulp for building:
+Controller
 
-- JavaScript bundling with Rollup
-- CSS concatenation and minification
-- HTML processing and minification
-- Asset optimization
-- Development vs production builds
+Basic Test
+
+Calibration
+
+Finetuning
+
+Adaptive Triggers
+
+Sony DualShock 4 (V1/V2)
+
+✅
+
+✅
+
+❌
+
+N/A
+
+Sony DualSense
+
+✅
+
+✅
+
+✅
+
+✅
+
+Sony DualSense Edge
+
+✅
+
+✅
+
+✅*
+
+✅
+
+## 🛠️ Built With
+
+Core: HTML5, JavaScript (ES6 Modules).
+
+Styling: Bootstrap 5, Custom CSS (Neon/HUD Theme).
+
+Build Tools: Gulp, Rollup.
+
+APIs: WebHID API, Gamepad API.
+
+📸 Screenshots
+
+(Add your screenshots here, e.g., Dashboard, Calibration Modal, Analysis Tool)
+
+## 🤝 Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
+
+Fork the Project.
+
+Create your Feature Branch (git checkout -b feature/AmazingFeature).
+
+Commit your Changes (git commit -m 'Add some AmazingFeature').
+
+Push to the Branch (git push origin feature/AmazingFeature).
+
+Open a Pull Request.
+
+## 📜 License
+
+Distributed under the MIT License. See LICENSE.txt for more information.
+
+## 👨‍💻 Author
+
+Ahmed Badawy
+
+Facebook: A7medMody196
+
+WhatsApp: +201110210770
+
+<div align="center">
+<sub>This tool is not affiliated with or endorsed by Sony Interactive Entertainment Inc. "PlayStation", "DualSense", and "DualShock" are registered trademarks of Sony Interactive Entertainment Inc.</sub>
+</div>

@@ -1,66 +1,84 @@
-// 1. اسم الكيش (غيرنا الرقم عشان نضمن التحديث)
-const CACHE_NAME = 'ab-control-hub-v12-simple';
+// Service Worker for AB Control Hub
+// Strategy: Network First, falling back to Cache
+// This ensures Ads/Analytics run fresh when online, but app works offline.
 
-// 2. الملفات اللي هنخزنها
-// شلنا './' المعقدة وخليناها بسيطة عشان تشتغل في أي فولدر
+const CACHE_NAME = 'ab-control-hub-v19-network-first';
+
+// Files to cache (Basic app shell)
 const urlsToCache = [
+  './',             // Cache root for GitHub Pages
   'index.html',
   'js/core.js',
   'js/utils.js',
   'js/controller-manager.js',
   'css/main.css',
-  'css/finetune.css'
+  'css/finetune.css',
+  'lang/ar_ar.json',
+  'lang/en_us.json'
 ];
 
-// 3. حدث التثبيت (Install)
 self.addEventListener('install', (event) => {
-  self.skipWaiting(); // عشان التحديث يشتغل فوراً
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Caching files...');
-      // هنا التريك: بنستخدم addAll بس لو فشل ملف واحد مش هيوقف الباقي
-      return cache.addAll(urlsToCache).catch(err => {
-          console.warn('Some files failed to cache, but continuing:', err);
-      });
+      // Cache app shell immediately
+      return Promise.all(
+        urlsToCache.map(url => {
+          return cache.add(url).catch(err => {
+             console.warn("Failed to cache:", url, err);
+             // Ignore individual file failures to not break install
+          });
+        })
+      );
     })
   );
 });
 
-// 4. حدث الجلب (Fetch) - ده اللي بيجيب الملفات
 self.addEventListener('fetch', (event) => {
+  // Ignore non-http requests
+  if (!event.request.url.startsWith('http')) return;
+  
+  // Only handle requests to our own origin (GitHub Pages) for caching
+  // Let external requests (Google Ads, Analytics) go straight to network
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) {
+     return; // Browser handles this as normal network request
+  }
+
+  // For our own files: Network First Strategy
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      // لو الملف في الكيش، هاته
-      if (response) {
-        return response;
-      }
-      
-      // لو مش في الكيش، هاته من النت
-      return fetch(event.request).then((networkResponse) => {
-          // لو الملف رجع سليم (200 OK)، خزنه في الكيش للمرة الجاية
-          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-              const responseToCache = networkResponse.clone();
-              caches.open(CACHE_NAME).then((cache) => {
-                  cache.put(event.request, responseToCache);
-              });
-          }
-          return networkResponse;
-      }).catch(() => {
-          // لو النت فاصل والملف مش في الكيش، مش مشكلة، التطبيق لسه هيشتغل لو الملفات الأساسية موجودة
-          // ممكن هنا نرجع صفحة "Offline" لو حبينا
-      });
-    })
+    fetch(event.request)
+      .then((networkResponse) => {
+        // If we got a valid response from network
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+            // Clone it and update cache for next time we are offline
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, responseToCache);
+            });
+        }
+        return networkResponse;
+      })
+      .catch(() => {
+        // Network failed (Offline mode) -> Fallback to Cache
+        return caches.match(event.request).then(response => {
+            if (response) return response;
+            // Fallback for root path if exact match fails
+            if (url.pathname.endsWith('/')) {
+                return caches.match('index.html');
+            }
+        });
+      })
   );
 });
 
-// 5. حدث التفعيل (Activate) - تنظيف الكيش القديم
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
+            // Clean up old caches
             return caches.delete(cacheName);
           }
         })
