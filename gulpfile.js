@@ -45,7 +45,7 @@ const paths = {
   'web-app-manifest-192x192.png',
   'web-app-manifest-512x512.png',
   'site.webmanifest',
-'background.png',
+'background.webp',
   'sw.js' // <-- *** ضيف السطر ده ***
 ],
     svg: 'assets/**/*.svg'

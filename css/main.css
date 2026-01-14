@@ -24,7 +24,7 @@ body {
   color: var(--text-light);
   
   /* --- صورة الخلفية --- */
-  background-image: linear-gradient(rgba(10, 10, 26, 0.92), rgba(10, 10, 26, 0.98)), url('../background.png');
+  background-image: linear-gradient(rgba(10, 10, 26, 0.92), rgba(10, 10, 26, 0.98)), url('../background.webp');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

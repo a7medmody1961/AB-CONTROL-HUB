@@ -180,35 +180,44 @@
       </div>
     </div>
 
-    <!-- SEO Content Section (Always Visible) -->
-    <section class="container mt-5 text-start" id="about-section" style="max-width: 900px; color: #ccc;">
-      <hr class="my-5" style="border-color: var(--border-color);">
-      
-      <div class="row">
-        <div class="col-12">
-          <h3 class="text-white mb-3 ds-i18n" style="font-family: var(--font-hud);">What is AB Control Hub?</h3>
-          <p class="ds-i18n">AB Control Hub Description</p>
-        </div>
-      </div>
-
-      <div class="row mt-4">
-        <div class="col-md-6">
-          <h4 class="text-white mb-2 ds-i18n" style="font-family: var(--font-hud);">Key Features Title</h4>
-          <ul>
-            <li><strong class="ds-i18n">Drift Calibration:</strong> <span class="ds-i18n">Drift Calibration Feature</span></li>
-            <li><strong class="ds-i18n">Input Analysis:</strong> <span class="ds-i18n">Input Analysis Feature</span></li>
-            <li><strong class="ds-i18n">Output Testing:</strong> <span class="ds-i18n">Output Testing Feature</span></li>
-            <li><strong class="ds-i18n">Device Info:</strong> <span class="ds-i18n">Device Info Feature</span></li>
-          </ul>
-        </div>
-        <div class="col-md-6">
-          <h4 class="text-white mb-2 ds-i18n" style="font-family: var(--font-hud);">Supported Controllers Title</h4>
-          <ul>
-            <li class="ds-i18n">DualShock 4 Support</li>
-            <li class="ds-i18n">DualSense Support</li>
-            <li class="ds-i18n">DualSense Edge Support</li>
-          </ul>
-          <p class="small text-muted mt-2 ds-i18n">WebHID Requirement</p>
+    <!-- SEO Content Section (Collapsible) -->
+    <section class="container mt-4" id="about-section" style="max-width: 900px; color: #ccc;">
+      <div class="accordion accordion-flush" id="aboutAccordion">
+        <div class="accordion-item bg-transparent border-0">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed bg-transparent text-white shadow-none ds-i18n" type="button" data-bs-toggle="collapse" data-bs-target="#aboutCollapse" aria-expanded="false" aria-controls="aboutCollapse" style="font-family: var(--font-hud); font-size: 1.5rem;">
+              What is AB Control Hub?
+            </button>
+          </h2>
+          <div id="aboutCollapse" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
+            <div class="accordion-body text-start">
+              <div class="row">
+                <div class="col-12">
+                  <p class="ds-i18n">AB Control Hub Description</p>
+                </div>
+              </div>
+              <div class="row mt-4">
+                <div class="col-md-6">
+                  <h4 class="text-white mb-2 ds-i18n" style="font-family: var(--font-hud);">Key Features Title</h4>
+                  <ul>
+                    <li><strong class="ds-i18n">Drift Calibration:</strong> <span class="ds-i18n">Drift Calibration Feature</span></li>
+                    <li><strong class="ds-i18n">Input Analysis:</strong> <span class="ds-i18n">Input Analysis Feature</span></li>
+                    <li><strong class="ds-i18n">Output Testing:</strong> <span class="ds-i18n">Output Testing Feature</span></li>
+                    <li><strong class="ds-i18n">Device Info:</strong> <span class="ds-i18n">Device Info Feature</span></li>
+                  </ul>
+                </div>
+                <div class="col-md-6">
+                  <h4 class="text-white mb-2 ds-i18n" style="font-family: var(--font-hud);">Supported Controllers Title</h4>
+                  <ul>
+                    <li class="ds-i18n">DualShock 4 Support</li>
+                    <li class="ds-i18n">DualSense Support</li>
+                    <li class="ds-i18n">DualSense Edge Support</li>
+                  </ul>
+                  <p class="small text-muted mt-2 ds-i18n">WebHID Requirement</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -360,10 +369,9 @@
               <div class="vstack gap-3 p-3">
                 <label class="form-label ds-i18n" style="opacity: 0.7; margin-bottom: -10px;">Vibration</label>
                 <div class="btn-group w-100" role="group">
-                  <button type="button" class="btn-glow-secondary" style="width: 25%" onclick="test_vibration(150)">150ms</button>
-                  <button type="button" class="btn-glow-secondary" style="width: 25%" onclick="test_vibration(300)">300ms</button>
-                  <button type="button" class="btn-glow-secondary" style="width: 25%" onclick="test_vibration(500)">500ms</button>
-                  <button type="button" class="btn-glow-secondary" style="width: 25%" onclick="test_vibration(1000)">1s</button>
+                  <button type="button" class="btn-glow-secondary" style="width: 33%" onclick="test_vibration(300)">300ms</button>
+                  <button type="button" class="btn-glow-secondary" style="width: 33%" onclick="test_vibration(500)">500ms</button>
+                  <button type="button" class="btn-glow-secondary" style="width: 33%" onclick="test_vibration(1000)">1s</button>
                 </div>
 
                 <label class="form-label ds-i18n" style="opacity: 0.7; margin-bottom: -10px;">Audio Tests (DS5)</label>

@@ -112,6 +112,13 @@ function lang_reset_page() {
 function lang_set_direction(new_direction, lang_name) {
   const lang_prefix = lang_name.split("_")[0];
   document.documentElement.setAttribute("lang", lang_prefix);
+  
+  // Set Body class for font styling
+  if (lang_name === 'ar_ar') {
+    document.body.classList.add('ds-i18n-ar');
+  } else {
+    document.body.classList.remove('ds-i18n-ar');
+  }
 
   if(new_direction == translationState.lang_cur_direction)
     return;
@@ -170,15 +177,22 @@ async function lang_translate(target_file, target_lang, target_direction) {
 
     const items = document.querySelectorAll('.ds-i18n');
     for(const item of items) {
-      const originalText = lang_orig_text[item.id];
+      const originalText = lang_orig_text[item.id] ? lang_orig_text[item.id].trim() : "";
       const translationEntry = lang_cur[originalText];
       const translatedText = Array.isArray(translationEntry) ? translationEntry[0] : translationEntry;
       
       if (translatedText) {
         item.innerHTML = translatedText;
       } else {
-        console.log(`Cannot find mapping for "${originalText}"`);
-        if(originalText) item.innerHTML = originalText;
+        // Fallback to exact match if trim didn't work
+        const exactEntry = lang_cur[lang_orig_text[item.id]];
+        const exactTranslated = Array.isArray(exactEntry) ? exactEntry[0] : exactEntry;
+        if (exactTranslated) {
+            item.innerHTML = exactTranslated;
+        } else {
+            console.log(`Cannot find mapping for "${originalText}"`);
+            if(lang_orig_text[item.id]) item.innerHTML = lang_orig_text[item.id];
+        }
       }
     }
 
