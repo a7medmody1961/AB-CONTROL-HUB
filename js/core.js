@@ -110,6 +110,17 @@ function gboot() {
 
     initAnalyticsApi(app);
     lang_init(app, handleLanguageChange, show_welcome_modal);
+    
+    // Cookie consent check
+    if (!readCookie('cookie_consent')) {
+      setDisplay('cookie-consent', true);
+    }
+
+    // Modal exposure for global access
+    window.acceptCookies = () => {
+      createCookie('cookie_consent', 'true', 365);
+      setDisplay('cookie-consent', false);
+    };
 
     document.querySelectorAll("input[name='displayMode']").forEach(el => {
         el.addEventListener('change', on_stick_mode_change);
@@ -144,13 +155,13 @@ function gboot() {
   }
 
   if (!("hid" in navigator) && !app.isAndroid) {
-    setDisplay('offlinebar', false);
-    setDisplay('onlinebar', false);
     setDisplay('missinghid', true);
     return;
   }
 
-  setDisplay('offlinebar', true);
+  // Initial SVG load
+  init_svg_controller('DS4');
+
   if (!app.isAndroid) {
       navigator.hid.addEventListener("disconnect", handleDisconnectedDevice);
   }
@@ -167,12 +178,37 @@ function toggleElement(id, show) {
 }
 
 // Helper to reset connect button UI state
+// Helper to reset connect button UI state
 function resetConnectUI() {
-    const btnConnect = document.getElementById("btnconnect");
-    const connectSpinner = document.getElementById("connectspinner");
+    const btnConnect = document.getElementById("btnconnect-overlay");
     if (btnConnect) btnConnect.disabled = false;
-    if (connectSpinner) connectSpinner.style.display = 'none';
 }
+
+window.test_vibration = (duration) => {
+  if (controller && controller.isConnected()) {
+    controller.setVibration({ heavyLeft: 180, lightRight: 180, duration });
+  }
+};
+
+window.test_speaker = () => {
+  if (controller && controller.isConnected()) {
+    if (controller.getModel().startsWith("DS5")) {
+      controller.setSpeakerTone(1000, () => {}, "speaker");
+    } else {
+      infoAlert(l("Speaker test only supported on DualSense controllers"));
+    }
+  }
+};
+
+window.test_mic = () => {
+    if (controller && controller.isConnected()) {
+        if (controller.getModel().startsWith("DS5")) {
+            infoAlert(l("Microphone test initiated - check your OS audio settings for input signal"));
+        } else {
+            infoAlert(l("Microphone test only supported on DualSense controllers"));
+        }
+    }
+};
 
 async function connect() {
   app.gj = crypto.randomUUID();
@@ -186,11 +222,9 @@ async function connect() {
   clearAllAlerts();
   await sleep(200);
 
-  const btnConnect = document.getElementById("btnconnect");
-  const connectSpinner = document.getElementById("connectspinner");
+  const btnConnect = document.getElementById("btnconnect-overlay");
   
-  btnConnect.disabled = true;
-  connectSpinner.style.display = 'inline-block';
+  if (btnConnect) btnConnect.disabled = true;
   await sleep(100);
 
   try {
@@ -356,8 +390,13 @@ async function setupDeviceUI(device) {
     const deviceName = ControllerFactory.getDeviceName(device.productId);
     document.getElementById("devname").textContent = deviceName + " (" + dec2hex(device.vendorId) + ":" + dec2hex(device.productId) + ")";
 
-    setDisplay("offlinebar", false);
-    setDisplay("onlinebar", true);
+    setDisplay("connection-overlay", false);
+    const onlineHeader = document.getElementById("online-header");
+    if(onlineHeader) onlineHeader.style.display = 'flex';
+    
+    const svgContainer = document.getElementById("controller-svg-container");
+    if(svgContainer) svgContainer.classList.remove('disconnected-svg');
+
     setDisplay("mainmenu", true);
     toggleElement("resetBtn", true);
 
@@ -424,9 +463,13 @@ async function disconnect() {
   await controller.disconnect();
   controller = null;
   close_all_modals();
-  setDisplay("offlinebar", true);
-  setDisplay("onlinebar", false);
-  setDisplay("mainmenu", false);
+  
+  setDisplay("connection-overlay", true);
+  const onlineHeader = document.getElementById("online-header");
+  if(onlineHeader) onlineHeader.style.display = 'none';
+
+  const svgContainer = document.getElementById("controller-svg-container");
+  if(svgContainer) svgContainer.classList.add('disconnected-svg');
   
   // Reset connect button state on disconnect
   resetConnectUI();
@@ -895,9 +938,24 @@ function detectFailedRangeCalibration(changes) {
 
 // Callback function to handle UI updates after controller input processing
 function handleControllerInput({ changes, inputConfig, touchPoints, batteryStatus }) {
-  // Input Analysis Hook
-  if (isInputAnalysisVisible()) {
-    input_analysis_handle_input(performance.now());
+  // Handle Touchpad Visualization
+  if (touchPoints && touchPoints.length > 0) {
+    touchPoints.forEach((point, index) => {
+      const el = document.getElementById(`touch-point-${index}`);
+      const visualizer = document.getElementById('touchpad-visualizer');
+      if (el && visualizer) {
+        if (point.active) {
+          el.style.display = 'block';
+          // Map 0-1919 and 0-941 to 0-100%
+          const xPercent = (point.x / 1919) * 100;
+          const yPercent = (point.y / 941) * 100;
+          el.style.left = `${xPercent}%`;
+          el.style.top = `${yPercent}%`;
+        } else {
+          el.style.display = 'none';
+        }
+      }
+    });
   }
 
   const { buttonMap } = inputConfig;

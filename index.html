@@ -123,51 +123,9 @@
       </div>
     </div>
 
-    <!-- Offline Screen (Connect Button) -->
-    <div id="offlinebar" class="offline-container" style="display: none;">
-      <h2 class="mb-3 ds-i18n h4">Please connect a DualShock 4, a DualSense or DualSense Edge controller to your computer and press Connect.</h2>
-      <button id="btnconnect" type="button" class="btn-glow-connect" onclick="connect()">
-        <span class="spinner-border spinner-border-sm" style="display: none;" id="connectspinner" aria-hidden="true"></span>
-        <i class="fas fa-power-off me-2"></i> <span class="ds-i18n">Connect</span>
-      </button>
-
-      <!-- SEO Content Section (Visible to Google & Users) -->
-      <section class="container mt-5 text-start" id="about-section" style="max-width: 900px; color: #ccc;">
-        <hr class="my-5" style="border-color: var(--border-color);">
-        
-        <div class="row">
-          <div class="col-12">
-            <h3 class="text-white mb-3 ds-i18n" style="font-family: var(--font-hud);">What is AB Control Hub?</h3>
-            <p class="ds-i18n">AB Control Hub is an advanced, free web-based tool designed to diagnose, test, and calibrate Sony PlayStation controllers directly from your browser. Whether you are experiencing <strong>analog stick drift</strong> or just want to check your controller's input latency, this tool provides a comprehensive solution without downloading any software.</p>
-          </div>
-        </div>
-
-        <div class="row mt-4">
-          <div class="col-md-6">
-            <h4 class="text-white mb-2 ds-i18n" style="font-family: var(--font-hud);">Key Features</h4>
-            <ul>
-              <li><strong class="ds-i18n">Drift Calibration:</strong> <span class="ds-i18n">Permanently fix stick drift on DualSense and DualShock 4.</span></li>
-              <li><strong class="ds-i18n">Input Analysis:</strong> <span class="ds-i18n">Measure Polling Rate (Hz), Input Latency (ms), and Jitter.</span></li>
-              <li><strong class="ds-i18n">Output Testing:</strong> <span class="ds-i18n">Test Vibration motors, Adaptive Triggers, and LED colors.</span></li>
-              <li><strong class="ds-i18n">Device Info:</strong> <span class="ds-i18n">Read battery level, firmware version, and hardware details.</span></li>
-            </ul>
-          </div>
-          <div class="col-md-6">
-            <h4 class="text-white mb-2 ds-i18n" style="font-family: var(--font-hud);">Supported Controllers</h4>
-            <ul>
-              <li class="ds-i18n">Sony DualShock 4 (V1 &amp; V2)</li>
-              <li class="ds-i18n">Sony DualSense (PS5)</li>
-              <li class="ds-i18n">Sony DualSense Edge</li>
-            </ul>
-            <p class="small text-muted mt-2 ds-i18n">* Note: Requires a browser with WebHID support (Chrome, Edge, Opera).</p>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- Online Dashboard (Hidden until connected) -->
-    <div id="onlinebar" style="display: none;">
-      <div class="dashboard-header">
+    <!-- Online Dashboard -->
+    <div id="onlinebar">
+      <div class="dashboard-header" id="online-header" style="display: none;">
         <div class="device-info">
           <span class="ds-i18n">Connected to:</span>
           <strong id="devname"></strong>
@@ -180,9 +138,16 @@
           </button>
         </div>
       </div>
+      
+      <!-- Overlay for disconnected state -->
+      <div id="connection-overlay" class="connection-overlay">
+        <button id="btnconnect-overlay" type="button" class="btn-glow-connect" onclick="connect()">
+          <i class="fas fa-power-off me-2"></i> <span class="ds-i18n">Connect Controller</span>
+        </button>
+      </div>
     </div>
 
-    <div id="mainmenu" class="container" style="display: none;">
+    <div id="mainmenu" class="container">
       <ul class="nav nav-tabs mb-3" id="mainTabs" role="tablist" style="display: none;">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="controller-tab" data-bs-toggle="tab" data-bs-target="#controller-content" type="button" role="tab" aria-controls="controller-content" aria-selected="true">
@@ -200,6 +165,98 @@
           </button>
         </li>
       </ul>
+
+      <div class="tab-content" id="mainTabsContent">
+        <!-- Controller Tab -->
+        <div class="tab-pane show active" id="controller-content" role="tabpanel" aria-labelledby="controller-tab">
+          <div class="dashboard-grid">
+
+            <div class="dash-module module-controller-svg disconnected-svg" id="controller-svg-container">
+              <div id="controller-svg-placeholder"></div>
+            </div>
+            <!-- ... rest of modules ... -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO Content Section (Always Visible) -->
+    <section class="container mt-5 text-start" id="about-section" style="max-width: 900px; color: #ccc;">
+      <hr class="my-5" style="border-color: var(--border-color);">
+      
+      <div class="row">
+        <div class="col-12">
+          <h3 class="text-white mb-3 ds-i18n" style="font-family: var(--font-hud);">What is AB Control Hub?</h3>
+          <p class="ds-i18n">AB Control Hub Description</p>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h4 class="text-white mb-2 ds-i18n" style="font-family: var(--font-hud);">Key Features Title</h4>
+          <ul>
+            <li><strong class="ds-i18n">Drift Calibration:</strong> <span class="ds-i18n">Drift Calibration Feature</span></li>
+            <li><strong class="ds-i18n">Input Analysis:</strong> <span class="ds-i18n">Input Analysis Feature</span></li>
+            <li><strong class="ds-i18n">Output Testing:</strong> <span class="ds-i18n">Output Testing Feature</span></li>
+            <li><strong class="ds-i18n">Device Info:</strong> <span class="ds-i18n">Device Info Feature</span></li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <h4 class="text-white mb-2 ds-i18n" style="font-family: var(--font-hud);">Supported Controllers Title</h4>
+          <ul>
+            <li class="ds-i18n">DualShock 4 Support</li>
+            <li class="ds-i18n">DualSense Support</li>
+            <li class="ds-i18n">DualSense Edge Support</li>
+          </ul>
+          <p class="small text-muted mt-2 ds-i18n">WebHID Requirement</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookie-consent" class="cookie-consent-banner" style="display: none;">
+    <div class="container d-flex justify-content-between align-items-center">
+      <p class="mb-0 ds-i18n">Cookie Banner Text</p>
+      <button class="btn btn-glow-primary ds-i18n" style="width: auto;" onclick="acceptCookies()">Accept</button>
+    </div>
+  </div>
+
+  <!-- Developer Modal -->
+  <div class="modal fade" id="developerModal" tabindex="-1" aria-labelledby="developerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content text-bg-dark">
+        <div class="modal-header">
+          <h5 class="modal-title ds-i18n" id="developerModalLabel">Developer Info</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-white">
+          <div class="text-center mb-4">
+            <i class="fas fa-user-circle fa-5x mb-3" style="color: var(--glow-cyan);"></i>
+            <h4 class="ds-i18n">Ahmed Badawy</h4>
+            <p class="text-muted ds-i18n">Developer</p>
+          </div>
+          <div class="list-group list-group-flush bg-transparent">
+            <a href="https://www.facebook.com/A7medMody196" target="_blank" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+              <i class="fab fa-facebook me-3" style="color: #1877F2;"></i> <span class="ds-i18n">Facebook</span>: A7medmody196
+            </a>
+            <a href="https://www.instagram.com/A7medMody196" target="_blank" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+              <i class="fab fa-instagram me-3" style="color: #E4405F;"></i> <span class="ds-i18n">Instagram</span>: A7medMody196
+            </a>
+            <a href="https://t.me/A7medmody196" target="_blank" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+              <i class="fab fa-telegram me-3" style="color: #0088cc;"></i> <span class="ds-i18n">Telegram</span>: A7medmody196
+            </a>
+            <a href="https://wa.me/201110210770" target="_blank" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+              <i class="fab fa-whatsapp me-3" style="color: #25D366;"></i> <span class="ds-i18n">WhatsApp</span>: +201110210770
+            </a>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary ds-i18n" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
       <div class="tab-content" id="mainTabsContent">
         <!-- Controller Tab -->
@@ -287,13 +344,37 @@
               </div>
             </div>
 
+            <div class="dash-module" id="touchpad-test-module">
+              <div class="card-header"><i class="fas fa-fingerprint me-2"></i><span class="ds-i18n">Touchpad Test</span></div>
+              <div class="p-3 text-center">
+                <div id="touchpad-visualizer" class="touchpad-area mb-2">
+                  <div id="touch-point-0" class="touch-point" style="display: none;"></div>
+                  <div id="touch-point-1" class="touch-point" style="display: none;"></div>
+                </div>
+                <div class="small text-muted ds-i18n">Touch the pad to see feedback</div>
+              </div>
+            </div>
+
             <div class="dash-module">
               <div class="card-header"><i class="fas fa-vial me-2"></i><span class="ds-i18n">Output Tests</span></div>
               <div class="vstack gap-3 p-3">
                 <label class="form-label ds-i18n" style="opacity: 0.7; margin-bottom: -10px;">Vibration</label>
-                <button type="button" class="btn-glow-secondary ds-btn" onclick="test_vibration(150)">
-                  <i class="fas fa-vibrate me-2"></i> <span class="ds-i18n">Test Vibration</span> (150ms)
-                </button>
+                <div class="btn-group w-100" role="group">
+                  <button type="button" class="btn-glow-secondary" style="width: 25%" onclick="test_vibration(150)">150ms</button>
+                  <button type="button" class="btn-glow-secondary" style="width: 25%" onclick="test_vibration(300)">300ms</button>
+                  <button type="button" class="btn-glow-secondary" style="width: 25%" onclick="test_vibration(500)">500ms</button>
+                  <button type="button" class="btn-glow-secondary" style="width: 25%" onclick="test_vibration(1000)">1s</button>
+                </div>
+
+                <label class="form-label ds-i18n" style="opacity: 0.7; margin-bottom: -10px;">Audio Tests (DS5)</label>
+                <div class="btn-group w-100" role="group">
+                  <button type="button" class="btn-glow-primary" style="width: 50%" onclick="test_speaker()">
+                    <i class="fas fa-volume-up me-2"></i><span class="ds-i18n">Speaker</span>
+                  </button>
+                  <button type="button" class="btn-glow-primary" style="width: 50%" onclick="test_mic()">
+                    <i class="fas fa-microphone me-2"></i><span class="ds-i18n">Mic</span>
+                  </button>
+                </div>
 
                 <label class="form-label ds-i18n" style="opacity: 0.7; margin-bottom: -10px;">LED Color</label>
                 <div class="btn-group w-100" role="group">
@@ -321,18 +402,6 @@
               </div>
             </div>
 
-            <div class="dash-module">
-              <div class="card-header"><i class="fas fa-chart-line me-2"></i><span class="ds-i18n">Input Analysis</span></div>
-              <div class="vstack gap-3 p-3">
-                <div class="text-center opacity-75">
-                    <i class="fas fa-wave-square fa-3x mb-2" style="color: var(--glow-cyan);"></i>
-                    <p class="ds-i18n small">Measure Polling Rate, Latency &amp; Jitter</p>
-                </div>
-                <button type="button" class="btn-glow-primary ds-btn" onclick="show_input_analysis_modal()">
-                  <i class="fas fa-play me-2"></i> <span class="ds-i18n">Open Analyzer</span>
-                </button>
-              </div>
-            </div>
             
             <div class="dash-module">
                 <div class="card-header"><i class="fas fa-microchip me-2"></i><span class="ds-i18n">System Control</span></div>
@@ -425,20 +494,14 @@
         
         <p class="mb-0 footer-text">
           <span class="ds-i18n">Developed by</span> 
-          <a href="https://www.facebook.com/A7medMody196" target="_blank" title="Ahmed Badawy Facebook" style="color: var(--glow-cyan); text-decoration: none;">
+          <a href="#" data-bs-toggle="modal" data-bs-target="#developerModal" style="color: var(--glow-cyan); text-decoration: none;">
             <b class="ds-i18n">Ahmed Badawy</b>
           </a>
         </p>
 
         <ul class="list-unstyled d-flex mb-0">
-          <li class="ms-3">
-            <a class="link-body-emphasis ds-i18n" href="privacy.html" style="font-size: 0.9rem; text-decoration: none; color: #aaa !important;">Privacy Policy</a>
-          </li>
-          <li class="ms-3">
-            <a class="link-body-emphasis" href="https://wa.me/+201110210770" target="_blank" title="WhatsApp">
-              <i class="fab fa-whatsapp"></i>
-            </a>
-          </li>
+          <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="terms.html">Terms of Use</a></li>
+          <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="privacy.html">Privacy Policy</a></li>
         </ul>
       </div>
     </div>
