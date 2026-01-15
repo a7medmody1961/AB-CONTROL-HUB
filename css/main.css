@@ -879,6 +879,19 @@ dl.row dd {
 #about-section {
   display: block !important;
   margin-bottom: 50px;
+  color: #fff !important;
+}
+
+#aboutCollapse .accordion-body {
+  color: #fff !important;
+}
+
+#aboutCollapse ul li {
+  color: #fff !important;
+}
+
+#aboutCollapse p {
+  color: #fff !important;
 }
 
 /* Styles for fine-tuning interface */

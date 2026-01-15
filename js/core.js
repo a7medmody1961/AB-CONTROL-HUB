@@ -190,22 +190,29 @@ window.test_vibration = (duration) => {
   }
 };
 
-window.test_speaker = () => {
+window.test_speaker = async () => {
   if (controller && controller.isConnected()) {
-    if (controller.getModel().startsWith("DS5")) {
-      controller.setSpeakerTone(1000, () => {}, "speaker");
-    } else {
-      infoAlert(l("Speaker test only supported on DualSense controllers"));
+    try {
+      if (controller.getModel().startsWith("DS5")) {
+        await controller.setSpeakerTone(1000, () => {}, "speaker");
+      } else if (controller.getModel() === "DS4") {
+        // DS4 supports audio through headphones
+        await controller.setSpeakerTone("headphones");
+      } else {
+        infoAlert(l("Speaker test only supported on DualSense or DualShock 4 controllers"));
+      }
+    } catch (e) {
+      alert(e.message);
     }
   }
 };
 
 window.test_mic = () => {
     if (controller && controller.isConnected()) {
-        if (controller.getModel().startsWith("DS5")) {
+        if (controller.getModel().startsWith("DS5") || controller.getModel() === "DS4") {
             infoAlert(l("Microphone test initiated - check your OS audio settings for input signal"));
         } else {
-            infoAlert(l("Microphone test only supported on DualSense controllers"));
+            infoAlert(l("Microphone test only supported on PlayStation controllers"));
         }
     }
 };
