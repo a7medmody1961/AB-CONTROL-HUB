@@ -22,18 +22,20 @@ body {
   font-family: 'Inter', sans-serif; /* خط عادي للكلام */
   background-color: var(--bg-dark);
   color: var(--text-light);
-  
+  padding-bottom: 0; /* اجعلها صفر */
+
+
   /* --- صورة الخلفية --- */
   background-image: linear-gradient(rgba(10, 10, 26, 0.92), rgba(10, 10, 26, 0.98)), url('../background.webp');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   background-repeat: no-repeat;
-  padding-bottom: 80px; /* للفوتر */
 }
 
 /* ### الهيدر والفوتر الجديد ### */
 .navbar, .page-footer {
+  height: 60px; /* تحديد ارتفاع ثابت للفوتر */
   font-family: var(--font-hud);
   font-size: 1.2rem;
   letter-spacing: 1px;
@@ -135,9 +137,16 @@ body {
 /* ### تصميم الجريد للداشبورد ### */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  /* إجبار عمودين في الشاشات الكبيرة وواحد في الصغيرة */
+  grid-template-columns: 1fr; 
   gap: 1.5rem;
   align-items: start;
+}
+
+@media (min-width: 992px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr; /* هنا نجبره على تقسيم الصفحة لنصفين */
+  }
 }
 
 /* ### تصميم الموديول (الكارت) ### */
@@ -169,11 +178,10 @@ body {
 /* موديول الأنالوج (خليه يكبر شوية) */
 .module-joysticks {
   grid-column: span 1;
-  /* ده بيخليه ياخد عرض أكبر لو فيه مكان */
-  @media (min-width: 1200px) {
-    grid-column: span 2; 
-  }
-  align-items: center;
+  justify-self: stretch; /* تجعله يملأ نصف الصفحة الأيسر */
+  width: 100%;
+  max-width: 100%; /* اجعله مرناً ليملأ العمود */
+  min-height: auto !important;
 }
 
 #stickCanvas {
@@ -565,25 +573,25 @@ dl.row dd {
 /* ### 5. Controller View Module ### */
 .module-controller-svg {
   grid-column: span 1;
-  padding: 1rem 0;
-  @media (min-width: 768px) {
-    grid-column: 1 / -1; 
-  }
+  padding: 1rem;
+  display: flex; 
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  width: 100%;
+  max-width: 100%; /* مرونة العرض */
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-module);
+  min-height: auto !important;
+  justify-self: stretch;
 }
+
 #controller-svg-placeholder {
   width: 100%;
-  max-width: 700px;
-  margin: auto;
+  max-width: 500px; /* تحكم في حجم الدراع نفسه من هنا */
   display: flex; 
   justify-content: center; 
   align-items: center; 
-}
-#controller-svg-placeholder svg {
-    width: 100%;
-    height: auto;
 }
 
 /* ### 3 & 4. Rebuilt Modal Styles ### */
@@ -690,6 +698,36 @@ dl.row dd {
   align-items: center;
   line-height: 1;
 }
+/* تنسيق البار العمودي بنفس ستايل القديم */
+.vertical-progress-container {
+    height: 150px; /* طول البار */
+    width: 25px;   /* عرض البار (نفس سمك القديم تقريباً) */
+    background-color: #e9ecef; /* لون الخلفية الرمادي بتاع البوتستراب */
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: flex-end; /* عشان يبدأ ملو من تحت */
+    overflow: hidden; /* عشان الحواف المدورة */
+    margin: 0 auto; /* توسيط */
+}
+
+/* في الوضع الليلي نغمق الخلفية شوية */
+body[data-bs-theme="dark"] .vertical-progress-container,
+body.ds-i18n-ar .vertical-progress-container { 
+    background-color: #2b3035; 
+}
+
+.vertical-progress-bar {
+    width: 100%;
+    background-color: var(--glow-cyan); /* نفس لونك المميز */
+    transition: height 0.1s ease; /* نعومة الحركة */
+}
+
+.trigger-value-text {
+    font-family: monospace;
+    font-size: 1.1rem;
+    color: white;
+    margin-top: 5px;
+}
 .btn-indicator.pressed {
   background-color: var(--glow-cyan);
   color: var(--bg-dark);
@@ -750,7 +788,14 @@ dl.row dd {
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 240, 240, 0.1) inset;
 }
-
+/* لف السهم عند الفتح */
+.accordion-button:not(.collapsed) .fa-chevron-down {
+  transform: rotate(180deg);
+}
+/* إخفاء سهم البوتستراب الافتراضي عشان حطينا واحد احلى */
+.accordion-button::after {
+  display: none !important;
+}
 .touch-point {
   width: 20px;
   height: 20px;
@@ -878,7 +923,7 @@ dl.row dd {
 /* Ensure about section is always visible and below */
 #about-section {
   display: block !important;
-  margin-bottom: 50px;
+  margin-bottom: 0px;
   color: #fff !important;
 }
 
@@ -1044,4 +1089,51 @@ input[id^="finetune"] {
 #finetuneModal.circularity-mode #right-stick-card.show-slider .right-stick-slider.finetune-circularity-mode {
   display: block !important;
 }
-/*# sourceMappingURL=app.css.map */
+
+/* ستايل زراير الهيدر الجديدة */
+.btn-neon-header {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* عرض ثابت عشان يبقوا مربعات مظبوطة */
+    height: 38px;
+    margin-right: 8px;
+    border-radius: 8px; /* حواف ناعمة */
+}
+
+/* زرار الحفظ - أخضر */
+.btn-neon-save:hover {
+    border-color: #00ff00;
+    color: #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    text-shadow: 0 0 5px #00ff00;
+}
+
+/* زرار الريستارت - برتقالي محمر */
+.btn-neon-reboot:hover {
+    border-color: #ff4444;
+    color: #ff4444;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+    text-shadow: 0 0 5px #ff4444;
+}
+
+/* تعديل بسيط لزرار Disconnect عشان يبقى نفس الارتفاع */
+.btn-glow-disconnect {
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+}
+/* كلاس جديد لتثبيت الترتيب من اليسار لليمين دائماً */
+.fixed-ltr-row {
+  direction: ltr !important;
+}
+
+/* عشان نضمن إن الكلام جوه الكروت يفضل واخد اتجاه اللغة (عربي أو إنجليزي) */
+/* الكود ده بيرجع اتجاه النصوص لطبيعته حسب لغة الموقع */
+body[dir="rtl"] .fixed-ltr-row .dash-module {
+  direction: rtl; 
+}

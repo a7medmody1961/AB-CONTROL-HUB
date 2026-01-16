@@ -9,7 +9,6 @@ import { draw_stick_position, CIRCULARITY_DATA_SIZE } from './stick-renderer.js'
 import { ds5_finetune, isFinetuneVisible, finetune_handle_controller_input } from './modals/finetune-modal.js';
 import { calibrate_stick_centers, auto_calibrate_stick_centers } from './modals/calib-center-modal.js';
 import { calibrate_range } from './modals/calib-range-modal.js';
-import { show_input_analysis_modal, toggle_input_analysis, stop_input_analysis, isInputAnalysisVisible, input_analysis_handle_input } from './modals/input-analysis-modal.js';
 
 
 // Application State - manages app-wide state and UI
@@ -146,7 +145,28 @@ function gboot() {
             }
         });
     }
-  }
+// ... (بعد أكواد الـ colorPicker القديمة) ...
+
+    // 1. استدعاء رسم الأنالوج عشان يظهر فاضي (أصفار)
+    refresh_stick_pos();
+
+    // 2. رسم أيقونات الأزرار الافتراضية عشان المكان ميكونش فاضي
+    const defaultButtons = [
+        {name: 'l2'}, {name: 'r2'}, // التريجرز
+        {name: 'up'}, {name: 'down'}, {name: 'left'}, {name: 'right'}, // الأسهم
+        {name: 'square'}, {name: 'cross'}, {name: 'circle'}, {name: 'triangle'}, // الأشكال
+        {name: 'l1'}, {name: 'r1'}, 
+        {name: 'l3'}, {name: 'r3'},
+        {name: 'share'}, {name: 'options'}, {name: 'ps'}, {name: 'touchpad'}
+    ];
+    // دي الدالة اللي بترسم مربعات الزراير
+    initialize_button_indicators(defaultButtons);
+
+    // 3. تصفير البارات بتاعة L2 و R2
+    if(domCache.l2_progress) domCache.l2_progress.style.height = '0%';
+    if(domCache.r2_progress) domCache.r2_progress.style.height = '0%';
+    
+  } // <--- ده القوس المقفول بتاع initializeApp
 
   if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', initializeApp);
@@ -191,14 +211,21 @@ window.test_vibration = (duration) => {
 };
 
 window.test_speaker = async () => {
+  // ### التعديل الجديد: التحقق من الدراع والترجمة ###
+  if (!controller || !controller.isConnected()) {
+    warningAlert(l("Please connect a controller first"));
+    return;
+  }
+  // ############################################
+
   if (controller && controller.isConnected()) {
     try {
       if (controller.getModel().startsWith("DS5")) {
         await controller.setSpeakerTone(1000, () => {}, "speaker");
       } else if (controller.getModel() === "DS4") {
-        // DS4 supports audio through headphones
         await controller.setSpeakerTone("headphones");
       } else {
+        // استخدمنا l() هنا أيضاً
         infoAlert(l("Speaker test only supported on DualSense or DualShock 4 controllers"));
       }
     } catch (e) {
@@ -208,6 +235,13 @@ window.test_speaker = async () => {
 };
 
 window.test_mic = () => {
+    // ### التعديل الجديد: التحقق من الدراع والترجمة ###
+    if (!controller || !controller.isConnected()) {
+      warningAlert(l("Please connect a controller first"));
+      return;
+    }
+    // ############################################
+
     if (controller && controller.isConnected()) {
         if (controller.getModel().startsWith("DS5") || controller.getModel() === "DS4") {
             infoAlert(l("Microphone test initiated - check your OS audio settings for input signal"));
@@ -531,6 +565,71 @@ async function refresh_nvstatus() {
   return await controller.queryNvStatus();
 }
 
+window.showControllerInfo = function() {
+    const listContainer = document.getElementById('modal-info-list');
+    listContainer.innerHTML = ''; // تنظيف القائمة القديمة
+
+    // 1. تجميع المعلومات الأساسية من الهيدر
+    const devName = document.getElementById('devname').innerText.replace(/\(.*?\)/, '').trim() || "Generic Controller";
+    const devBat = document.getElementById('d-bat').innerText || "Unknown";
+    
+    // إضافة الاسم والبطارية أولاً
+    addToModalList("Name", devName, "text-white");
+    addToModalList("Battery", devBat, devBat.includes("%") ? "text-success" : "text-warning");
+
+    // 2. سحب باقي المعلومات التفصيلية من تبويب Info المخفي
+    // الكود الأصلي بيحط المعلومات في عناصر اسمها fwinfoextra-hw و fwinfoextra-fw
+    const infoSources = ['fwinfoextra-hw', 'fwinfoextra-fw'];
+    
+    infoSources.forEach(sourceId => {
+        const sourceEl = document.getElementById(sourceId);
+        if (sourceEl) {
+            const dts = sourceEl.getElementsByTagName('dt');
+            const dds = sourceEl.getElementsByTagName('dd');
+            
+            for (let i = 0; i < dts.length; i++) {
+                let key = dts[i].innerText.replace(':', '').trim();
+                let value = dds[i].innerText.trim();
+                
+                // منع تكرار المعلومات اللي عرضناها فوق
+                if (key.toLowerCase().includes('battery') || key === 'Name') continue;
+                
+                // تنظيف القيمة من أي أيقونات HTML لو موجودة
+                addToModalList(key, value, "text-info");
+            }
+        }
+    });
+
+    // 3. عرض النافذة
+    const infoModal = new bootstrap.Modal(document.getElementById('controllerInfoModal'));
+    infoModal.show();
+}
+
+// دالة مساعدة لترتيب الشكل جوه الـ Modal
+function addToModalList(key, value, valueColorClass) {
+    const listContainer = document.getElementById('modal-info-list');
+    
+    const li = document.createElement('li');
+    li.className = "list-group-item bg-transparent d-flex justify-content-between align-items-center border-secondary";
+    li.style.padding = "12px 20px";
+    
+    // المفتاح (Key) بلون رمادي فاتح عشان يبان
+    const keySpan = document.createElement('span');
+    keySpan.className = "text-white-50 small text-uppercase fw-bold"; // ده اللي هيخلي كلمة Name و Firmware تبان
+    keySpan.innerText = key;
+    
+    // القيمة (Value)
+    const valueSpan = document.createElement('strong');
+    valueSpan.className = valueColorClass;
+    valueSpan.style.fontFamily = "monospace";
+    valueSpan.style.fontSize = "1.1em";
+    valueSpan.innerText = value;
+    
+    li.appendChild(keySpan);
+    li.appendChild(valueSpan);
+    listContainer.appendChild(li);
+}
+
 function set_edge_progress(score) {
   const el = document.getElementById("dsedge-progress");
   if(el) el.style.width = score + "%";
@@ -603,8 +702,7 @@ function reset_circularity_mode() {
 }
 
 function refresh_stick_pos() {
-  if(!controller) return;
-
+  // 1. التأكد إن الكانفاس موجود
   const c = domCache.stickCanvas;
   if(!c) return;
   
@@ -613,25 +711,38 @@ function refresh_stick_pos() {
   const hb = 20 + sz;
   const yb = 15 + sz;
   const w = c.width;
+  
+  // تنظيف الرسم القديم
   ctx.clearRect(0, 0, c.width, c.height);
 
-  const { left: { x: plx, y: ply }, right: { x: prx, y: pry } } = controller.button_states.sticks;
+  // 2. تحديد القيم الافتراضية (أصفار)
+  let plx = 0, ply = 0, prx = 0, pry = 0;
+
+  // 3. لو الدراع واصل، هات القيم الحقيقية
+  if (controller && controller.button_states && controller.button_states.sticks) {
+      const sticks = controller.button_states.sticks;
+      plx = sticks.left.x;
+      ply = sticks.left.y;
+      prx = sticks.right.x;
+      pry = sticks.right.y;
+  }
 
   const enable_zoom_center = center_zoom_checked();
   const enable_circ_test = circ_checked();
   
-  // Draw left stick
+  // 4. رسم الأنالوج الأيسر (سواء بصفر أو بقيم حقيقية)
   draw_stick_position(ctx, hb, yb, sz, plx, ply, {
     circularity_data: enable_circ_test ? ll_data : null,
     enable_zoom_center,
   });
 
-  // Draw right stick
+  // 5. رسم الأنالوج الأيمن
   draw_stick_position(ctx, w-hb, yb, sz, prx, pry, {
     circularity_data: enable_circ_test ? rr_data : null,
     enable_zoom_center,
   });
 
+  // 6. تحديث الأرقام اللي تحت الرسمة
   const precision = enable_zoom_center ? 3 : 2;
   
   if(domCache.lx_lbl) domCache.lx_lbl.textContent = float_to_str(plx, precision);
@@ -639,48 +750,39 @@ function refresh_stick_pos() {
   if(domCache.rx_lbl) domCache.rx_lbl.textContent = float_to_str(prx, precision);
   if(domCache.ry_lbl) domCache.ry_lbl.textContent = float_to_str(pry, precision);
 
-  // Move L3 and R3 SVG elements according to stick position
-  try {
-    const model = controller.getModel();
-    let l3_x, l3_y, r3_x, r3_y;
-    let transform_l, transform_r;
+  // 7. تحريك صورة الدراع الـ SVG (دي بس اللي محتاجة دراع واصل عشان نعرف نوعه)
+  if (controller) {
+      try {
+        const model = controller.getModel();
+        let l3_x, l3_y, r3_x, r3_y;
+        let transform_l, transform_r;
 
-    if (model === "DS4") {
-        const max_offset = 25;
-        const l3_cx = 295.63, l3_cy = 461.03;
-        const r3_cx = 662.06, r3_cy = 419.78;
+        // نفس الكود القديم بتاعك لحساب التحريك
+        if (model === "DS4") {
+            const max_offset = 25;
+            const l3_cx = 295.63, l3_cy = 461.03;
+            const r3_cx = 662.06, r3_cy = 419.78;
+            l3_x = l3_cx + plx * max_offset; l3_y = l3_cy + ply * max_offset;
+            r3_x = r3_cx + prx * max_offset; r3_y = r3_cy + pry * max_offset;
+            transform_l = `translate(${l3_x - l3_cx},${l3_y - l3_cy})`;
+            transform_r = `translate(${r3_x - r3_cx},${r3_y - r3_cy})`;
+        } else if (model === "DS5" || model === "DS5_Edge") {
+            const max_offset = 25;
+            const l3_cx = 295.63, l3_cy = 461.03;
+            const r3_cx = 662.06, r3_cy = 419.78;
+            l3_x = l3_cx + plx * max_offset; l3_y = l3_cy + ply * max_offset;
+            r3_x = r3_cx + prx * max_offset; r3_y = r3_cy + pry * max_offset;
+            transform_l = `translate(${l3_x - l3_cx},${l3_y - l3_cy}) scale(0.70)`;
+            transform_r = `translate(${r3_x - r3_cx},${r3_y - r3_cy}) scale(0.70)`;
+        }
 
-        l3_x = l3_cx + plx * max_offset;
-        l3_y = l3_cy + ply * max_offset;
-        r3_x = r3_cx + prx * max_offset;
-        r3_y = r3_cy + pry * max_offset;
-
-        transform_l = `translate(${l3_x - l3_cx},${l3_y - l3_cy})`;
-        transform_r = `translate(${r3_x - r3_cx},${r3_y - r3_cy})`;
-
-    } else if (model === "DS5" || model === "DS5_Edge") {
-        const max_offset = 25;
-        const l3_cx = 295.63, l3_cy = 461.03;
-        const r3_cx = 662.06, r3_cy = 419.78;
-
-        l3_x = l3_cx + plx * max_offset;
-        l3_y = l3_cy + ply * max_offset;
-        r3_x = r3_cx + prx * max_offset;
-        r3_y = r3_cy + pry * max_offset;
-
-        transform_l = `translate(${l3_x - l3_cx},${l3_y - l3_cy}) scale(0.70)`;
-        transform_r = `translate(${r3_x - r3_cx},${r3_y - r3_cy}) scale(0.70)`;
-    }
-
-    if (transform_l) {
-        const l3_group = document.querySelector('g#L3');
-        if (l3_group) l3_group.setAttribute('transform', transform_l);
-        
-        const r3_group = document.querySelector('g#R3');
-        if (r3_group) r3_group.setAttribute('transform', transform_r);
-    }
-  } catch (e) {
-    // Fail silently if SVG not present
+        if (transform_l) {
+            const l3_group = document.querySelector('g#L3');
+            if (l3_group) l3_group.setAttribute('transform', transform_l);
+            const r3_group = document.querySelector('g#R3');
+            if (r3_group) r3_group.setAttribute('transform', transform_r);
+        }
+      } catch (e) { }
   }
 }
 
@@ -743,10 +845,18 @@ function update_ds_button_svg(changes, BUTTON_MAP) {
       const percentage = Math.round((val / 255) * 100);
       
       // Update bar using cached elements or fallback
+      // تحديث البار (الطول)
       const progressBar = (trigger === 'l2' ? domCache.l2_progress : domCache.r2_progress) || document.getElementById(`${trigger}-progress`);
       if (progressBar) {
-          progressBar.style.width = percentage + '%';
-          progressBar.textContent = percentage + '%';
+          progressBar.style.height = percentage + '%'; // نغير الطول
+          progressBar.style.width = '100%';            // نثبت العرض
+          progressBar.textContent = '';                // نفضي الكلام من جوه البار
+      }
+
+      // تحديث رقم النسبة المئوية الخارجي
+      const valLabel = document.getElementById(`${trigger}-val`);
+      if (valLabel) {
+          valLabel.textContent = percentage + '%';
       }
 
       // Update SVG
@@ -897,13 +1007,22 @@ function initialize_button_indicators(BUTTON_MAP) {
   
   for (const btn of BUTTON_MAP) {
     if (buttons_to_show.includes(btn.name)) {
-      const btn_name_translated = l(btn.name); 
-      const icon = iconMap[btn.name];
+      
+      // === التعديل: تغيير الاسم للعرض فقط ===
+      let displayName = btn.name;
+      if (displayName === 'create') {
+          displayName = 'Share'; // نغير الاسم هنا لـ Share
+      }
+      
+      // نترجم الاسم الجديد (Share) بدلاً من الاسم البرمجي (create)
+      const btn_name_translated = l(displayName); 
+      
+      const icon = iconMap[btn.name]; // نستخدم الاسم الأصلي لجلب الأيقونة
       
       const span = document.createElement('span');
-      span.id = `indicator-${btn.name}`;
+      span.id = `indicator-${btn.name}`; // الـ ID يظل كما هو ليعمل الكود
       span.className = 'btn-indicator';
-      span.setAttribute('title', btn_name_translated);
+      span.setAttribute('title', btn_name_translated); // التلميح يظهر الاسم الجديد المترجم
       span.innerHTML = icon;
       container.appendChild(span);
     }
@@ -1273,41 +1392,68 @@ function infoAlert(message, duration = 5_000) {
 // Export functions to global scope for HTML onclick handlers
 window.gboot = gboot;
 window.connect = connect;
+window.showControllerInfo = showControllerInfo;
 window.disconnect = disconnectSync;
 window.show_faq_modal = show_faq_modal;
 window.show_info_tab = show_info_tab;
-window.calibrate_range = () => calibrate_range(
-  controller,
-  { ll_data, rr_data },
-  (success, message) => {
-    if (success) {
-      resetStickDiagrams();
-      successAlert(message);
-      switchToRangeMode();
-      app.shownRangeCalibrationWarning = false
-    }
+window.calibrate_range = () => {
+  // 1. التحقق من الاتصال أولاً
+  if (!controller || !controller.isConnected()) {
+    warningAlert(l("Please connect a controller first"));
+    return;
   }
-);
-window.calibrate_stick_centers = () => calibrate_stick_centers(
-  controller,
-  (success, message) => {
-    if (success) {
-      resetStickDiagrams();
-      successAlert(message);
-      switchTo10xZoomMode();
+  
+  calibrate_range(
+    controller,
+    { ll_data, rr_data },
+    (success, message) => {
+      if (success) {
+        resetStickDiagrams();
+        successAlert(message);
+        switchToRangeMode();
+        app.shownRangeCalibrationWarning = false;
+      }
     }
+  );
+};
+
+window.calibrate_stick_centers = () => {
+  // 1. التحقق من الاتصال أولاً
+  if (!controller || !controller.isConnected()) {
+    warningAlert(l("Please connect a controller first"));
+    return;
   }
-);
-window.auto_calibrate_stick_centers = () => auto_calibrate_stick_centers(
-  controller,
-  (success, message) => {
-    if (success) {
-      resetStickDiagrams();
-      successAlert(message);
-      switchTo10xZoomMode();
+
+  calibrate_stick_centers(
+    controller,
+    (success, message) => {
+      if (success) {
+        resetStickDiagrams();
+        successAlert(message);
+        switchTo10xZoomMode();
+      }
     }
+  );
+};
+
+window.auto_calibrate_stick_centers = () => {
+  // 1. التحقق من الاتصال أولاً
+  if (!controller || !controller.isConnected()) {
+    warningAlert(l("Please connect a controller first"));
+    return;
   }
-);
+
+  auto_calibrate_stick_centers(
+    controller,
+    (success, message) => {
+      if (success) {
+        resetStickDiagrams();
+        successAlert(message);
+        switchTo10xZoomMode();
+      }
+    }
+  );
+};
 window.ds5_finetune = () => ds5_finetune(
   controller,
   { ll_data, rr_data, clear_circularity },
@@ -1323,19 +1469,47 @@ window.board_model_info = board_model_info;
 window.edge_color_info = edge_color_info;
 
 window.test_vibration = (duration = 150) => {
+  if (!controller || !controller.isConnected()) {
+    // التعديل هنا: استخدام دالة الترجمة l()
+    warningAlert(l("Please connect a controller first"));
+    return;
+  }
   console.log("Testing vibration...");
   controller.setVibration({ heavyLeft: 255, lightRight: 255, duration });
 }
 
 window.test_led = (color) => {
+  if (!controller || !controller.isConnected()) {
+    // التعديل هنا
+    warningAlert(l("Please connect a controller first"));
+    return;
+  }
+
   console.log(`Testing LED: ${color}`);
-  if (color === 'red') controller.currentController.setLightbarColor(255, 0, 0);
-  if (color === 'green') controller.currentController.setLightbarColor(0, 255, 0);
-  if (color === 'blue') controller.currentController.setLightbarColor(0, 0, 255);
-  if (color === 'off') controller.currentController.setLightbarColor(0, 0, 0);
+  // 2. التأكد من أن الكنترولر يدعم تغيير الألوان
+  if (controller.currentController && controller.currentController.setLightbarColor) {
+      if (color === 'red') controller.currentController.setLightbarColor(255, 0, 0);
+      if (color === 'green') controller.currentController.setLightbarColor(0, 255, 0);
+      if (color === 'blue') controller.currentController.setLightbarColor(0, 0, 255);
+      if (color === 'off') controller.currentController.setLightbarColor(0, 0, 0);
+  }
 }
 
 window.test_trigger = (side, preset) => {
+  if (!controller || !controller.isConnected()) {
+    // التعديل هنا
+    warningAlert(l("Please connect a controller first"));
+    return;
+  }
+  
+  // 2. التأكد أن الدراع PS5 (لأن التريجر مش موجود في PS4)
+const model = controller.getModel();
+  if (!model.startsWith("DS5")) {
+    // التعديل هنا
+    warningAlert(l("Adaptive Triggers are only supported on PS5 controllers (DualSense)."));
+    return;
+  }
+
   console.log(`Testing trigger ${side}: ${preset}`);
   
   const params = {
@@ -1345,10 +1519,6 @@ window.test_trigger = (side, preset) => {
   
   controller.setAdaptiveTriggerPreset(params);
 }
-
-window.show_input_analysis_modal = () => show_input_analysis_modal(controller);
-window.toggle_input_analysis = toggle_input_analysis;
-window.stop_input_analysis = stop_input_analysis;
 
 // Auto-initialize the application when the module loads
 gboot();
