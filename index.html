@@ -1,544 +1,226 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <!-- CSP Adjusted: Allows Google Ads/Analytics/TagManager -->
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src * data: blob: filesystem: about: ws: wss: 'unsafe-inline' 'unsafe-eval'; 
-        script-src * data: blob: 'unsafe-inline' 'unsafe-eval'; 
-        connect-src * data: blob: 'unsafe-inline'; 
-        img-src * data: blob: 'unsafe-inline'; 
-        frame-src * data: blob:; 
-        style-src * data: blob: 'unsafe-inline'; 
-        font-src * data: blob: 'unsafe-inline';">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Under Maintenance | AB Control Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-    <title>AB Control Hub | PS4/PS5 Controller Calibration & Test | معايرة وفحص دراعات بلايستيشن</title>
-    
-    <!-- Meta Info -->
-    <meta name="description" content="Ultimate Web-Based tool to test and calibrate PlayStation controllers (DualSense & DualShock 4). Fix analog stick drift, measure input latency, and test buttons online without installing software.">
-    <meta name="keywords" content="gamepad tester, controller calibration, dualsense drift fix, dualshock 4 calibration, ps5 controller test, input lag test, analog stick repair, معايرة الانالوج, فحص دراعات">
-    <meta name="author" content="Ahmed Badawy">
-    <meta name="robots" content="index, follow">
+    <style>
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://ab-control-hub.site/">
-    <meta property="og:title" content="AB Control Hub | Gamepad Calibration Tool">
-    <meta property="og:description" content="Fix stick drift and calibrate your PS4/PS5 controller directly in your browser.">
-    <meta property="og:image" content="social-share.jpg">
+        /* خلفية نيون خفيفة */
+        .bg-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 240, 240, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+            top: -10%;
+            left: -10%;
+            z-index: -1;
+        }
+        .bg-glow-2 {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(214, 51, 132, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+            bottom: -10%;
+            right: -10%;
+            z-index: -1;
+        }
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://ab-control-hub.site/">
-    <meta property="twitter:title" content="AB Control Hub | Gamepad Calibration Tool">
-    <meta property="twitter:description" content="Fix stick drift and calibrate your PS4/PS5 controller directly in your browser.">
-    <meta property="twitter:image" content="social-share.jpg">
+        .maintenance-container {
+            text-align: center;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(20, 20, 20, 0.8);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
+            width: 90%;
+        }
 
-    <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "http://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "AB Control Hub",
-      "operatingSystem": "Web Browser",
-      "applicationCategory": "UtilitiesApplication",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "author": {
-        "@type": "Person",
-        "name": "Ahmed Badawy"
-      },
-      "description": "Tool for testing and calibrating PlayStation controllers and fixing analog stick drift."
-    }
-    </script>
+        .icon-box {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #00f0f0, #d63384);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s infinite;
+        }
 
-    <!-- Google Tag Manager / Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=HYTZNPS0QC"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-HYTZNPS0QC');
-    </script>
+        h1 {
+            font-family: 'Teko', sans-serif;
+            font-size: 4rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
 
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7023137362392156" crossorigin="anonymous"></script>
+        p {
+            color: #a0a0a0;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+        /* تصميم العداد */
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
 
-    <!-- Styles -->
-    <link id="bootstrap-css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/finetune.css">
+        .time-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            min-width: 100px;
+            border: 1px solid rgba(0, 240, 240, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
 
-    <!-- Icons -->
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    <link rel="manifest" href="site.webmanifest">
-    <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link rel="shortcut icon" href="favicon.ico" />
-    <meta name="apple-mobile-web-app-title" content="AB Control Hub" />
+        .time-box span {
+            display: block;
+            font-family: 'Teko', sans-serif;
+            font-size: 3rem;
+            line-height: 1;
+            color: #00f0f0;
+        }
 
-    <!-- Scripts (Deferred) -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
-    <script type="module" src="js/core.js"></script>
+        .time-box label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ccc;
+        }
+
+        .social-links a {
+            color: #fff;
+            font-size: 1.5rem;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            color: #d63384;
+            transform: translateY(-3px);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @media (max-width: 576px) {
+            h1 { font-size: 3rem; }
+            .countdown { gap: 0.5rem; }
+            .time-box { min-width: 70px; padding: 0.5rem; }
+            .time-box span { font-size: 2rem; }
+        }
+    </style>
 </head>
-<body class="d-flex flex-column">  
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-md">
-    <div class="container-fluid">
-      <h1 class="visually-hidden">AB Control Hub - PlayStation Controller Calibration Tool by Ahmed Badawy</h1>
-      <a class="navbar-brand" href="#">
-        <i class="fas fa-gamepad me-2"></i> AB CONTROL HUB
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <i class="fas fa-bars"></i>
-      </button>
+<body>
 
-      <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
-        <ul class="navbar-nav">
-          <li class="nav-item" id="lang-switcher">
-            <a class="nav-link" id="langSwitchButton" role="button" href="#" onclick="toggle_lang()">
-              <i class="fas fa-language"></i>&nbsp;<span id="curLang">English</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
 
-  <div class="container-fluid px-2 pb-0 pt-1">
-
-    <!-- Browser Not Supported Message -->
-    <div id="missinghid" style="display: none;">
-      <div class="offline-container">
-        <h2 class="ds-i18n">Unsupported browser. Please use a web browser with WebHID support (e.g. Chrome).</h2>
-        <p class="ds-i18n">(Supports Android via OTG or Bluetooth on Chrome)</p>
-        <p class="text-muted small mt-2 ds-i18n">(iOS and iPadOS are not supported by Apple)</p>
-      </div>
-    </div>
-
-    <!-- Online Dashboard & Connection Status -->
-    <div id="onlinebar">
-      <div class="dashboard-header" id="online-header" style="display: none;">
-        
-        <div class="device-info d-flex align-items-center">
-          <span class="ds-i18n me-2">Connected:</span>
-          <strong id="devname" class="me-2 text-info"></strong>
-          <button type="button" class="btn btn-sm btn-outline-light rounded-circle" onclick="showControllerInfo()" style="width: 30px; height: 30px; padding: 0;">
-            <i class="fas fa-info"></i>
-          </button>
-          <span id="d-board" style="display:none;"></span> 
+    <div class="maintenance-container">
+        <div class="icon-box">
+            <i class="fas fa-tools"></i>
         </div>
 
-        <div class="device-status d-flex align-items-center">
-          
-          <button id="savechanges" type="button" class="btn btn-neon-header btn-neon-save" onclick="flash_all_changes()" title="Save Changes">
-            <i class="fas fa-save fa-lg"></i>
-          </button>
+        <h1>Under Maintenance</h1>
+        <p>We are currently upgrading the <strong>AB Control Hub</strong> to provide you with a better experience.<br>We'll be back online shortly!</p>
 
-          <button id="resetBtn" type="button" class="btn btn-neon-header btn-neon-reboot" onclick="reboot_controller()" title="Reboot Controller" style="display: none;">
-            <i class="fas fa-sync-alt fa-lg"></i>
-          </button>
-
-          <div class="vr mx-3 bg-secondary" style="height: 25px;"></div>
-
-          <strong id="d-bat" class="me-3" style="font-family: 'Teko', sans-serif; font-size: 1.4rem;"></strong>
-
-          <button type="button" class="btn-glow-disconnect" onclick="disconnect()">
-            <i class="fas fa-times me-2"></i> <span class="ds-i18n">Disconnect</span>
-          </button>
-        </div>
-      </div>
-      
-      <!-- Overlay for disconnected state -->
-      <div id="connection-overlay" class="connection-overlay">
-        <button id="btnconnect-overlay" type="button" class="btn-glow-connect" onclick="connect()">
-          <i class="fas fa-power-off me-2"></i> <span class="ds-i18n">Connect Controller</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Main Menu Tabs & Content -->
-    <div id="mainmenu" class="container-fluid mt-0 pt-0" style="margin-top: -10px;">
-      
-      <!-- Nav Tabs -->
-      <ul class="nav nav-tabs mb-3" id="mainTabs" role="tablist" style="display: none;">
-        <li class="nav-item"><button class="nav-link active" id="controller-tab" data-bs-toggle="tab" data-bs-target="#controller-content" type="button" role="tab">Calibration</button></li>
-        <li class="nav-item"><button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-content" type="button" role="tab">Info</button></li>
-        <li class="nav-item"><button class="nav-link" id="debug-tab" data-bs-toggle="tab" data-bs-target="#debug-content" type="button" role="tab">Debug</button></li>
-      </ul>
-
-      <!-- Tab Content Area -->
-      <div class="tab-content" id="mainTabsContent">
-        
-        <!-- 1. Controller / Calibration Tab -->
-        <div class="tab-pane fade show active" id="controller-content" role="tabpanel" aria-labelledby="controller-tab">
-        <section id="about-section" class="mb-3">
-  <div class="accordion accordion-flush" id="aboutAccordion">
-    <div class="accordion-item bg-transparent border-0">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed bg-transparent text-white shadow-none p-2 d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#aboutCollapse" aria-expanded="false" aria-controls="aboutCollapse" style="font-family: var(--font-hud); font-size: 1.4rem; border-bottom: 1px solid rgba(0, 240, 240, 0.3);">
-          <i class="fas fa-info-circle me-2" style="color: var(--glow-cyan);"></i> 
-          <span class="ds-i18n flex-grow-1 text-start">What is AB Control Hub?</span>
-          <i class="fas fa-chevron-down ms-2 text-white" style="font-size: 0.8em; transition: transform 0.3s;"></i>
-        </button>
-      </h2>
-      
-      <div id="aboutCollapse" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
-        <div class="accordion-body text-start text-white pt-3">
-          <p class="ds-i18n lead mb-3" style="font-size: 1rem; color: #e0e0e0;">
-            AB Control Hub is the ultimate Web-Based tool to test and calibrate PlayStation controllers (DualSense & DualShock 4). Fix analog stick drift, measure input latency, and test buttons online without installing software.
-          </p>
-          
-          <div class="row g-3">
-            <div class="col-md-6">
-              <ul class="list-unstyled mb-0 small text-white-50">
-                <li class="mb-2"><i class="fas fa-magic me-2 text-success"></i><span class="ds-i18n">Drift Calibration & Center Fix (Permanent)</span></li>
-                <li class="mb-2"><i class="fas fa-shield-alt me-2 text-info"></i><span class="ds-i18n">Privacy First: Local Processing (No Uploads)</span></li>
-                <li class="mb-2"><i class="fas fa-bolt me-2 text-warning"></i><span class="ds-i18n">Real-time WebHID Technology (Zero Latency)</span></li>
-              </ul>
+        <div class="countdown">
+            <div class="time-box">
+                <span id="days">00</span>
+                <label>Days</label>
             </div>
-            <div class="col-md-6">
-              <ul class="list-unstyled mb-0 small text-white-50">
-                <li class="mb-2"><i class="fas fa-vial me-2" style="color: var(--glow-magenta);"></i><span class="ds-i18n">Haptic Vibration & LED Testing</span></li>
-                <li class="mb-2"><i class="fab fa-usb me-2 text-white"></i><span class="ds-i18n">Plug & Test: No Drivers/Software Needed</span></li>
-                <li class="mb-2"><i class="fas fa-gamepad me-2 text-primary"></i><span class="ds-i18n">Supported: DualShock 4, DualSense & Edge</span></li>
-              </ul>
+            <div class="time-box">
+                <span id="hours">00</span>
+                <label>Hours</label>
             </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-  
-<div class="row g-2 mb-3 mt-0 align-items-stretch fixed-ltr-row">
-
-    <div class="col-lg-4 col-md-12">
-        <div class="dash-module module-joysticks h-100">
-          <div class="card-header"><i class="fas fa-crosshairs me-2"></i><span class="ds-i18n">Joystick Info</span></div>
-          <div class="vstack px-2">
-            <canvas id="stickCanvas" width="300" height="150" style="width: 100%; object-fit: contain;"></canvas>
-          </div>
-          <div class="px-2">
-            <div class="hstack justify-content-center">
-              <div class="vstack text-center"><span class="small ds-i18n">LX:</span><pre id="lx-lbl" class="m-0"></pre></div>
-              <div class="vstack text-center"><span class="small ds-i18n">LY:</span><pre id="ly-lbl" class="m-0"></pre></div>
-              <div class="vstack text-center"><span class="small ds-i18n">RX:</span><pre id="rx-lbl" class="m-0"></pre></div>
-              <div class="vstack text-center"><span class="small ds-i18n">RY:</span><pre id="ry-lbl" class="m-0"></pre></div>
+            <div class="time-box">
+                <span id="minutes">00</span>
+                <label>Minutes</label>
             </div>
-          </div>
-          <div class="px-2 mt-2">
-            <div class="btn-group w-100 mb-3" role="group">
-              <input type="radio" class="btn-check" name="displayMode" id="normalMode" value="normal" checked>
-              <label class="btn btn-outline-secondary btn-sm ds-i18n" for="normalMode">Normal</label>
-              
-              <input type="radio" class="btn-check" name="displayMode" id="centerZoomMode" value="centerZoom">
-              <label class="btn btn-outline-secondary btn-sm ds-i18n" for="centerZoomMode">10x zoom</label>
-
-              <input type="radio" class="btn-check" name="displayMode" id="checkCircularityMode" value="checkCircularity">
-              <label class="btn btn-outline-secondary btn-sm ds-i18n" for="checkCircularityMode">Circularity</label>
+            <div class="time-box">
+                <span id="seconds">00</span>
+                <label>Seconds</label>
             </div>
-          </div>
         </div>
-    </div>
 
-    <div class="col-lg-4 col-md-12">
-        <div class="dash-module module-controller-svg disconnected-svg h-100 d-flex align-items-center justify-content-center" id="controller-svg-container">
-          <div id="controller-svg-placeholder"></div>
-        </div>
-    </div>
-
-    <div class="col-lg-4 col-md-12">
-      <div class="dash-module h-100">
-        <div class="card-header"><i class="fas fa-keyboard me-2"></i><span class="ds-i18n">Button Test</span></div>
-        <div class="p-3">
-          <div class="d-flex justify-content-center gap-5 mb-4">
-              <div class="text-center">
-                  <label class="fw-bold text-white mb-2" style="font-size: 1.2rem;">L2</label>
-                  <div class="vertical-progress-container">
-                      <div class="vertical-progress-bar" id="l2-progress" style="height: 0%;"></div>
-                  </div>
-                  <div class="trigger-value-text" id="l2-val">0%</div>
-              </div>
-              <div class="text-center">
-                  <label class="fw-bold text-white mb-2" style="font-size: 1.2rem;">R2</label>
-                  <div class="vertical-progress-container">
-                      <div class="vertical-progress-bar" id="r2-progress" style="height: 0%;"></div>
-                  </div>
-                  <div class="trigger-value-text" id="r2-val">0%</div>
-              </div>
-          </div>
-          <hr style="border-color: rgba(255,255,255,0.1);">
-          <div class="d-flex flex-wrap gap-2 justify-content-center" id="digital-buttons-container" style="min-height: 50px;"></div>
-        </div>
-      </div>
-    </div>
-
-  </div> 
-
-<div class="row g-2 mb-0 align-items-stretch fixed-ltr-row">
-    <div class="col-lg-4 col-md-12">
-      <div class="dash-module h-100" id="touchpad-test-module">
-        <div class="card-header"><i class="fas fa-fingerprint me-2"></i><span class="ds-i18n">Touchpad Test</span></div>
-        <div class="p-3 text-center d-flex flex-column justify-content-center h-100">
-          <div id="touchpad-visualizer" class="touchpad-area mb-2">
-            <div id="touch-point-0" class="touch-point" style="display: none;"></div>
-            <div id="touch-point-1" class="touch-point" style="display: none;"></div>
-          </div>
-          <div class="small text-white ds-i18n" style="opacity: 0.8;">Touch the pad to see feedback</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-4 col-md-12">
-  <div class="dash-module h-100">
-    <div class="card-header"><i class="fas fa-vial me-2"></i><span class="ds-i18n">Output Tests</span></div>
-    <div class="vstack gap-2 p-3 justify-content-center">
-      
-      <label class="text-white-50 small mb-0 ms-1 ds-i18n">Vibration Test</label>
-      <div class="btn-group w-100 btn-group-sm" role="group">
-        <button type="button" class="btn-glow-secondary" onclick="test_vibration(500)">500ms</button>
-        <button type="button" class="btn-glow-secondary" onclick="test_vibration(1000)">1s</button>
-      </div>
-
-      <label class="text-white-50 small mb-0 ms-1 ds-i18n">Audio (DS5)</label>
-      <div class="btn-group w-100 btn-group-sm" role="group">
-        <button type="button" class="btn-glow-primary" onclick="test_speaker()"><i class="fas fa-volume-up"></i> Speak</button>
-        <button type="button" class="btn-glow-primary" onclick="test_mic()"><i class="fas fa-microphone"></i> Mic</button>
-      </div>
-
-      <label class="text-white-50 small mb-0 ms-1 ds-i18n">LED Color</label>
-      <div class="btn-group w-100 btn-group-sm" role="group">
-         <label class="btn-glow-secondary" style="width: 15%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
-            <input type="color" id="ledColorPicker" value="#800080" style="opacity: 0; position: absolute; left:0; top:0; width: 150%; height: 150%; cursor: pointer;">
-            <i class="fas fa-palette"></i>
-         </label>
-         <button type="button" class="btn-glow-red" onclick="test_led('red')">Red</button>
-         <button type="button" class="btn-glow-success" onclick="test_led('green')">Green</button>
-         <button type="button" class="btn-glow-blue" onclick="test_led('blue')">Blue</button>
-         <button type="button" class="btn-glow-white" onclick="test_led('off')">Off</button>
-      </div>
-
-      <label class="text-white-50 small mb-0 ms-1 ds-i18n">Adaptive Triggers (PS5 Only)</label>
-      <div class="btn-group w-100 btn-group-sm" role="group">
-         <button type="button" class="btn-glow-secondary" onclick="test_trigger('left', 'medium')">L Trig</button>
-         <button type="button" class="btn-glow-secondary" onclick="test_trigger('right', 'medium')">R Trig</button>
-         <button type="button" class="btn-glow-danger" onclick="test_trigger('left', 'off'); test_trigger('right', 'off');">Reset</button>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-    <div class="col-lg-4 col-md-12">
-  <div class="dash-module h-100">
-    <div class="card-header"><i class="fas fa-sliders-h me-2"></i><span class="ds-i18n">Calibration Suite</span></div>
-    <div class="vstack gap-3 p-3 d-flex flex-column justify-content-center h-100">
-      
-      <button type="button" class="btn-glow-primary ds-btn" onclick="calibrate_stick_centers()" id="four-step-center-calib">
-        1. <span class="ds-i18n">Calibrate stick center</span>
-      </button>
-
-      <button type="button" class="btn-glow-primary ds-btn" onclick="auto_calibrate_stick_centers()" id="quick-center-calib" style="display: none;">
-        1. <span class="ds-i18n">Calibrate stick center</span>
-      </button>
-      
-      <button type="button" class="btn-glow-secondary ds-btn" onclick="calibrate_range()">
-        2. <span class="ds-i18n">Calibrate stick range</span>
-      </button>
-      
-      <button type="button" class="btn-glow-white ds-btn" onclick="ds5_finetune()" id="ds5finetune" style="display: none;">
-  3. <span class="ds-i18n">Finetune stick calibration</span>
-</button>
-
-    </div>
-  </div>
-</div>
-
-        <!-- 2. Info Tab -->
-        <div class="tab-pane fade" id="info-content" role="tabpanel" aria-labelledby="info-tab">
-          <div class="container-fluid py-4">
-            <div class="row">
-              <div class="col-lg-12 col-xl-6 py-3">
-                <div class="card">
-                  <h5 class="card-header"><i class="fas fa-code"></i>&nbsp;&nbsp;<span class="ds-i18n">Software</span></h5>
-                  <div class="card-body">
-                    <dl class="row" id="fwinfoextra-fw"></dl>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-12 col-xl-6 py-3">
-                <div class="card">
-                  <h5 class="card-header"><i class="fas fa-microchip"></i>&nbsp;&nbsp;<span class="ds-i18n">Hardware</span></h5>
-                  <div class="card-body">
-                    <dl class="row" id="fwinfoextra-hw"></dl>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="social-links">
+            <a href="https://www.facebook.com/A7medMody196" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="https://t.me/A7medmody196" target="_blank"><i class="fab fa-telegram"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-discord"></i></a>
+            <a href="mailto:contact@ab-control-hub.site"><i class="fas fa-envelope"></i></a>
         </div>
         
-        <!-- 3. Debug Tab -->
-        <div class="tab-pane fade" id="debug-content" role="tabpanel" aria-labelledby="debug-tab">
-          <div class="container-fluid py-4">
-            <div class="row">
-              <p class="ds-i18n">Sections below are not useful, just some debug infos or manual commands</p>
-            </div>
-            <div class="row">
-              <div class="col-md-6 col-sm-12">
-                <div class="card text-bg-light" >
-                  <div class="card-header"><i class="fas fa-bug"></i>&nbsp;&nbsp;<span class="ds-i18n">Debug Info</span></div>
-                  <div class="vstack p-2">
-                    <div class="hstack"><p class="ds-i18n">NVS Status</p><p class="ms-auto ds-i18n" id="d-nvstatus">Unknown</p></div>
-                  </div>
-                </div>
-                <br>
-              </div>
-              <div class="col-md-6 col-sm-12">
-                <div class="card text-bg-light" >
-                  <div class="card-header"><i class="fas fa-skull-crossbones"></i>&nbsp;&nbsp;<span class="ds-i18n">Debug buttons</span></div>
-                  <div class="vstack gap-2 p-2">
-                    <div class="hstack gap-2">
-                      <button type="button" class="btn btn-success ds-btn ds-i18n" onclick="refresh_nvstatus()">Query NVS status</button>
-                      <button type="button" class="btn btn-primary ds-btn ds-i18n" onclick="nvsunlock()">NVS unlock</button>
-                      <button type="button" class="btn btn-primary ds-btn ds-i18n" onclick="nvslock()">NVS lock</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="mt-4 text-white-50 small">
+            Developed by Ahmed Badawy
         </div>
-
-      </div> <!-- End Tab Content -->
-    </div> <!-- End Main Menu -->
-
-    
-
-  <!-- Cookie Consent Banner -->
-  <div id="cookie-consent" class="cookie-consent-banner" style="display: none;">
-    <div class="container d-flex justify-content-between align-items-center">
-      <p class="mb-0 ds-i18n">Cookie Banner Text</p>
-      <button class="btn btn-glow-primary ds-i18n" style="width: auto;" onclick="acceptCookies()">Accept</button>
     </div>
-  </div>
 
-  <div class="modal fade" id="controllerInfoModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content text-bg-dark border-secondary" style="box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);">
-        <div class="modal-header border-secondary">
-          <h5 class="modal-title"><i class="fas fa-microchip me-2 text-info"></i>Device Details</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body p-0">
-          <ul class="list-group list-group-flush" id="modal-info-list">
-             </ul>
-        </div>
-        <div class="modal-footer border-secondary">
-          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Developer Modal -->
-  <div class="modal fade" id="developerModal" tabindex="-1" aria-labelledby="developerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content text-bg-dark">
-        <div class="modal-header">
-          <h5 class="modal-title ds-i18n" id="developerModalLabel">Developer Info</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body text-white">
-          <div class="text-center mb-4">
-            <i class="fas fa-user-circle fa-5x mb-3" style="color: var(--glow-cyan);"></i>
-            <h4 class="ds-i18n">Ahmed Badawy</h4>
-            <p class="text-muted ds-i18n">Developer</p>
-          </div>
-          <div class="list-group list-group-flush bg-transparent">
-            <a href="https://www.facebook.com/A7medMody196" target="_blank" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
-              <i class="fab fa-facebook me-3" style="color: #1877F2;"></i> <span class="ds-i18n">Facebook</span>: A7medmody196
-            </a>
-            <a href="https://www.instagram.com/A7medMody196" target="_blank" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
-              <i class="fab fa-instagram me-3" style="color: #E4405F;"></i> <span class="ds-i18n">Instagram</span>: A7medMody196
-            </a>
-            <a href="https://t.me/A7medmody196" target="_blank" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
-              <i class="fab fa-telegram me-3" style="color: #0088cc;"></i> <span class="ds-i18n">Telegram</span>: A7medmody196
-            </a>
-            <a href="https://wa.me/201110210770" target="_blank" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
-              <i class="fab fa-whatsapp me-3" style="color: #25D366;"></i> <span class="ds-i18n">WhatsApp</span>: +201110210770
-            </a>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary ds-i18n" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Alerts Container -->
-  <div class="container-fluid fixed-bottom " style="z-index: 1040; pointer-events: none; bottom: 70px;">
-    <div class="container">
-      <div id="alert-container" class="mb-3" style="pointer-events: auto;"></div>
-    </div>
-  </div>
-
-  <!-- Footer -->
-<footer class="page-footer border-top mt-3">
-
-        <div class="container">
-      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center py-3" id="footbody">
+    <script>
+        // ============================================
+        // حدد تاريخ الانتهاء هنا (بعد 3 أيام من الآن)
+        // ============================================
         
-        <p class="mb-0 footer-text">
-          <span class="ds-i18n">Developed by</span> 
-          <a href="#" data-bs-toggle="modal" data-bs-target="#developerModal" style="color: var(--glow-cyan); text-decoration: none;">
-            <b class="ds-i18n">Ahmed Badawy</b>
-          </a>
-        </p>
+        // الكود ده بيحسب 3 أيام من لحظة فتح الموقع لأول مرة
+        // لو عاوز تاريخ ثابت (مثلاً يوم 20 يناير)، غير السطر ده لـ:
+        // const countDownDate = new Date("Jan 20, 2026 12:00:00").getTime();
+        
+        const threeDaysFromNow = new Date();
+        threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+        const countDownDate = threeDaysFromNow.getTime();
 
-        <ul class="list-unstyled d-flex mb-0">
-          <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="terms.html">Terms of Use</a></li>
-          <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="privacy.html">Privacy Policy</a></li>
-          <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="Support & Feedback.html">Support & Feedback</a></li>
-        </ul>
-      </div>
-    </div>
-  </footer>
+        // تحديث العداد كل ثانية
+        const x = setInterval(function() {
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
 
-  <!-- Service Worker -->
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js', { scope: './' })
-        .then(registration => {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        })
-        .catch(err => {
-          console.log('ServiceWorker registration failed: ', err);
-        });
-    });
-  }
-  </script>
+            // حساب الوقت
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // عرض النتائج في الـ HTML
+            document.getElementById("days").innerHTML = days < 10 ? "0" + days : days;
+            document.getElementById("hours").innerHTML = hours < 10 ? "0" + hours : hours;
+            document.getElementById("minutes").innerHTML = minutes < 10 ? "0" + minutes : minutes;
+            document.getElementById("seconds").innerHTML = seconds < 10 ? "0" + seconds : seconds;
+
+            // لما العداد يخلص
+            if (distance < 0) {
+                clearInterval(x);
+                document.querySelector(".countdown").innerHTML = "<h2 style='color:#00f0f0'>WE ARE LIVE!</h2>";
+                // ممكن تعمل هنا إعادة توجيه لصفحة الموقع الأصلية
+                 // window.location.href = "index_app.html";
+            }
+        }, 1000);
+    </script>
+
 </body>
 </html>
