@@ -186,11 +186,13 @@
         
         // الكود ده بيحسب 3 أيام من لحظة فتح الموقع لأول مرة
         // لو عاوز تاريخ ثابت (مثلاً يوم 20 يناير)، غير السطر ده لـ:
-        // const countDownDate = new Date("Jan 20, 2026 12:00:00").getTime();
+       // ============================================
+        // تحديد تاريخ الانتهاء الثابت (20 يناير 2026)
+        // ============================================
         
-        const threeDaysFromNow = new Date();
-        threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
-        const countDownDate = threeDaysFromNow.getTime();
+        // هنا قمنا بتحديد التاريخ والساعة بدقة
+        // الصيغة: "Month Day, Year Hour:Minute:Second"
+        const countDownDate = new Date("Jan 20, 2026 00:00:00").getTime();
 
         // تحديث العداد كل ثانية
         const x = setInterval(function() {
@@ -214,8 +216,7 @@
             if (distance < 0) {
                 clearInterval(x);
                 document.querySelector(".countdown").innerHTML = "<h2 style='color:#00f0f0'>WE ARE LIVE!</h2>";
-                // ممكن تعمل هنا إعادة توجيه لصفحة الموقع الأصلية
-                 // window.location.href = "index_app.html";
+                 // window.location.href = "index.html";
             }
         }, 1000);
     </script>
