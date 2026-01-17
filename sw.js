@@ -2,7 +2,7 @@
 // Strategy: Network First, falling back to Cache
 // This ensures Ads/Analytics run fresh when online, but app works offline.
 
-const CACHE_NAME = 'ab-control-hub-v5';
+const CACHE_NAME = 'ab-control-hub-v57';
 
 // Files to cache (Basic app shell)
 const urlsToCache = [
