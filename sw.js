@@ -2,19 +2,53 @@
 // Strategy: Network First, falling back to Cache
 // This ensures Ads/Analytics run fresh when online, but app works offline.
 
-const CACHE_NAME = 'ab-control-hub-v57';
-
-// Files to cache (Basic app shell)
+const CACHE_NAME = 'ab-control-hub-v3'; // غيرنا الرقم لـ 3 عشان المتصفح يحس بالتغيير
 const urlsToCache = [
-  './',             // Cache root for GitHub Pages
-  'index.html',
-  'js/core.js',
-  'js/utils.js',
-  'js/controller-manager.js',
-  'css/main.css',
-  'css/finetune.css',
-  'lang/ar_ar.json',
-  'lang/en_us.json'
+  './',
+  './index.html',
+  './terms.html',
+  './privacy.html',
+  './Support%20&%20Feedback.html', // لاحظ الترميز %20 للمسافات
+  './guide.html',
+  './css/main.css',
+  './css/finetune.css',
+  './fa.min.css',
+  './js/core.js',
+  './js/utils.js',
+  './js/translations.js',
+  './js/template-loader.js',
+  './js/stick-renderer.js',
+  './js/controller-manager.js',
+  './js/controllers/base-controller.js',
+  './js/controllers/ds4-controller.js',
+  './js/controllers/ds5-controller.js',
+  './js/controllers/ds5-edge-controller.js',
+  './js/controllers/controller-factory.js',
+  './js/modals/calib-center-modal.js',
+  './js/modals/calib-range-modal.js',
+  './js/modals/finetune-modal.js',
+  './lang/en_us.json',
+  './lang/ar_ar.json',
+  './assets/dualsense-controller.svg',
+  './assets/dualshock-controller.svg',
+  './assets/icons.svg',
+  './background.webp',
+  './favicon.svg',
+  './favicon.ico',
+  './apple-touch-icon.png',
+  './site.webmanifest',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+  'https://code.jquery.com/jquery-3.7.1.min.js',
+  'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css',
+  './templates/calib-center-modal.html',
+  './templates/auto-calib-center-modal.html',
+  './templates/range-modal.html',
+  './templates/finetune-modal.html',
+  './templates/popup-modal.html',
+  './templates/faq-modal.html',
+  './templates/edge-modal.html',
+  './templates/edge-progress-modal.html'
 ];
 
 self.addEventListener('install', (event) => {

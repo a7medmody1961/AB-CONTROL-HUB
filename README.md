@@ -1,137 +1,113 @@
-## 🎮 AB Control Hub
+# 🎮 AB Control Hub
 
 <div align="center">
 
-The Ultimate Web-Based Calibration & Testing Tool for PlayStation Controllers
+**The Ultimate Web-Based Calibration & Testing Tool for PlayStation Controllers**
 
-Live Demo | Report Bug | Request Feature
+[Live Demo](https://ab-control-hub.site/) | [Report Bug](https://github.com/a7medmody1961/ab-control-hub/issues) | [Request Feature](https://github.com/a7medmody1961/ab-control-hub/issues)
 
 </div>
 
 ## 📖 Overview
 
-AB Control Hub is a powerful, open-source web application designed to diagnose, test, and calibrate Sony PlayStation controllers (DualShock 4, DualSense, and DualSense Edge). Built with modern web technologies and the WebHID API, it allows users to fix analog stick drift, analyze input latency, and customize controller settings directly from the browser without installing third-party software.
+**AB Control Hub** is a powerful, secure, and open-source web application designed to diagnose, test, and calibrate Sony PlayStation controllers (**DualShock 4**, **DualSense**, and **DualSense Edge**).
 
-Developed with ❤️ by Ahmed Badawy.
+Built with modern web technologies and the **WebHID API**, it runs entirely in your browser. It allows users to fix analog stick drift, finetune controller settings, and test hardware components without installing any third-party software or drivers.
+
+> **Developed with ❤️ by Ahmed Badawy.**
 
 ## ✨ Key Features
 
-🔌 WebHID Integration: Connect controllers directly via USB or Bluetooth using the browser's native Human Interface Device API.
+### 🔌 Seamless Connectivity
+* **WebHID Integration:** Connect directly via USB or Bluetooth (Chrome/Edge/Opera).
+* **No Drivers Needed:** Plug and play experience.
 
-🕹️ Comprehensive Calibration:
+### 🕹️ Advanced Calibration (Drift Fix)
+* **Center Calibration:** Re-center analog sticks to eliminate drift.
+* **Range Calibration:** Correct circularity errors and outer deadzones.
+* **Finetuning (DS5/Edge):** Advanced, permanent calibration stored directly in the controller's internal memory (NVS).
 
-Center Calibration: Fix drift by re-centering analog sticks.
+### 🔍 Hardware Diagnostics & Testing
+* **Visual Feedback:** Real-time visualization of analog sticks (Normal, 10x Zoom, Circularity) and button inputs.
+* **Touchpad:** Visualizer for touch tracking.
+* **Output Testing:**
+    * **Haptics:** Test Vibration motors (Heavy/Light).
+    * **Audio:** Test Controller Speaker & Microphone (DS4/DS5).
+    * **LED:** Control Lightbar colors (Red, Green, Blue, Off).
+    * **Adaptive Triggers (DS5):** Test resistance modes.
 
-Range Calibration: Correct circularity errors and outer deadzones.
+### ℹ️ Device Insights
+* **Detailed Info:** Reads Battery Level, Firmware Version, and Serial Number.
+* **Hardware Detection:** Detects Controller Color and Board Model (Experimental).
 
-Finetuning (DS5/Edge): Advanced permanent calibration stored in the controller's firmware.
+### 🛡️ Security & Privacy
+* **Local Processing:** All data is processed locally in your browser. No inputs are recorded or uploaded.
+* **Secure Context:** Implements strict Content Security Policy (CSP) for maximum user safety.
 
-## 📊 Advanced Input Analysis:
-
-Real-time Polling Rate measurement (Hz).
-
-Input Latency / Interval monitoring (ms).
-
-Jitter & Stability analysis with live graphs.
-
-## 🎮 Output Testing:
-
-Test Vibration motors (Heavy/Light).
-
-Control LED Lightbar colors.
-
-Test Adaptive Triggers (DualSense only) with various presets (Resistance, Machine Gun, etc.).
-
-ℹ️ Device Insights: Read detailed hardware info including Battery Level, Firmware Version, Board Model, and Serial Number.
-
-🌍 Multi-Language Support: Fully localized interface in English and Arabic (العربية).
-
-📱 PWA & Offline Support: Works offline and can be installed as a native app on supported devices.
-
-⚡ Responsive Design: Optimized for Desktop and Mobile (via OTG).
+### 📱 Modern Experience
+* **PWA Support:** Installable as a native app on Desktop and Android. **Works 100% Offline** after first load.
+* **Multi-Language:** Fully localized interface in **English** and **Arabic (العربية)**.
+* **Responsive:** Optimized for Desktop and Mobile screens.
 
 ## 🎮 Supported Controllers
 
-Controller
-
-Basic Test
-
-Calibration
-
-Finetuning
-
-Adaptive Triggers
-
-Sony DualShock 4 (V1/V2)
-
-✅
-
-✅
-
-❌
-
-N/A
-
-Sony DualSense
-
-✅
-
-✅
-
-✅
-
-✅
-
-Sony DualSense Edge
-
-✅
-
-✅
-
-✅*
-
-✅
+| Controller | Button Test | Calibration | Finetuning (NVS) | Adaptive Triggers | Audio Test |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Sony DualShock 4 (V1/V2)** | ✅ | ✅ | ❌ | N/A | ✅ |
+| **Sony DualSense** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Sony DualSense Edge** | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## 🛠️ Built With
 
-Core: HTML5, JavaScript (ES6 Modules).
+* **Core:** HTML5, JavaScript (ES6 Modules)
+* **Styling:** Bootstrap 5, Custom CSS (Neon/HUD Theme)
+* **APIs:** WebHID API, Gamepad API
+* **Build Tools:** Gulp, Rollup
 
-Styling: Bootstrap 5, Custom CSS (Neon/HUD Theme).
+## 🚀 Getting Started (Local Development)
 
-Build Tools: Gulp, Rollup.
+To run this project locally on your machine:
 
-APIs: WebHID API, Gamepad API.
-
-📸 Screenshots
-
-(Add your screenshots here, e.g., Dashboard, Calibration Modal, Analysis Tool)
+1.  **Clone the repo:**
+    ```bash
+    git clone [https://github.com/a7medmody1961/ab-control-hub.git](https://github.com/a7medmody1961/ab-control-hub.git)
+    ```
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+3.  **Run Dev Server:**
+    ```bash
+    npm start
+    ```
+4.  **Build for Production:**
+    ```bash
+    npm run build
+    ```
 
 ## 🤝 Contributing
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-Fork the Project.
-
-Create your Feature Branch (git checkout -b feature/AmazingFeature).
-
-Commit your Changes (git commit -m 'Add some AmazingFeature').
-
-Push to the Branch (git push origin feature/AmazingFeature).
-
-Open a Pull Request.
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
 ## 📜 License
 
-Distributed under the MIT License. See LICENSE.txt for more information.
+Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 ## 👨‍💻 Author
 
-Ahmed Badawy
+**Ahmed Badawy**
 
-Facebook: A7medMody196
+* **Facebook:** [A7medMody196](https://www.facebook.com/A7medMody196)
+* **WhatsApp:** +201110210770
+* **Telegram:** [A7medmody196](https://t.me/A7medmody196)
 
-WhatsApp: +201110210770
-
+---
 <div align="center">
 <sub>This tool is not affiliated with or endorsed by Sony Interactive Entertainment Inc. "PlayStation", "DualSense", and "DualShock" are registered trademarks of Sony Interactive Entertainment Inc.</sub>
 </div>

@@ -35,7 +35,9 @@ body {
 
 /* ### الهيدر والفوتر الجديد ### */
 .navbar, .page-footer {
-  height: 60px; /* تحديد ارتفاع ثابت للفوتر */
+  /* removed fixed height to allow flexibility, min-height handles structure */
+  min-height: 60px; 
+  height: auto !important; 
   font-family: var(--font-hud);
   font-size: 1.2rem;
   letter-spacing: 1px;
@@ -555,6 +557,19 @@ body {
   .offline-container h1 {
     font-size: 1.8rem;
   }
+
+  /* Font adjustments for mobile navbar */
+  .navbar-brand {
+    font-size: 1.4rem;
+  }
+  #lang-switcher .nav-link {
+    font-size: 1rem;
+  }
+  
+  /* FORCE VISIBILITY FOR CONTROLLER SVG ON MOBILE */
+  .module-controller-svg {
+    min-height: 250px !important; /* Force explicit height instead of auto */
+  }
 }
 
 /* تعديلات متفرقة من الملف القديم */
@@ -582,7 +597,7 @@ dl.row dd {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   background-color: var(--bg-module);
-  min-height: auto !important;
+  min-height: 300px; /* This is overridden in media query now */
   justify-self: stretch;
 }
 
@@ -779,7 +794,7 @@ body.ds-i18n-ar .vertical-progress-container {
 .touchpad-area {
   width: 100%;
   max-width: 400px;
-  height: 180px;
+  height: 250px;
   background-color: var(--bg-dark);
   border: 2px solid var(--border-color);
   border-radius: 10px;
@@ -1136,4 +1151,342 @@ input[id^="finetune"] {
 /* الكود ده بيرجع اتجاه النصوص لطبيعته حسب لغة الموقع */
 body[dir="rtl"] .fixed-ltr-row .dash-module {
   direction: rtl; 
+}
+/* --- Mobile Menu Fixes --- */
+/* جعل زر القائمة أبيض بدلاً من الأسود */
+.navbar-toggler {
+    color: var(--text-light) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* إضافة تأثير التوهج عند الضغط عليه */
+.navbar-toggler:focus {
+    box-shadow: 0 0 5px var(--glow-cyan);
+    outline: none;
+}
+/* --- Desktop Layout: Clean Fix --- */
+@media (min-width: 992px) { 
+  /* ضمان أن الكروت تملأ ارتفاع الصف بالكامل */
+  .dash-module {
+    height: 100% !important;
+  }
+  
+  /* تضبيط المسافات للإعلان */
+  #mid-section-ad {
+    margin: 15px 0;
+  }
+
+  /* تأكيد إلغاء أي هوامش زيادة للصفوف */
+  .row {
+      margin-left: 0;
+      margin-right: 0;
+  }
+}
+/* --- Fix Bottom Spacing (Force) --- */
+
+/* 1. إزالة أي مسافة سفلية من القائمة الرئيسية ومحتوياتها */
+#mainmenu, 
+#mainTabsContent, 
+#controller-content {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* 2. استهداف الصف الأخير (صف الكاليبريشن والتاتش) وإلغاء المسافة تحته */
+#controller-content > .row:last-child {
+    margin-bottom: 10px !important; /* مسافة صغيرة جداً 10 بيكسل */
+}
+
+/* 3. التحكم في مربع الإعلان السفلي مباشرة */
+#bottom-ad-container {
+    margin-top: 0 !important; /* إلغاء المسافة العلوية تماماً */
+    padding-top: 0 !important;
+}
+/* === HUD Modal Styling === */
+.hud-modal {
+    background: rgba(10, 10, 26, 0.95);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 0 40px rgba(0, 240, 240, 0.15);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.modal-glow-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at 50% -20%, rgba(0, 240, 240, 0.1), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.hud-title {
+    font-family: 'Teko', sans-serif;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--glow-cyan);
+    text-shadow: 0 0 10px rgba(0, 240, 240, 0.5);
+}
+
+/* Stepper */
+.calib-stepper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    margin-top: 10px;
+}
+
+.calib-stepper .step {
+    width: 35px;
+    height: 35px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #666;
+    font-family: 'Teko', sans-serif;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.calib-stepper .step.active {
+    background: var(--glow-cyan);
+    color: #000;
+    box-shadow: 0 0 15px var(--glow-cyan);
+    border-color: var(--glow-cyan);
+    transform: scale(1.1);
+}
+
+.calib-stepper .line {
+    width: 30px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0 5px;
+}
+
+/* Stick Visualizer Animation */
+.stick-visual {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+    position: relative;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.stick-knob {
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle, var(--glow-cyan) 0%, #008888 100%);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 20px var(--glow-cyan);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Animation Classes for Stick */
+.move-top-left { transform: translate(-120%, -120%); }
+.move-top-right { transform: translate(20%, -120%); }
+.move-bottom-left { transform: translate(-120%, 20%); }
+.move-bottom-right { transform: translate(20%, 20%); }
+
+/* Alerts */
+.alert-dark-glass {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 204, 0, 0.3);
+    color: #ccc;
+    border-radius: 8px;
+}
+
+/* Buttons */
+.hud-btn-primary {
+    background: linear-gradient(45deg, transparent 5%, var(--glow-cyan) 5%);
+    color: #000;
+    border: 0;
+    font-family: 'Teko', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    padding: 8px 30px;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    transition: all 0.3s;
+}
+
+.hud-btn-primary:hover {
+    background: var(--glow-cyan);
+    box-shadow: 0 0 20px var(--glow-cyan);
+    transform: translateY(-2px);
+    color: #000;
+}
+
+.hud-btn-secondary {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-family: 'Teko', sans-serif;
+    font-size: 1.1rem;
+    margin-right: 15px;
+}
+
+.text-cyan { color: var(--glow-cyan); }
+.text-magenta { color: var(--glow-magenta); 
+}
+/* === زرار الدعم الذهبي === */
+:root {
+  --glow-gold: #ffcc00;
+}
+
+.btn-glow-gold {
+  font-family: var(--font-hud);
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  padding: 5px 20px;
+  border-radius: 50px;
+  border: 2px solid var(--glow-gold);
+  background: transparent;
+  transition: all 0.3s ease;
+  color: var(--glow-gold);
+  text-shadow: 0 0 5px var(--glow-gold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn-glow-gold:hover {
+  background: var(--glow-gold);
+  color: #000;
+  box-shadow: 0 0 15px var(--glow-gold);
+  transform: translateY(-2px);
+}
+
+/* تعديل بسيط لزراير النسخ في المودال */
+.input-group .btn-outline-light:hover {
+    background-color: var(--glow-cyan);
+    color: black;
+    border-color: var(--glow-cyan);
+}
+/* =========================================
+   Cyberpunk Info Modal Override
+   (تحديث شكل قائمة المعلومات لتشبه باقي الموديلات)
+========================================= */
+
+/* 1. تحويل جسم النافذة للستايل الزجاجي المضيء */
+#controllerInfoModal .modal-content {
+    background: rgba(10, 10, 26, 0.95); /* خلفية كحلي غامق شفاف */
+    backdrop-filter: blur(15px);         /* تأثير الزجاج الضبابي */
+    border: 1px solid var(--glow-cyan);  /* حدود سماوي نيون */
+    box-shadow: 0 0 40px rgba(0, 240, 240, 0.2); /* توهج حول النافذة */
+    border-radius: 15px;
+}
+
+/* 2. تنسيق العنوان (الهيدر) */
+#controllerInfoModal .modal-header {
+    border-bottom: 1px solid rgba(0, 240, 240, 0.3);
+}
+
+#controllerInfoModal .modal-title {
+    font-family: var(--font-hud); /* استخدام خط Teko المميز */
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    color: var(--glow-cyan);
+    text-shadow: 0 0 10px rgba(0, 240, 240, 0.6); /* ظل للنص */
+    text-transform: uppercase;
+}
+
+/* 3. زر الإغلاق (X) */
+#controllerInfoModal .btn-close {
+    filter: invert(1) drop-shadow(0 0 2px var(--glow-cyan)); /* جعل الزر أبيض ومضيء */
+}
+
+/* 4. تنسيق عناصر القائمة (البيانات) لتشبه شاشات الهاكرز */
+#modal-info-list .list-group-item {
+    background: linear-gradient(90deg, rgba(0, 240, 240, 0.05) 0%, transparent 100%); /* تدرج خفيف */
+    border: none !important; /* إلغاء الحدود العادية */
+    border-left: 3px solid var(--glow-cyan) !important; /* وضع خط نيون ع الشمال */
+    margin-bottom: 6px; /* مسافة بين كل سطر */
+    transition: all 0.3s ease;
+    color: #fff; /* لون النص */
+}
+
+/* حركة بسيطة عند مرور الماوس على البيانات */
+#modal-info-list .list-group-item:hover {
+    background: linear-gradient(90deg, rgba(0, 240, 240, 0.15) 0%, transparent 100%);
+    padding-left: 25px !important; /* السطر يتحرك لليمين قليلاً */
+    box-shadow: -5px 0 10px rgba(0, 240, 240, 0.1);
+}
+
+/* 5. تنسيق زر Close السفلي */
+#controllerInfoModal .modal-footer {
+    border-top: 1px solid rgba(0, 240, 240, 0.3);
+}
+
+#controllerInfoModal .modal-footer .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--glow-cyan);
+    color: var(--glow-cyan);
+    font-family: var(--font-hud);
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+#controllerInfoModal .modal-footer .btn-secondary:hover {
+    background: var(--glow-cyan);
+    color: #000; /* الكتابة تسود عند التحويم */
+    box-shadow: 0 0 20px var(--glow-cyan); /* توهج قوي */
+}
+
+/* تعديل ألوان النصوص داخل القائمة */
+#modal-info-list span.text-secondary {
+    color: rgba(255, 255, 255, 0.6) !important; /* جعل عناوين البيانات (Key) رمادي فاتح */
+}
+
+#modal-info-list span {
+    font-family: 'Consolas', monospace; /* خط رقمي للبيانات */
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.3);
+}
+/* === إصلاح تنسيق النصوص العربية === */
+
+body.ds-i18n-ar .accordion-body,
+body.ds-i18n-ar p,
+body.ds-i18n-ar .lead,
+body.ds-i18n-ar li,
+body.ds-i18n-ar .footer-text {
+    /* 1. إجبار المحاذاة لليمين */
+    text-align: right !important;
+    
+    /* 2. تأكيد اتجاه النص من اليمين لليسار */
+    direction: rtl !important;
+    
+    /* 3. زيادة المسافة بين السطور (مهم جداً عشان الكلام ميبقاش لازق في بعضه) */
+    line-height: 1.8 !important; 
+    
+    /* 4. تكبير حجم الخط العربي سنة بسيطة عشان يبقى مقروء */
+    font-size: 1.1rem;
+}
+
+/* إصلاح مشكلة الأيقونات اللي بتلزق في الكلام في العربي */
+body.ds-i18n-ar .me-2 {
+    margin-left: 0.5rem !important;
+    margin-right: 0 !important;
+}
+
+body.ds-i18n-ar .ms-2 {
+    margin-right: 0.5rem !important;
+    margin-left: 0 !important;
+}
+
+/* تحسين شكل القوائم (النقط) في العربي */
+body.ds-i18n-ar ul li {
+    margin-bottom: 8px; /* مسافة بين كل نقطة والتانية */
+    display: flex;      /* عشان الأيقونة والكلام يبقوا على سطر واحد مظبوط */
+    align-items: center;
 }

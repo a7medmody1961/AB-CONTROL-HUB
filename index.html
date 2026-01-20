@@ -1,225 +1,734 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Under Maintenance | AB Control Hub</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.google https://*.gstatic.com https://*.googlesyndication.com https://*.googleadservices.com https://*.googletagmanager.com https://*.doubleclick.net https://*.googleapis.com https://cdn.jsdelivr.net https://code.jquery.com;
+        style-src 'self' 'unsafe-inline' https://*.googleapis.com https://cdn.jsdelivr.net https://*.google.com;
+        img-src 'self' data: https://*.google.com https://*.google https://*.googleapis.com https://*.gstatic.com https://*.googlesyndication.com https://*.google-analytics.com https://*.doubleclick.net https://*.googleadservices.com;
+        font-src 'self' data: https://*.gstatic.com https://cdn.jsdelivr.net https://*.googleapis.com;
+        connect-src 'self' https://*.google.com https://*.google https://*.googleapis.com https://*.gstatic.com https://*.google-analytics.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://the.al https://cdn.jsdelivr.net;
+        frame-src 'self' https://*.google.com https://*.google https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com;
+    ">
 
-    <style>
-        body {
-            background-color: #050505;
-            color: #ffffff;
-            font-family: 'Inter', sans-serif;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
+    <title>AB Control Hub | PS4/PS5 Controller Calibration & Test | معايرة وفحص دراعات بلايستيشن</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Ultimate Web-Based tool to test and calibrate PlayStation controllers (DualSense & DualShock 4). Fix analog stick drift, measure input latency, and test buttons online without installing software.">
+    <meta name="keywords" content="gamepad tester, controller calibration, dualsense drift fix, dualshock 4 calibration, ps5 controller test, input lag test, analog stick repair, معايرة الانالوج, فحص دراعات">
+    <meta name="author" content="Ahmed Badawy">
+    <meta name="robots" content="index, follow">
 
-        /* خلفية نيون خفيفة */
-        .bg-glow {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(0, 240, 240, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
-            top: -10%;
-            left: -10%;
-            z-index: -1;
-        }
-        .bg-glow-2 {
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(214, 51, 132, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
-            bottom: -10%;
-            right: -10%;
-            z-index: -1;
-        }
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ab-control-hub.site/">
+    <meta property="og:title" content="AB Control Hub | Gamepad Calibration Tool">
+    <meta property="og:description" content="Fix stick drift and calibrate your PS4/PS5 controller directly in your browser.">
+    <meta property="og:image" content="social-share.jpg">
 
-        .maintenance-container {
-            text-align: center;
-            padding: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(20, 20, 20, 0.8);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-            max-width: 800px;
-            width: 90%;
-        }
+    <!-- Twitter Card -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://ab-control-hub.site/">
+    <meta property="twitter:title" content="AB Control Hub | Gamepad Calibration Tool">
+    <meta property="twitter:description" content="Fix stick drift and calibrate your PS4/PS5 controller directly in your browser.">
+    <meta property="twitter:image" content="social-share.jpg">
 
-        .icon-box {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, #00f0f0, #d63384);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: pulse 2s infinite;
-        }
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <meta name="apple-mobile-web-app-title" content="AB Control Hub" />
 
-        h1 {
-            font-family: 'Teko', sans-serif;
-            font-size: 4rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 0.5rem;
-        }
-
-        p {
-            color: #a0a0a0;
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-        }
-
-        /* تصميم العداد */
-        .countdown {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .time-box {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            border-radius: 10px;
-            min-width: 100px;
-            border: 1px solid rgba(0, 240, 240, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .time-box span {
-            display: block;
-            font-family: 'Teko', sans-serif;
-            font-size: 3rem;
-            line-height: 1;
-            color: #00f0f0;
-        }
-
-        .time-box label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #ccc;
-        }
-
-        .social-links a {
-            color: #fff;
-            font-size: 1.5rem;
-            margin: 0 10px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-
-        .social-links a:hover {
-            color: #d63384;
-            transform: translateY(-3px);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        @media (max-width: 576px) {
-            h1 { font-size: 3rem; }
-            .countdown { gap: 0.5rem; }
-            .time-box { min-width: 70px; padding: 0.5rem; }
-            .time-box span { font-size: 2rem; }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="bg-glow"></div>
-    <div class="bg-glow-2"></div>
-
-    <div class="maintenance-container">
-        <div class="icon-box">
-            <i class="fas fa-tools"></i>
-        </div>
-
-        <h1>Under Maintenance</h1>
-        <p>We are currently upgrading the <strong>AB Control Hub</strong> to provide you with a better experience.<br>We'll be back online shortly!</p>
-
-        <div class="countdown">
-            <div class="time-box">
-                <span id="days">00</span>
-                <label>Days</label>
-            </div>
-            <div class="time-box">
-                <span id="hours">00</span>
-                <label>Hours</label>
-            </div>
-            <div class="time-box">
-                <span id="minutes">00</span>
-                <label>Minutes</label>
-            </div>
-            <div class="time-box">
-                <span id="seconds">00</span>
-                <label>Seconds</label>
-            </div>
-        </div>
-
-        <div class="social-links">
-            <a href="https://www.facebook.com/A7medMody196" target="_blank"><i class="fab fa-facebook"></i></a>
-            <a href="https://t.me/A7medmody196" target="_blank"><i class="fab fa-telegram"></i></a>
-        </div>
-        
-        <div class="mt-4 text-white-50 small">
-            Developed by Ahmed Badawy
-        </div>
-    </div>
-
-    <script>
-        // ============================================
-        // حدد تاريخ الانتهاء هنا (بعد 3 أيام من الآن)
-        // ============================================
-        
-        // الكود ده بيحسب 3 أيام من لحظة فتح الموقع لأول مرة
-        // لو عاوز تاريخ ثابت (مثلاً يوم 20 يناير)، غير السطر ده لـ:
-       // ============================================
-        // تحديد تاريخ الانتهاء الثابت (20 يناير 2026)
-        // ============================================
-        
-        // هنا قمنا بتحديد التاريخ والساعة بدقة
-        // الصيغة: "Month Day, Year Hour:Minute:Second"
-        const countDownDate = new Date("Jan 21, 2026 00:00:00").getTime();
-
-        // تحديث العداد كل ثانية
-        const x = setInterval(function() {
-
-            const now = new Date().getTime();
-            const distance = countDownDate - now;
-
-            // حساب الوقت
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            // عرض النتائج في الـ HTML
-            document.getElementById("days").innerHTML = days < 10 ? "0" + days : days;
-            document.getElementById("hours").innerHTML = hours < 10 ? "0" + hours : hours;
-            document.getElementById("minutes").innerHTML = minutes < 10 ? "0" + minutes : minutes;
-            document.getElementById("seconds").innerHTML = seconds < 10 ? "0" + seconds : seconds;
-
-            // لما العداد يخلص
-            if (distance < 0) {
-                clearInterval(x);
-                document.querySelector(".countdown").innerHTML = "<h2 style='color:#00f0f0'>WE ARE LIVE!</h2>";
-                 // window.location.href = "index.html";
-            }
-        }, 1000);
+    <!-- Schema.org Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "AB Control Hub",
+      "operatingSystem": "Web Browser",
+      "applicationCategory": "UtilitiesApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Ahmed Badawy"
+      },
+      "description": "Tool for testing and calibrating PlayStation controllers and fixing analog stick drift."
+    }
     </script>
 
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=HYTZNPS0QC"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-HYTZNPS0QC');
+    </script>
+
+    <!-- Google Ads -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7023137362392156" crossorigin="anonymous"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Stylesheets -->
+    <link id="bootstrap-css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/finetune.css">
+
+    <!-- Core Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
+    <script type="module" src="js/core.js"></script>
+</head>
+
+<body class="d-flex flex-column min-vh-100">  
+  
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-md">
+    <div class="container-fluid">
+      <h1 class="visually-hidden">AB Control Hub - PlayStation Controller Calibration Tool by Ahmed Badawy</h1>
+      <a class="navbar-brand" href="#">
+        <i class="fas fa-gamepad me-2"></i> AB CONTROL HUB
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+        <ul class="navbar-nav align-items-center">
+
+          <!-- Desktop: Support Button -->
+          <li class="nav-item d-none d-md-block me-2">
+            <a class="btn btn-glow-gold rounded-pill" href="#" onclick="show_donate_modal()" role="button">
+                <i class="fas fa-heart me-2"></i> <span class="ds-i18n">Support</span>
+            </a>
+          </li>
+          
+          <!-- Language Switcher -->
+          <li class="nav-item mb-2 mb-md-0 me-md-2" id="lang-switcher">
+            <a class="nav-link" id="langSwitchButton" role="button" href="#" onclick="toggle_lang()">
+              <i class="fas fa-language fa-lg"></i>&nbsp;<span id="curLang">English</span>
+            </a>
+          </li>
+
+          <!-- Mobile: Quick Links -->
+          <li class="nav-item d-md-none">
+            <a class="nav-link" href="#" onclick="document.getElementById('controller-tab').click()">
+                <i class="fas fa-home me-2"></i> <span class="ds-i18n">Home</span>
+            </a>
+          </li>
+          <li class="nav-item d-md-none">
+            <a class="nav-link" href="#" onclick="document.getElementById('tests-tab').click()">
+                <i class="fas fa-vial me-2"></i> <span class="ds-i18n">Tests</span>
+            </a>
+          </li>
+          <li class="nav-item d-md-none">
+            <a class="nav-link" href="#" onclick="document.getElementById('calibration-tab').click()">
+                <i class="fas fa-sliders-h me-2"></i> <span class="ds-i18n">Calibration</span>
+            </a>
+          </li>
+          
+          <li class="nav-item d-md-none">
+            <hr class="dropdown-divider bg-secondary opacity-50 my-2">
+          </li>
+
+          <!-- Common Links -->
+          <li class="nav-item">
+            <a class="nav-link" href="guide.html">
+                <i class="fas fa-book-open me-2"></i> <span class="ds-i18n">Guide</span>
+            </a>
+          </li>
+          
+          <!-- Mobile Only Footer Links -->
+          <li class="nav-item d-md-none">
+            <a class="nav-link" href="terms.html">
+              <i class="fas fa-file-alt me-2 text-white"></i> Terms of Use
+            </a>
+          </li>
+          <li class="nav-item d-md-none">
+            <a class="nav-link" href="privacy.html">
+              <i class="fas fa-user-shield me-2 text-white"></i> Privacy Policy
+            </a>
+          </li>
+          <li class="nav-item d-md-none">
+            <!-- Fixed: Encoded spaces in URL -->
+            <a class="nav-link" href="Support%20&%20Feedback.html">
+              <i class="fas fa-headset me-2 text-white"></i> Support & Feedback
+            </a>
+          </li>
+          
+          <li class="nav-item d-md-none mt-2">
+            <a class="nav-link text-warning fw-bold border border-warning rounded text-center" href="#" onclick="show_donate_modal()">
+                <i class="fas fa-heart me-2"></i> <span class="ds-i18n">Support Development</span>
+            </a>
+          </li>
+
+          <li class="nav-item d-md-none mt-2">
+             <span class="nav-link small text-white-50" style="font-size: 0.8rem;">
+               Dev by <span style="color: var(--glow-cyan);">Ahmed Badawy</span>
+             </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container-fluid px-2 pb-0 pt-1 flex-grow-1">
+
+    <!-- Top Ad Placeholder -->
+    <div class="container my-3 text-center" style="min-height: 90px;">
+        <span class="text-white-50 small ds-i18n" style="border: 1px dashed #0ff; padding: 15px; display: block; background: rgba(0, 240, 240, 0.05);">
+            Space for Ad
+        </span>
+    </div>
+
+    <!-- Missing HID Alert -->
+    <div id="missinghid" style="display: none;">
+      <div class="offline-container">
+        <h2 class="ds-i18n">Unsupported browser. Please use a web browser with WebHID support (e.g. Chrome).</h2>
+        <p class="ds-i18n">(Supports Android via OTG or Bluetooth on Chrome)</p>
+        <p class="text-muted small mt-2 ds-i18n">(iOS and iPadOS are not supported by Apple)</p>
+      </div>
+    </div>
+
+    <!-- Online Dashboard Bar -->
+    <div id="onlinebar">
+      <div class="dashboard-header" id="online-header" style="display: none;">
+        
+        <div class="device-info d-flex align-items-center">
+          <span class="ds-i18n me-2">Connected:</span>
+          <strong id="devname" class="me-2 text-info"></strong>
+          <button type="button" class="btn btn-sm btn-outline-light rounded-circle" onclick="showControllerInfo()" style="width: 30px; height: 30px; padding: 0;" aria-label="Controller Info">
+            <i class="fas fa-info"></i>
+          </button>
+          <span id="d-board" style="display:none;"></span> 
+        </div>
+
+        <div class="device-status d-flex align-items-center">
+          
+          <button id="savechanges" type="button" class="btn btn-neon-header btn-neon-save" onclick="flash_all_changes()" title="Save Changes">
+            <i class="fas fa-save fa-lg"></i>
+          </button>
+
+          <button id="resetBtn" type="button" class="btn btn-neon-header btn-neon-reboot" onclick="reboot_controller()" title="Reboot Controller" style="display: none;">
+            <i class="fas fa-sync-alt fa-lg"></i>
+          </button>
+
+          <div class="vr mx-3 bg-secondary" style="height: 25px;"></div>
+
+          <strong id="d-bat" class="me-3" style="font-family: 'Teko', sans-serif; font-size: 1.4rem;"></strong>
+
+          <button type="button" class="btn-glow-disconnect" onclick="disconnect()">
+            <i class="fas fa-times me-2"></i> <span class="ds-i18n">Disconnect</span>
+          </button>
+        </div>
+      </div>
+      
+      <div id="connection-overlay" class="connection-overlay">
+        <button id="btnconnect-overlay" type="button" class="btn-glow-connect" onclick="connect()">
+          <i class="fas fa-power-off me-2"></i> <span class="ds-i18n">Connect Controller</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Menu & Tabs -->
+    <div id="mainmenu" class="container-fluid mt-0 pt-0" style="margin-top: -10px;">
+      
+      <ul class="nav nav-tabs mb-3" id="mainTabs" role="tablist" style="display: none;">
+        <li class="nav-item"><button class="nav-link active" id="controller-tab" data-bs-toggle="tab" data-bs-target="#controller-content" type="button" role="tab">Home</button></li>
+        <li class="nav-item"><button class="nav-link" id="tests-tab" data-bs-toggle="tab" data-bs-target="#tests-content" type="button" role="tab">Tests</button></li>
+        <li class="nav-item"><button class="nav-link" id="calibration-tab" data-bs-toggle="tab" data-bs-target="#calibration-content" type="button" role="tab">Calibration</button></li>
+      </ul>
+
+      <div class="tab-content" id="mainTabsContent" dir="ltr">
+        
+        <div class="tab-pane fade show active" id="controller-content" role="tabpanel" aria-labelledby="controller-tab">
+            
+            <section id="about-section" class="mb-3">
+            <div class="accordion accordion-flush" id="aboutAccordion">
+                <div class="accordion-item bg-transparent border-0">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed bg-transparent text-white shadow-none p-2 d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#aboutCollapse" aria-expanded="false" aria-controls="aboutCollapse" style="font-family: var(--font-hud); font-size: 1.4rem; border-bottom: 1px solid rgba(0, 240, 240, 0.3);">
+                    <i class="fas fa-info-circle me-2" style="color: var(--glow-cyan);"></i> 
+                    <span class="ds-i18n flex-grow-1 text-start">What is AB Control Hub?</span>
+                    <i class="fas fa-chevron-down ms-2 text-white" style="font-size: 0.8em; transition: transform 0.3s;"></i>
+                    </button>
+                </h2>
+                <div id="aboutCollapse" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
+                    <div class="accordion-body text-start text-white pt-3">
+                    <p class="ds-i18n lead mb-3" style="font-size: 1rem; color: #e0e0e0;">
+                        AB Control Hub is the ultimate Web-Based tool to test and calibrate PlayStation controllers (DualSense & DualShock 4). Fix analog stick drift, measure input latency, and test buttons online without installing software.
+                    </p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                        <ul class="list-unstyled mb-0 small text-white-50">
+                            <li class="mb-2"><i class="fas fa-magic me-2 text-success"></i><span class="ds-i18n">Drift Calibration & Center Fix (Permanent)</span></li>
+                            <li class="mb-2"><i class="fas fa-shield-alt me-2 text-info"></i><span class="ds-i18n">Privacy First: Local Processing (No Uploads)</span></li>
+                        </ul>
+                        </div>
+                        <div class="col-md-6">
+                        <ul class="list-unstyled mb-0 small text-white-50">
+                            <li class="mb-2"><i class="fas fa-vial me-2" style="color: var(--glow-magenta);"></i><span class="ds-i18n">Haptic Vibration & LED Testing</span></li>
+                            <li class="mb-2"><i class="fas fa-wifi me-2 text-info"></i><span class="ds-i18n">Works Offline After First Load (PWA)</span></li>
+                        </ul>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+            </section>
+            
+            <div class="row g-2 mb-3 mt-0 align-items-stretch fixed-ltr-row">
+                <div class="col-lg-4 col-md-12">
+                    <div class="dash-module module-joysticks h-100">
+                    <div class="card-header"><i class="fas fa-crosshairs me-2"></i><span class="ds-i18n">Joystick Info</span></div>
+                    <div class="vstack px-2">
+                        <canvas id="stickCanvas" width="300" height="150" style="width: 100%; object-fit: contain;"></canvas>
+                    </div>
+                    <div class="px-2">
+                        <div class="hstack justify-content-center">
+                        <div class="vstack text-center"><span class="small ds-i18n">LX:</span><pre id="lx-lbl" class="m-0"></pre></div>
+                        <div class="vstack text-center"><span class="small ds-i18n">LY:</span><pre id="ly-lbl" class="m-0"></pre></div>
+                        <div class="vstack text-center"><span class="small ds-i18n">RX:</span><pre id="rx-lbl" class="m-0"></pre></div>
+                        <div class="vstack text-center"><span class="small ds-i18n">RY:</span><pre id="ry-lbl" class="m-0"></pre></div>
+                        </div>
+                    </div>
+                    <div class="px-2 mt-2">
+                        <div class="btn-group w-100 mb-3" role="group">
+                        <input type="radio" class="btn-check" name="displayMode" id="normalMode" value="normal" checked>
+                        <label class="btn btn-outline-secondary btn-sm ds-i18n" for="normalMode">Normal</label>
+                        
+                        <input type="radio" class="btn-check" name="displayMode" id="centerZoomMode" value="centerZoom">
+                        <label class="btn btn-outline-secondary btn-sm ds-i18n" for="centerZoomMode">10x zoom</label>
+
+                        <input type="radio" class="btn-check" name="displayMode" id="checkCircularityMode" value="checkCircularity">
+                        <label class="btn btn-outline-secondary btn-sm ds-i18n" for="checkCircularityMode">Circularity</label>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-12">
+                    <div class="dash-module module-controller-svg disconnected-svg h-100 d-flex align-items-center justify-content-center" id="controller-svg-container">
+                    <div id="controller-svg-placeholder"></div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-12">
+                    <div class="dash-module h-100">
+                        <div class="card-header"><i class="fas fa-keyboard me-2"></i><span class="ds-i18n">Button Test</span></div>
+                        <div class="p-3">
+                        <div class="d-flex justify-content-center gap-5 mb-4">
+                            <div class="text-center">
+                                <label class="fw-bold text-white mb-2" style="font-size: 1.2rem;">L2</label>
+                                <div class="vertical-progress-container">
+                                    <div class="vertical-progress-bar" id="l2-progress" style="height: 0%;"></div>
+                                </div>
+                                <div class="trigger-value-text" id="l2-val">0%</div>
+                            </div>
+                            <div class="text-center">
+                                <label class="fw-bold text-white mb-2" style="font-size: 1.2rem;">R2</label>
+                                <div class="vertical-progress-container">
+                                    <div class="vertical-progress-bar" id="r2-progress" style="height: 0%;"></div>
+                                </div>
+                                <div class="trigger-value-text" id="r2-val">0%</div>
+                            </div>
+                        </div>
+                        <hr style="border-color: rgba(255,255,255,0.1);">
+                        <div class="d-flex flex-wrap gap-2 justify-content-center" id="digital-buttons-container" style="min-height: 50px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mid-section-ad" class="container-fluid my-4 text-center" style="min-height: 90px;">
+                <span class="text-white-50 small ds-i18n" style="border: 1px dashed #0ff; padding: 15px; display: block; background: rgba(0, 240, 240, 0.05);">
+                    Space for Ad
+                </span>
+            </div>
+
+            <div class="row g-2 mb-0 align-items-stretch fixed-ltr-row d-none d-lg-flex">
+                
+                <div class="col-lg-4 col-md-12">
+                    <div class="dash-module h-100">
+                        <div class="card-header"><i class="fas fa-sliders-h me-2"></i><span class="ds-i18n">Calibration Suite</span></div>
+                        <div class="vstack gap-4 p-4 d-flex flex-column justify-content-center h-100">
+                        
+                        <div class="text-center mb-2">
+                            <p class="text-white-50 ds-i18n">Follow these steps to calibrate your controller permanently.</p>
+                        </div>
+
+                        <button type="button" class="btn-glow-primary ds-btn p-3" onclick="calibrate_stick_centers()" id="four-step-center-calib">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="fas fa-crosshairs fa-lg me-2"></i>
+                                <div class="text-start">
+                                    <div class="fw-bold"><span class="ds-i18n">1. Center Calibration</span></div>
+                                </div>
+                            </div>
+                        </button>
+                        
+                        <button type="button" class="btn-glow-primary ds-btn p-3" onclick="auto_calibrate_stick_centers()" id="quick-center-calib" style="display: none;">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="fas fa-magic fa-lg me-2"></i>
+                                <div class="text-start">
+                                    <div class="fw-bold"><span class="ds-i18n">1. Quick Calibration</span></div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <button type="button" class="btn-glow-secondary ds-btn p-3" onclick="calibrate_range()">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="fas fa-circle-notch fa-lg me-2"></i>
+                                <div class="text-start">
+                                    <div class="fw-bold"><span class="ds-i18n">2. Range Calibration</span></div>
+                                </div>
+                            </div>
+                        </button>
+                        
+                        <button type="button" class="btn-glow-white ds-btn p-3" onclick="ds5_finetune()" id="ds5finetune" style="display: none;">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="fas fa-microchip fa-lg me-2"></i>
+                                <div class="text-start">
+                                    <div class="fw-bold"><span class="ds-i18n">3. Finetune</span></div>
+                                </div>
+                            </div>
+                        </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-12">
+                    <div class="dash-module h-100">
+                        <div class="card-header"><i class="fas fa-vial me-2"></i><span class="ds-i18n">Output Tests</span></div>
+                        <div class="vstack gap-3 p-4 justify-content-center">
+                        
+                        <div class="test-group">
+                            <label class="text-white-50 small mb-1 ms-1 ds-i18n">Vibration Test</label>
+                            <div class="btn-group w-100 btn-group-lg" role="group">
+                                <button type="button" class="btn-glow-secondary" onclick="test_vibration(500)">500ms</button>
+                                <button type="button" class="btn-glow-secondary" onclick="test_vibration(1000)">1s</button>
+                            </div>
+                        </div>
+
+                        <div id="audio-test-group" class="test-group">
+                            <label class="text-white-50 small mb-1 ms-1 ds-i18n">Audio (DS5)</label>
+                            <div class="btn-group w-100 btn-group-lg" role="group">
+                                <button type="button" class="btn-glow-primary" onclick="test_speaker()"><i class="fas fa-volume-up"></i> Speak</button>
+                                <button type="button" class="btn-glow-primary" onclick="test_mic()"><i class="fas fa-microphone"></i> Mic</button>
+                            </div>
+                        </div>
+
+                        <div class="test-group">
+                            <label class="text-white-50 small mb-1 ms-1 ds-i18n">LED Color</label>
+                            <div class="btn-group w-100 btn-group-lg" role="group">
+                                <label class="btn-glow-secondary" style="width: 15%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer;">
+                                    <input type="color" id="ledColorPicker" value="#800080" style="opacity: 0; position: absolute; left:0; top:0; width: 100%; height: 100%; cursor: pointer;">
+                                    <i class="fas fa-palette"></i>
+                                </label>
+                                <button type="button" class="btn-glow-red" onclick="test_led('red')">R</button>
+                                <button type="button" class="btn-glow-success" onclick="test_led('green')">G</button>
+                                <button type="button" class="btn-glow-blue" onclick="test_led('blue')">B</button>
+                                <button type="button" class="btn-glow-white" onclick="test_led('off')">Off</button>
+                            </div>
+                        </div>
+
+                        <div id="trigger-test-group" class="test-group">
+                            <label class="text-white-50 small mb-1 ms-1 ds-i18n">Triggers (PS5 Only)</label>
+                            <div class="btn-group w-100 btn-group-lg" role="group">
+                                <button type="button" class="btn-glow-secondary" onclick="test_trigger('left', 'medium')">L Trig</button>
+                                <button type="button" class="btn-glow-secondary" onclick="test_trigger('right', 'medium')">R Trig</button>
+                                <button type="button" class="btn-glow-danger" onclick="test_trigger('left', 'off'); test_trigger('right', 'off');">Reset</button>
+                            </div>
+                        </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-12">
+                    <div class="dash-module h-100" id="touchpad-test-module">
+                        <div class="card-header"><i class="fas fa-fingerprint me-2"></i><span class="ds-i18n">Touchpad Test</span></div>
+                        <div class="p-3 text-center d-flex flex-column justify-content-center h-100">
+                        <div id="touchpad-visualizer" class="touchpad-area mb-2">
+                            <div id="touch-point-0" class="touch-point" style="display: none;"></div>
+                            <div id="touch-point-1" class="touch-point" style="display: none;"></div>
+                        </div>
+                        <div class="small text-white ds-i18n" style="opacity: 0.8;">Touch the pad to see feedback</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- End Row -->
+        </div> <!-- End Tab 1: Home -->
+
+        <!-- Tab 2: Tests -->
+        <div class="tab-pane fade" id="tests-content" role="tabpanel" aria-labelledby="tests-tab">
+             <div class="container-fluid py-3">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6 col-md-12">
+                        <div class="dash-module h-100">
+                            <div class="card-header"><i class="fas fa-vial me-2"></i><span class="ds-i18n">Output Tests</span></div>
+                            <div class="vstack gap-3 p-4 justify-content-center">
+                            
+                            <div class="test-group">
+                                <label class="text-white-50 small mb-1 ms-1 ds-i18n">Vibration Test</label>
+                                <div class="btn-group w-100 btn-group-lg" role="group">
+                                    <button type="button" class="btn-glow-secondary" onclick="test_vibration(500)">500ms</button>
+                                    <button type="button" class="btn-glow-secondary" onclick="test_vibration(1000)">1s</button>
+                                </div>
+                            </div>
+
+                            <div id="audio-test-group" class="test-group">
+                                <label class="text-white-50 small mb-1 ms-1 ds-i18n">Audio (DS5)</label>
+                                <div class="btn-group w-100 btn-group-lg" role="group">
+                                    <button type="button" class="btn-glow-primary" onclick="test_speaker()"><i class="fas fa-volume-up"></i> Speak</button>
+                                    <button type="button" class="btn-glow-primary" onclick="test_mic()"><i class="fas fa-microphone"></i> Mic</button>
+                                </div>
+                            </div>
+
+                            <div class="test-group">
+                                <label class="text-white-50 small mb-1 ms-1 ds-i18n">LED Color</label>
+                                <div class="btn-group w-100 btn-group-lg" role="group">
+                                    <label class="btn-glow-secondary" style="width: 15%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer;">
+                                        <input type="color" id="ledColorPicker" value="#800080" style="opacity: 0; position: absolute; left:0; top:0; width: 100%; height: 100%; cursor: pointer;">
+                                        <i class="fas fa-palette"></i>
+                                    </label>
+                                    <button type="button" class="btn-glow-red" onclick="test_led('red')">Red</button>
+                                    <button type="button" class="btn-glow-success" onclick="test_led('green')">Green</button>
+                                    <button type="button" class="btn-glow-blue" onclick="test_led('blue')">Blue</button>
+                                    <button type="button" class="btn-glow-white" onclick="test_led('off')">Off</button>
+                                </div>
+                            </div>
+
+                            <div id="trigger-test-group" class="test-group">
+                                <label class="text-white-50 small mb-1 ms-1 ds-i18n">Adaptive Triggers (PS5 Only)</label>
+                                <div class="btn-group w-100 btn-group-lg" role="group">
+                                    <button type="button" class="btn-glow-secondary" onclick="test_trigger('left', 'medium')">L Trig</button>
+                                    <button type="button" class="btn-glow-secondary" onclick="test_trigger('right', 'medium')">R Trig</button>
+                                    <button type="button" class="btn-glow-danger" onclick="test_trigger('left', 'off'); test_trigger('right', 'off');">Reset</button>
+                                </div>
+                            </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Calibration -->
+        <div class="tab-pane fade" id="calibration-content" role="tabpanel" aria-labelledby="calibration-tab">
+             <div class="container-fluid py-3">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6 col-md-12">
+                        <div class="dash-module h-100">
+                            <div class="card-header"><i class="fas fa-sliders-h me-2"></i><span class="ds-i18n">Calibration Suite</span></div>
+                            <div class="vstack gap-4 p-4 d-flex flex-column justify-content-center h-100">
+                            
+                            <div class="text-center mb-2">
+                                <p class="text-white-50 ds-i18n">Follow these steps to calibrate your controller permanently.</p>
+                            </div>
+
+                            <button type="button" class="btn-glow-primary ds-btn p-4" onclick="calibrate_stick_centers()" id="four-step-center-calib">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-crosshairs fa-2x me-3"></i>
+                                    <div class="text-start">
+                                        <div class="fw-bold fs-5"><span class="ds-i18n">1. Center Calibration</span></div>
+                                        <div class="small opacity-75"><span class="ds-i18n">Fix drift when sticks are idle</span></div>
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button type="button" class="btn-glow-primary ds-btn p-4" onclick="auto_calibrate_stick_centers()" id="quick-center-calib" style="display: none;">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-magic fa-2x me-3"></i>
+                                    <div class="text-start">
+                                        <div class="fw-bold fs-5"><span class="ds-i18n">1. Quick Calibration</span></div>
+                                        <div class="small opacity-75"><span class="ds-i18n">Automated center fix</span></div>
+                                    </div>
+                                </div>
+                            </button>
+                            
+                            <button type="button" class="btn-glow-secondary ds-btn p-4" onclick="calibrate_range()">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-circle-notch fa-2x me-3"></i>
+                                    <div class="text-start">
+                                        <div class="fw-bold fs-5"><span class="ds-i18n">2. Range Calibration</span></div>
+                                        <div class="small opacity-75"><span class="ds-i18n">Fix sticks not reaching 100%</span></div>
+                                    </div>
+                                </div>
+                            </button>
+                            
+                            <button type="button" class="btn-glow-white ds-btn p-4" onclick="ds5_finetune()" id="ds5finetune" style="display: none;">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-microchip fa-2x me-3"></i>
+                                    <div class="text-start">
+                                        <div class="fw-bold fs-5"><span class="ds-i18n">3. Finetune</span></div>
+                                        <div class="small opacity-75"><span class="ds-i18n">Manual hardware adjustment</span></div>
+                                    </div>
+                                </div>
+                            </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      </div> <!-- End of Tab Content -->
+    </div> <!-- End of Main Menu -->
+    
+    <!-- Cookie Consent (Inside Main) -->
+    <div id="cookie-consent" class="cookie-consent-banner" style="display: none;">
+        <div class="container d-flex justify-content-between align-items-center">
+        <p class="mb-0 ds-i18n">Cookie Banner Text</p>
+        <button class="btn btn-glow-primary ds-i18n" style="width: auto;" onclick="acceptCookies()">Accept</button>
+        </div>
+    </div>
+    
+    <!-- Bottom Ad Placeholder -->
+    <div id="bottom-ad-container" class="container my-4 text-center" style="min-height: 90px;">
+        <span class="text-white-50 small ds-i18n" style="border: 1px dashed #0ff; padding: 15px; display: block; background: rgba(0, 240, 240, 0.05);">
+            Space for Ad
+        </span>
+    </div>
+
+  </main>
+
+  <!-- Modals & Overlays (Outside Main) -->
+  
+  <!-- Controller Info Modal -->
+  <div class="modal fade" id="controllerInfoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-bg-dark border-secondary" style="box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);">
+        <div class="modal-header border-secondary">
+        <h5 class="modal-title"><i class="fas fa-microchip me-2 text-info"></i><span class="ds-i18n">Device Details</span></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-0">
+        <ul class="list-group list-group-flush" id="modal-info-list">
+            </ul>
+        </div>
+        <div class="modal-footer border-secondary">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- Developer Modal -->
+  <div class="modal fade" id="developerModal" tabindex="-1" aria-labelledby="developerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content text-bg-dark">
+        <div class="modal-header">
+        <h5 class="modal-title ds-i18n" id="developerModalLabel">Developer Info</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-white">
+        <div class="text-center mb-4">
+            <i class="fas fa-user-circle fa-5x mb-3" style="color: var(--glow-cyan);"></i>
+            <h4 class="ds-i18n">Ahmed Badawy</h4>
+            <p class="text-muted ds-i18n">Developer</p>
+        </div>
+        <div class="list-group list-group-flush bg-transparent">
+            <a href="https://www.facebook.com/A7medMody196" target="_blank" rel="noopener noreferrer" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+            <i class="fab fa-facebook me-3" style="color: #1877F2;"></i> <span class="ds-i18n">Facebook</span>: A7medmody196
+            </a>
+            <a href="https://www.instagram.com/A7medMody196" target="_blank" rel="noopener noreferrer" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+            <i class="fab fa-instagram me-3" style="color: #E4405F;"></i> <span class="ds-i18n">Instagram</span>: A7medMody196
+            </a>
+            <a href="https://t.me/A7medmody196" target="_blank" rel="noopener noreferrer" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+            <i class="fab fa-telegram me-3" style="color: #0088cc;"></i> <span class="ds-i18n">Telegram</span>: A7medmody196
+            </a>
+            <a href="https://wa.me/201110210770" target="_blank" rel="noopener noreferrer" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+            <i class="fab fa-whatsapp me-3" style="color: #25D366;"></i> <span class="ds-i18n">WhatsApp</span>: +201110210770
+            </a>
+        </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary ds-i18n" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- Alert Container (Fixed Bottom) -->
+  <div class="container-fluid fixed-bottom " style="z-index: 1040; pointer-events: none; bottom: 70px;">
+    <div class="container">
+      <div id="alert-container" class="mb-3" style="pointer-events: auto;"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="page-footer border-top mt-auto">
+      <div class="container">
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center py-3" id="footbody">
+        
+        <p class="mb-0 footer-text">
+          <span class="ds-i18n">Developed by</span> 
+          <a href="#" data-bs-toggle="modal" data-bs-target="#developerModal" style="color: var(--glow-cyan); text-decoration: none;">
+            <b class="ds-i18n">Ahmed Badawy</b>
+          </a>
+        </p>
+
+        <ul class="list-unstyled d-none d-md-flex mb-0">
+          <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="terms.html">Terms of Use</a></li>
+          <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="privacy.html">Privacy Policy</a></li>
+          <!-- Fixed: Encoded spaces in URL -->
+          <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="Support%20&%20Feedback.html">Support &amp; Feedback</a>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js', { scope: './' })
+        .then(registration => {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        })
+        .catch(err => {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+    });
+  }
+  </script>
+  
+  <!-- Navbar Auto-Collapse on Mobile -->
+  <script>
+    document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            const navbarCollapse = document.getElementById('navbarNavDropdown');
+            if (navbarCollapse.classList.contains('show')) {
+                const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
+                if (bsCollapse) bsCollapse.hide();
+            }
+        });
+    });
+  </script>
 </body>
 </html>

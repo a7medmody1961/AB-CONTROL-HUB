@@ -1,0 +1,79 @@
+<div class="modal fade" id="donateModal" tabindex="-1" aria-labelledby="donateLabel">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content hud-modal">
+      
+      <div class="modal-glow-bg"></div>
+
+      <div class="modal-header border-0 pb-0">
+        <h1 class="modal-title hud-title ds-i18n fs-3" id="donateLabel">Support Development</h1>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body p-4">
+        
+        <p class="text-center text-white-50 mb-4 ds-i18n">Your support helps keep this project alive and free for everyone!</p>
+
+        <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist" style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active rounded-pill fw-bold" id="pills-egypt-tab" data-bs-toggle="pill" data-bs-target="#pills-egypt" type="button" role="tab">
+              <i class="fas fa-flag text-warning me-2"></i> <span class="ds-i18n">Egypt (Local)</span>
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill fw-bold" id="pills-global-tab" data-bs-toggle="pill" data-bs-target="#pills-global" type="button" role="tab">
+              <i class="fas fa-globe-americas text-cyan me-2"></i> <span class="ds-i18n">International</span>
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="pills-tabContent">
+          
+          <div class="tab-pane fade show active" id="pills-egypt" role="tabpanel">
+            
+            <div class="mb-3">
+                <label class="text-white small mb-1"><i class="fas fa-mobile-alt text-danger me-2"></i><span class="ds-i18n">Vodafone Cash</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control bg-dark text-white border-secondary" value="01030678446" id="vodaNumber" readonly>
+                    <button class="btn btn-outline-light" type="button" onclick="copyToClipboard('vodaNumber')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="text-white small mb-1"><i class="fas fa-qrcode text-info me-2"></i><span class="ds-i18n">InstaPay (Number)</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control bg-dark text-white border-secondary" value="01110210770" id="instaHandle" readonly>
+                    <button class="btn btn-outline-light" type="button" onclick="copyToClipboard('instaHandle')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+
+          </div>
+
+          <div class="tab-pane fade" id="pills-global" role="tabpanel">
+            
+            <div class="text-center mb-4">
+                <a href="https://paypal.me/A7medmody19601" target="_blank" class="btn btn-primary w-100 py-2 fs-5" style="background: #0070ba; border: none;">
+                    <i class="fab fa-paypal me-2"></i> PayPal
+                </a>
+            </div>
+
+            <div class="mb-3">
+                <label class="text-white small mb-1"><i class="fas fa-university text-warning me-2"></i><span class="ds-i18n">Bank Transfer (IBAN)</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control bg-dark text-white border-secondary" value="EG190005100500000105086515001" id="ibanNumber" readonly>
+                    <button class="btn btn-outline-light" type="button" onclick="copyToClipboard('ibanNumber')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

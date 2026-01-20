@@ -1,39 +1,82 @@
-<div class="modal fade" id="edgeModal" tabindex="-1" aria-labelledby="modal-title" aria-hidden="true">
+<div class="modal fade" id="edgeModal" tabindex="-1" aria-labelledby="modal-title">
   <div class="modal-dialog modal-xl modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title ds-i18n">DualSense Edge Calibration</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
+    <div class="modal-content hud-modal">
+      
+      <div class="modal-glow-bg"></div>
 
-      <div class="modal-body p-4" id="donateBody">
-          <p class="ds-i18n">Support for calibrating DualSense Edge stick modules is now available as an <b>experimental feature</b>.</p>
-          <p class="ds-i18n">Please note: the stick modules on the DS Edge <b>cannot be calibrated via software alone</b>.</p>
-          <p class="ds-i18n">To store a custom calibration on the stick's internal memory, a <b>hardware modification</b> is required.</p>
-          <p class="ds-i18n">This involves temporarily disabling write protection by applying <b>+1.8V</b> to a specific test point on each module.</p>
-          <p></p>
-
-          <p><span class="ds-i18n">You can do this in two ways:</span>
-          <ul>
-            <li class="ds-i18n"><b>Internally</b>: by soldering a wire from a +1.8V source to the write-protect TP.</li>
-            <li class="ds-i18n"><b>Externally</b>: by applying +1.8V directly to the visible test point without opening the controller.</li>
-          </ul>
-        </p>
-
-        <p><b><span class="ds-i18n">This is only for advanced users. If you're not sure what you're doing, please do not attempt it.</span></b></p>
-        <p><span class="ds-i18n">More details and images</span>&nbsp;<a href="https://github.com/lewy20041/Dualsense_Edge_Modules_Callibration" class="ds-i18n">here</a>.</p>
-
-        <p class="ds-i18n">We are not responsible for any damage caused by attempting this modification.</p>
-        <p class="ds-i18n">For more info or help, feel free to reach out on Discord.</p>
-
-      </div>
-      <div class="modal-footer">
-        <div class="form-check me-auto">
-          <input class="form-check-input" type="checkbox" id="edgeModalDontShowAgain">
-          <label class="form-check-label ds-i18n" for="edgeModalDontShowAgain">Don't show again</label>
+      <div class="modal-header border-0 pb-0">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-microchip text-magenta fs-3 me-3"></i>
+            <h1 class="modal-title hud-title ds-i18n fs-3" id="modal-title">DualSense Edge Calibration</h1>
         </div>
-        <button type="button" class="btn btn-primary ds-i18n" data-bs-dismiss="modal">Understood</button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
+      <div class="modal-body p-4 pt-2" id="donateBody">
+        
+        <div class="text-start">
+            <p class="text-white fs-5">
+                <span class="badge bg-danger bg-opacity-25 border border-danger me-2 ds-i18n">EXPERIMENTAL</span>
+                <span class="ds-i18n">Support for calibrating DualSense Edge stick modules is now available as an experimental feature.</span>
+            </p>
+            
+            <div class="alert alert-dark-glass border-0 border-start border-4 border-info ps-3 my-3">
+                <p class="ds-i18n text-white mb-2">Please note: the stick modules on the DS Edge <b class="text-cyan">cannot be calibrated via software alone</b>.</p>
+                <p class="ds-i18n text-white mb-0">To store a custom calibration on the stick's internal memory, a <b class="text-magenta">hardware modification</b> is required.</p>
+            </div>
+
+            <p class="ds-i18n text-white-50">This involves temporarily disabling write protection by applying <b class="text-white">+1.8V</b> to a specific test point on each module.</p>
+        </div>
+
+        <div class="row my-4">
+            <div class="col-12">
+                <p class="text-white ds-i18n mb-3 border-bottom border-secondary pb-2 d-inline-block">You can do this in two ways:</p>
+                <ul class="list-unstyled">
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="fas fa-caret-right text-cyan mt-1 me-2"></i>
+                        <span class="ds-i18n text-white"><b>Internally</b>: by soldering a wire from a +1.8V source to the write-protect TP.</span>
+                    </li>
+                    <li class="d-flex align-items-start">
+                        <i class="fas fa-caret-right text-cyan mt-1 me-2"></i>
+                        <span class="ds-i18n text-white"><b>Externally</b>: by applying +1.8V directly to the visible test point without opening the controller.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="alert alert-dark-glass border border-danger shadow-lg p-4 text-center position-relative overflow-hidden">
+            <div style="position: absolute; top:0; left:0; width:100%; height:5px; background: var(--glow-magenta); box-shadow: 0 0 10px var(--glow-magenta);"></div>
+            
+            <i class="fas fa-triangle-exclamation text-danger fa-2x mb-3 fa-beat" style="--fa-animation-duration: 2s;"></i>
+            
+            <p class="mb-2"><b><span class="ds-i18n text-danger fs-5 text-uppercase" style="letter-spacing: 1px;">Warning: Advanced Users Only</span></b></p>
+            
+            <p class="ds-i18n text-white mb-3">If you're not sure what you're doing, please do not attempt it.</p>
+            
+            <div class="d-inline-block p-2 border border-secondary rounded bg-black bg-opacity-50">
+                <span class="ds-i18n text-white-50 me-2">More details and images</span>
+                <a href="https://github.com/lewy20041/Dualsense_Edge_Modules_Callibration" target="_blank" class="text-cyan text-decoration-none fw-bold">
+                    <span class="ds-i18n">Click here</span> <i class="fas fa-external-link-alt small ms-1"></i>
+                </a>
+            </div>
+            
+            <p class="ds-i18n text-white-50 small mt-3 mb-0">We are not responsible for any damage caused by attempting this modification.</p>
+        </div>
+        
+        <p class="ds-i18n text-center text-white-50 mt-2">For more info or help, feel free to reach out on Discord.</p>
+
+      </div>
+
+      <div class="modal-footer border-0 pt-0">
+        <div class="form-check me-auto ps-4">
+          <input class="form-check-input bg-dark border-secondary" type="checkbox" id="edgeModalDontShowAgain">
+          <label class="form-check-label ds-i18n text-white small" for="edgeModalDontShowAgain">Don't show again</label>
+        </div>
+        <button type="button" class="btn btn-primary hud-btn-primary" data-bs-dismiss="modal">
+            <i class="fas fa-check me-2"></i><span class="ds-i18n">Understood</span>
+        </button>
+      </div>
+
     </div>
   </div>
 </div>

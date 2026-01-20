@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ultimate Controller Calibration Guide | Fix Stick Drift | AB Control Hub</title>
+    
+    <meta name="description" content="The comprehensive technical guide to fixing Analog Stick Drift on DualSense & DualShock 4. Learn about WebHID technology, potentiometer wear, and how to calibrate your controller permanently.">
+    <meta name="keywords" content="stick drift fix, dualsense calibration, ps5 controller repair, potentiometer wear, webhid api, circularity test, input lag test">
+    <meta name="author" content="Ahmed Badawy">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    
+    <link id="bootstrap-css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    
+    <style>
+        body { 
+            background: var(--bg-dark); 
+            color: white; 
+            overflow-y: auto !important; 
+            height: auto !important; 
+        }
+        .content-card { 
+            background: var(--bg-module); 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            padding: 2.5rem; 
+            margin-bottom: 50px; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        /* Typography enhancements for readability */
+        h1 {
+            color: var(--glow-cyan); 
+            font-family: var(--font-hud); 
+            text-transform: uppercase;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px rgba(0, 240, 240, 0.3);
+            margin-bottom: 2rem;
+        }
+        h2 { 
+            color: var(--glow-magenta); 
+            font-family: var(--font-hud); 
+            font-size: 1.8rem;
+            margin-top: 3rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        h3 {
+            color: var(--glow-green);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        p, li { 
+            line-height: 1.8; 
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+        }
+        strong {
+            color: white;
+            font-weight: 600;
+        }
+        .article-section {
+            margin-bottom: 3rem;
+        }
+        .info-box {
+            background: rgba(0, 240, 240, 0.05);
+            border-left: 4px solid var(--glow-cyan);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: rgba(255, 0, 85, 0.05);
+            border-left: 4px solid var(--glow-red);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 4px;
+        }
+        .step-number {
+            display: inline-block;
+            background: var(--glow-cyan);
+            color: black;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            text-align: center;
+            line-height: 25px;
+            margin-right: 10px;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script type="module" src="js/core.js"></script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <nav class="navbar navbar-expand-md mb-5">
+        <div class="container-fluid">
+          <h1 class="visually-hidden">AB Control Hub Guide</h1>
+          <a class="navbar-brand" href="index.html">
+            <i class="fas fa-gamepad me-2"></i> AB CONTROL HUB
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+          </button>
+    
+          <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+            <ul class="navbar-nav align-items-center">
+                
+    <li class="nav-item mb-2 mb-md-0 me-md-2" id="lang-switcher">
+        <a class="nav-link" id="langSwitchButton" role="button" href="#" onclick="toggle_lang()">
+        <i class="fas fa-language fa-lg"></i>&nbsp;<span id="curLang">العربية</span>
+        </a>
+    </li>
+
+    <li class="nav-item d-none d-md-block me-2">
+        <a class="btn btn-glow-gold rounded-pill" href="#" onclick="show_donate_modal()" role="button">
+            <i class="fas fa-heart me-2"></i> <span class="ds-i18n">Support</span>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="index.html">
+                <i class="fas fa-home me-2"></i> <span class="ds-i18n">Home</span>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link active" href="guide.html" style="color: var(--glow-cyan) !important;">
+            <i class="fas fa-book-open me-2"></i> <span class="ds-i18n">Guide</span>
+        </a>
+    </li>
+
+    <li class="nav-item d-md-none">
+        <hr class="dropdown-divider bg-secondary opacity-50 my-2">
+    </li>
+    
+    <li class="nav-item d-md-none">
+        <a class="nav-link" href="terms.html">
+            <i class="fas fa-file-alt me-2 text-white"></i> Terms of Use
+        </a>
+    </li>
+    
+    <li class="nav-item d-md-none">
+        <a class="nav-link" href="privacy.html">
+            <i class="fas fa-user-shield me-2 text-white"></i> Privacy Policy
+        </a>
+    </li>
+    
+    <li class="nav-item d-md-none">
+        <a class="nav-link" href="Support & Feedback.html">
+            <i class="fas fa-headset me-2 text-white"></i> Support & Feedback
+        </a>
+    </li>
+    
+    <li class="nav-item d-md-none mt-2">
+        <a class="nav-link text-warning fw-bold border border-warning rounded text-center" href="#" onclick="show_donate_modal()">
+            <i class="fas fa-heart me-2"></i> <span class="ds-i18n">Support Development</span>
+        </a>
+    </li>
+
+    <li class="nav-item d-md-none mt-2">
+            <span class="nav-link small text-white-50" style="font-size: 0.8rem;">
+            Dev by <span style="color: var(--glow-cyan);">Ahmed Badawy</span>
+            </span>
+    </li>
+</ul>
+          </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="content-card">
+            
+            <div class="text-center">
+                <h1 class="ds-i18n">The Technical Guide to Controller Calibration</h1>
+                <p class="lead text-white-50 ds-i18n">Deep dive into Analog Stick Drift, WebHID Technology, and Hardware Diagnostics.</p>
+            </div>
+
+            <div class="my-4 text-center">
+                <span class="text-white-50 small" style="border: 1px dashed #0ff; padding: 15px; display: block; background: rgba(0, 240, 240, 0.05);">
+                    Space for Ad (Responsive)
+                </span>
+            </div>
+
+            <article class="article-section">
+                <h2 class="ds-i18n"><i class="fas fa-microchip me-2"></i> 1. The Science Behind Stick Drift</h2>
+                
+                <h3 class="ds-i18n">What is a Potentiometer?</h3>
+                <p class="ds-i18n">
+                    Most modern controllers (DualSense, DualShock 4, Xbox) use <strong>ALPS analog stick modules</strong>. These modules rely on two potentiometers—one for the X-axis (horizontal) and one for the Y-axis (vertical). A potentiometer is essentially a variable resistor that uses a physical wiper blade sliding across a carbon track to read position.
+                </p>
+
+                <h3 class="ds-i18n">Why Does Drift Occur?</h3>
+                <p class="ds-i18n">
+                    Every time you move the stick, friction occurs. Over hundreds of hours of gameplay (like Call of Duty or FIFA), this friction causes two things:
+                </p>
+                <ul>
+                    <li class="ds-i18n"><strong>Wear of the Carbon Track:</strong> The resistive material wears down, changing the electrical resistance values.</li>
+                    <li class="ds-i18n"><strong>Dust Accumulation:</strong> Conductive dust from the wear process can settle on the tracks, causing "jitter" or erratic signals.</li>
+                </ul>
+                <p class="ds-i18n">
+                    When this happens, the controller reports that the stick is moving (e.g., Value +15) even when it is physically centered (Value 0). This is <strong>Stick Drift</strong>.
+                </p>
+
+                <div class="info-box">
+                    <strong class="ds-i18n">The AB Control Hub Solution:</strong>
+                    <br class="ds-i18n">
+                    <span class="ds-i18n">Since we cannot physically repair the carbon track via software, our tool uses <strong>Firmware Level Calibration</strong>. We calculate the exact error offset of your drifted stick and write a new "Center Point" to the controller's permanent memory (NVS). This forces the controller to mathematically ignore the drift.</span>
+                </div>
+            </article>
+
+            <article class="article-section">
+                <h2 class="ds-i18n"><i class="fas fa-network-wired me-2"></i> 2. How WebHID Changes the Game</h2>
+                
+                <p class="ds-i18n">
+                    Historically, calibrating a controller required downloading executable files (.exe), installing drivers, and risking viruses. <strong>AB Control Hub</strong> is built on the <strong>WebHID API</strong> (Web Human Interface Device), a cutting-edge browser standard.
+                </p>
+                
+                <h3 class="ds-i18n">Technical Advantages</h3>
+                <ul>
+                    <li class="ds-i18n"><strong>Direct Hardware Access:</strong> The browser communicates directly with the USB/Bluetooth HID Report Descriptors. This allows for millisecond-level precision in reading input lags.</li>
+                    <li class="ds-i18n"><strong>Sandboxed Security:</strong> Unlike native apps, a website cannot read your files or access other hardware without explicit permission. This makes AB Control Hub significantly safer than downloading random tools.</li>
+                    <li class="ds-i18n"><strong>Cross-Platform:</strong> The underlying JavaScript code runs identically on Windows, macOS, Linux, and Android.</li>
+                </ul>
+            </article>
+
+            <article class="article-section">
+                <h2 class="ds-i18n"><i class="fas fa-search me-2"></i> 3. Detecting Counterfeit Controllers</h2>
+                <p class="ds-i18n">
+                    The market is flooded with "High Copy" controllers. While they look identical to the original Sony DualSense, their internals are vastly inferior. Use our tool to spot them:
+                </p>
+
+                <h3 class="ds-i18n">The Circularity Test</h3>
+                <p class="ds-i18n">
+                    Switch the joystick visualizer to <strong>"Circularity Mode"</strong>. Rotate your stick in a perfect circle.
+                </p>
+                <ul>
+                    <li class="ds-i18n"><strong>Original:</strong> Average error is typically <strong>8% - 12%</strong>. The movement is smooth.</li>
+                    <li class="ds-i18n"><strong>Fake:</strong> Average error often exceeds <strong>20%</strong>. The shape may look like a square (diamond) rather than a circle, indicating cheap non-linear potentiometers.</li>
+                </ul>
+
+                <h3 class="ds-i18n">The Polling Rate & Input Lag</h3>
+                <p class="ds-i18n">
+                    Original controllers via USB typically have a stable polling rate (e.g., 250Hz or 1000Hz depending on overclock). Fake controllers often have unstable polling rates, leading to input lag spikes visible in our graph.
+                </p>
+            </article>
+
+            <div class="my-4 text-center">
+                <span class="text-white-50 small" style="border: 1px dashed #0ff; padding: 15px; display: block; background: rgba(0, 240, 240, 0.05);">
+                    Space for Ad
+                </span>
+            </div>
+
+            <article class="article-section">
+                <h2 class="ds-i18n"><i class="fas fa-sliders-h me-2"></i> 4. Step-by-Step Calibration</h2>
+                
+                <div class="warning-box">
+                    <strong class="ds-i18n">Important:</strong> 
+                    <span class="ds-i18n">Ensure your controller is sufficiently charged and the cable is stable. Do not disconnect during the "Save" process.</span>
+                </div>
+
+                <h3 class="ds-i18n">Method A: Center Calibration (Drift Fix)</h3>
+                <p class="ds-i18n">
+                    This fixes sticks that move on their own.
+                </p>
+                <ol>
+                    <li class="ds-i18n">Go to the <strong>Calibration</strong> tab.</li>
+                    <li class="ds-i18n">Click <strong>"Center Calibration"</strong>.</li>
+                    <li class="ds-i18n">Follow the prompt: Rotate both sticks 3 times fully, then let go.</li>
+                    <li class="ds-i18n">The tool will calculate the offset and apply it.</li>
+                </ol>
+
+                <h3 class="ds-i18n">Method B: Range Calibration (Deadzone Fix)</h3>
+                <p class="ds-i18n">
+                    This fixes sticks that don't reach full speed (e.g., character runs slowly).
+                </p>
+                <ol>
+                    <li class="ds-i18n">Click <strong>"Range Calibration"</strong>.</li>
+                    <li class="ds-i18n">Rotate the sticks to their absolute maximum limits in all directions.</li>
+                    <li class="ds-i18n">The tool expands the internal mapping to ensure 100% output at the edges.</li>
+                </ol>
+            </article>
+
+            <div class="mt-5 text-center">
+                <a href="index.html" class="btn btn-lg btn-outline-info text-uppercase" style="border-width: 2px; letter-spacing: 1px;">
+                    <i class="fas fa-magic me-2"></i> <span class="ds-i18n">Start Calibration Now</span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal fade" id="developerModal" tabindex="-1" aria-labelledby="developerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content text-bg-dark">
+            <div class="modal-header">
+            <h5 class="modal-title ds-i18n" id="developerModalLabel">Developer Info</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-white">
+            <div class="text-center mb-4">
+                <i class="fas fa-user-circle fa-5x mb-3" style="color: var(--glow-cyan);"></i>
+                <h4 class="ds-i18n">Ahmed Badawy</h4>
+                <p class="text-muted ds-i18n">Developer</p>
+            </div>
+            <div class="list-group list-group-flush bg-transparent">
+                <a href="https://www.facebook.com/A7medMody196" target="_blank" rel="noopener noreferrer" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+                <i class="fab fa-facebook me-3" style="color: #1877F2;"></i> <span class="ds-i18n">Facebook</span>: A7medmody196
+                </a>
+                <a href="https://www.instagram.com/A7medMody196" target="_blank" rel="noopener noreferrer" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+                <i class="fab fa-instagram me-3" style="color: #E4405F;"></i> <span class="ds-i18n">Instagram</span>: A7medMody196
+                </a>
+                <a href="https://t.me/A7medmody196" target="_blank" rel="noopener noreferrer" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+                <i class="fab fa-telegram me-3" style="color: #0088cc;"></i> <span class="ds-i18n">Telegram</span>: A7medmody196
+                </a>
+                <a href="https://wa.me/201110210770" target="_blank" rel="noopener noreferrer" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+                <i class="fab fa-whatsapp me-3" style="color: #25D366;"></i> <span class="ds-i18n">WhatsApp</span>: +201110210770
+                </a>
+            </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary ds-i18n" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <footer class="page-footer border-top mt-auto">
+        <div class="container">
+          <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center py-3" id="footbody">
+            
+            <p class="mb-0 footer-text">
+              <span class="ds-i18n">Developed by</span> 
+              <a href="#" data-bs-toggle="modal" data-bs-target="#developerModal" style="color: var(--glow-cyan); text-decoration: none;">
+                <b class="ds-i18n">Ahmed Badawy</b>
+              </a>
+            </p>
+    
+            <ul class="list-unstyled d-none d-md-flex mb-0">
+              <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="terms.html">Terms of Use</a></li>
+              <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="privacy.html">Privacy Policy</a></li>
+              <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="Support%20&%20Feedback.html">Support & Feedback</a></li>
+            </ul>
+          </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

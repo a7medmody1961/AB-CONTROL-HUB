@@ -90,14 +90,14 @@ export async function loadAllTemplates() {
     // Load modals
     // Optimization: Load all modals in parallel instead of sequentially
     const modalNames = [
-      'faq-modal',
       'popup-modal',
       'finetune-modal',
       'calib-center-modal',
       'auto-calib-center-modal',
       'range-modal',
       'edge-progress-modal',
-      'edge-modal'
+      'edge-modal',
+      'donate-modal'
     ];
 
     // Create an array of promises

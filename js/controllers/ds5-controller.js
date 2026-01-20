@@ -295,34 +295,18 @@ class DS5Controller extends BaseController {
       const fwversion2 = view.getUint32(52, true);
       const fwversion3 = view.getUint32(56, true);
 
-      const serial_number = await this.getSystemInfo(1, 19, 17);
-      const color = ds5_color(serial_number);
-      const infoItems = [
-        { key: "Serial Number", value: serial_number, cat: "hw" },
-        { key: "MCU Unique ID", value: await this.getSystemInfo(1, 9, 9, false), cat: "hw", isExtra: true },
-        { key: "PCBA ID", value: reverse_str(await this.getSystemInfo(1, 17, 14)), cat: "hw", isExtra: true },
-        { key: "Battery Barcode", value: await this.getSystemInfo(1, 24, 23), cat: "hw", isExtra: true },
-        { key: "VCM Left Barcode", value: await this.getSystemInfo(1, 26, 16), cat: "hw", isExtra: true },
-        { key: "VCM Right Barcode", value: await this.getSystemInfo(1, 28, 16), cat: "hw", isExtra: true },
-
-        { key: "Color", value: l(color), cat: "hw", addInfoIcon: 'color' },
-
-        ...(is_edge ? [] : [{ key: "Board Model", value: this.hwToBoardModel(hwinfo), cat: "hw", addInfoIcon: 'board' }]),
-
-        { key: "FW Build Date", value: build_date + " " + build_time, cat: "fw" },
-        { key: "FW Type", value: "0x" + dec2hex(fwtype), cat: "fw", isExtra: true },
-        { key: "FW Series", value: "0x" + dec2hex(swseries), cat: "fw", isExtra: true },
-        { key: "HW Model", value: "0x" + dec2hex32(hwinfo), cat: "hw", isExtra: true },
-        { key: "FW Version", value: "0x" + dec2hex32(fwversion), cat: "fw", isExtra: true },
-        { key: "FW Update", value: "0x" + dec2hex(updversion), cat: "fw", isExtra: true },
-        { key: "FW Update Info", value: "0x" + dec2hex8(unk), cat: "fw", isExtra: true },
-        { key: "SBL FW Version", value: "0x" + dec2hex32(fwversion1), cat: "fw", isExtra: true },
-        { key: "Venom FW Version", value: "0x" + dec2hex32(fwversion2), cat: "fw", isExtra: true },
-        { key: "Spider FW Version", value: "0x" + dec2hex32(fwversion3), cat: "fw", isExtra: true },
-
-        { key: "Touchpad ID", value: await this.getSystemInfo(5, 2, 8, false), cat: "hw", isExtra: true },
-        { key: "Touchpad FW Version", value: await this.getSystemInfo(5, 4, 8, false), cat: "fw", isExtra: true },
+      let infoItems = [
+          { key: "FW Build Date", value: build_date + " " + build_time, cat: "fw" },
+          { key: "HW Model", value: "0x" + dec2hex32(hwinfo), cat: "hw", isExtra: true }
       ];
+
+      // محاولة جلب المعلومات الإضافية بشكل منفصل حتى لا يتوقف الاتصال
+      try {
+          const serial = await this.getSystemInfo(1, 19, 17);
+          infoItems.push({ key: "Serial Number", value: serial, cat: "hw" });
+          infoItems.push({ key: "Color", value: l(ds5_color(serial)), cat: "hw" });
+          if(!is_edge) infoItems.push({ key: "Board Model", value: this.hwToBoardModel(hwinfo), cat: "hw" });
+      } catch(e) { console.warn("Could not fetch extended info"); }
 
       const old_controller = build_date.search(/ 2020| 2021/);
       let disable_bits = 0;

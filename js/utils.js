@@ -83,17 +83,29 @@ export function reverse_str(s) {
   return s.split('').reverse().join('');
 }
 
-export let la = undefined;
-export function lf(operation, data) { la(operation, buf2hex(data.buffer)); return data; }
+// التعديل 1: جعلنا القيمة الافتراضية دالة فارغة لمنع الأخطاء
+export let la = (k, v) => {};
+
+export function lf(operation, data) { 
+  if (la) la(operation, buf2hex(data.buffer)); 
+  return data; 
+}
 
 export function initAnalyticsApi({gj, gu}) {
   la = (k, v = {}) => {
+    // التعديل 2: التحقق من الاتصال بالإنترنت أولاً
+    if (!navigator.onLine) {
+      return;
+    }
+
     // Replaced jQuery $.ajax with native fetch
     fetch("https://the.al/ds4_a/l", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
+      // التعديل 3: وضع no-cors لتجنب أخطاء الكونسول
+      mode: 'no-cors',
       body: JSON.stringify({u: gu, j: gj, k, v})
     }).catch(() => {
       // Fail silently, analytics shouldn't break the app

@@ -44,7 +44,7 @@
             color: var(--glow-cyan);
             transition: 0.3s;
             border-radius: 5px;
-            padding: 10px 30px; /* نفس حشو زر الخصوصية */
+            padding: 10px 30px; 
         }
         .btn-glow-primary:hover {
             background: var(--glow-cyan);
@@ -70,11 +70,11 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script type="module" src="js/core.js"></script>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
 <nav class="navbar navbar-expand-md mb-4">
     <div class="container-fluid">
-      <h1 class="visually-hidden">AB Control Hub</h1>
+      <h1 class="visually-hidden">AB Control Hub - Support</h1>
       <a class="navbar-brand" href="index.html">
         <i class="fas fa-gamepad me-2"></i> AB CONTROL HUB
       </a>
@@ -83,13 +83,66 @@
       </button>
 
       <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
-        <ul class="navbar-nav">
-          <li class="nav-item" id="lang-switcher">
-            <a class="nav-link" id="langSwitchButton" role="button" href="#" onclick="toggle_lang()">
-              <i class="fas fa-language"></i>&nbsp;<span id="curLang">English</span>
-            </a>
-          </li>
-        </ul>
+        <ul class="navbar-nav align-items-center">
+    
+    <li class="nav-item mb-2 mb-md-0 me-md-2" id="lang-switcher">
+        <a class="nav-link" id="langSwitchButton" role="button" href="#" onclick="toggle_lang()">
+        <i class="fas fa-language fa-lg"></i>&nbsp;<span id="curLang">العربية</span>
+        </a>
+    </li>
+
+    <li class="nav-item d-none d-md-block me-2">
+        <a class="btn btn-glow-gold rounded-pill" href="#" onclick="show_donate_modal()" role="button">
+            <i class="fas fa-heart me-2"></i> <span class="ds-i18n">Support</span>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="index.html">
+                <i class="fas fa-home me-2"></i> <span class="ds-i18n">Home</span>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="guide.html">
+                <i class="fas fa-book-open me-2"></i> <span class="ds-i18n">Guide</span>
+        </a>
+    </li>
+
+    <li class="nav-item d-md-none">
+        <hr class="dropdown-divider bg-secondary opacity-50 my-2">
+    </li>
+    
+    <li class="nav-item d-md-none">
+        <a class="nav-link" href="terms.html">
+            <i class="fas fa-file-alt me-2 text-white"></i> Terms of Use
+        </a>
+    </li>
+    
+    <li class="nav-item d-md-none">
+        <a class="nav-link" href="privacy.html">
+            <i class="fas fa-user-shield me-2 text-white"></i> Privacy Policy
+        </a>
+    </li>
+    
+    <li class="nav-item d-md-none">
+        <a class="nav-link active" href="Support & Feedback.html" style="color: var(--glow-cyan) !important;">
+            <i class="fas fa-headset me-2 text-white"></i> Support & Feedback
+        </a>
+    </li>
+    
+    <li class="nav-item d-md-none mt-2">
+        <a class="nav-link text-warning fw-bold border border-warning rounded text-center" href="#" onclick="show_donate_modal()">
+            <i class="fas fa-heart me-2"></i> <span class="ds-i18n">Support Development</span>
+        </a>
+    </li>
+
+    <li class="nav-item d-md-none mt-2">
+            <span class="nav-link small text-white-50" style="font-size: 0.8rem;">
+            Dev by <span style="color: var(--glow-cyan);">Ahmed Badawy</span>
+            </span>
+    </li>
+</ul>
       </div>
     </div>
 </nav>
@@ -145,6 +198,61 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="developerModal" tabindex="-1" aria-labelledby="developerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content text-bg-dark">
+        <div class="modal-header">
+        <h5 class="modal-title ds-i18n" id="developerModalLabel">Developer Info</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-white">
+        <div class="text-center mb-4">
+            <i class="fas fa-user-circle fa-5x mb-3" style="color: var(--glow-cyan);"></i>
+            <h4 class="ds-i18n">Ahmed Badawy</h4>
+            <p class="text-muted ds-i18n">Developer</p>
+        </div>
+        <div class="list-group list-group-flush bg-transparent">
+            <a href="https://www.facebook.com/A7medMody196" target="_blank" rel="noopener noreferrer" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+            <i class="fab fa-facebook me-3" style="color: #1877F2;"></i> <span class="ds-i18n">Facebook</span>: A7medmody196
+            </a>
+            <a href="https://www.instagram.com/A7medMody196" target="_blank" rel="noopener noreferrer" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+            <i class="fab fa-instagram me-3" style="color: #E4405F;"></i> <span class="ds-i18n">Instagram</span>: A7medMody196
+            </a>
+            <a href="https://t.me/A7medmody196" target="_blank" rel="noopener noreferrer" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+            <i class="fab fa-telegram me-3" style="color: #0088cc;"></i> <span class="ds-i18n">Telegram</span>: A7medmody196
+            </a>
+            <a href="https://wa.me/201110210770" target="_blank" rel="noopener noreferrer" class="list-group-item list-group-item-action bg-transparent text-white border-secondary">
+            <i class="fab fa-whatsapp me-3" style="color: #25D366;"></i> <span class="ds-i18n">WhatsApp</span>: +201110210770
+            </a>
+        </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary ds-i18n" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+    </div>
+</div>
+
+<footer class="page-footer border-top mt-auto">
+    <div class="container">
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center py-3" id="footbody">
+        
+        <p class="mb-0 footer-text">
+          <span class="ds-i18n">Developed by</span> 
+          <a href="#" data-bs-toggle="modal" data-bs-target="#developerModal" style="color: var(--glow-cyan); text-decoration: none;">
+            <b class="ds-i18n">Ahmed Badawy</b>
+          </a>
+        </p>
+
+        <ul class="list-unstyled d-none d-md-flex mb-0">
+          <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="terms.html">Terms of Use</a></li>
+          <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="privacy.html">Privacy Policy</a></li>
+          <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="Support%20&%20Feedback.html">Support & Feedback</a></li>
+        </ul>
+      </div>
+    </div>
+</footer>
 
 <script type="module">
     document.getElementById('supportForm').addEventListener('submit', function(e) {

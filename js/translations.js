@@ -104,7 +104,8 @@ function lang_reset_page() {
   }
   
   const curLangEl = document.getElementById("curLang");
-  if(curLangEl) curLangEl.innerHTML = "English";
+  // التعديل هنا: بما أننا رجعنا إنجليزي، نعرض زر "العربية"
+  if(curLangEl) curLangEl.innerHTML = "العربية";
   
   document.title = lang_orig_text[".title"];
 }
@@ -164,12 +165,10 @@ async function lang_translate(target_file, target_lang, target_direction) {
     const { lang_orig_text, lang_cur } = translationState;
     lang_set_direction(target_direction, target_lang);
 
-    // Replaced $.each with Object.entries().forEach
     Object.entries(data).forEach(([key, val]) => {
       if(lang_cur[key]) {
         console.log("Warn: already exists " + key);
       } else {
-        // Keep array structure for compatibility
         lang_cur[key] = [val];
       }
     });
@@ -187,7 +186,6 @@ async function lang_translate(target_file, target_lang, target_direction) {
       if (translatedText) {
         item.innerHTML = translatedText;
       } else {
-        // Fallback to exact match if trim didn't work
         const exactEntry = lang_cur[lang_orig_text[item.id]];
         const exactTranslated = Array.isArray(exactEntry) ? exactEntry[0] : exactEntry;
         if (exactTranslated) {
@@ -207,8 +205,16 @@ async function lang_translate(target_file, target_lang, target_direction) {
          document.title = translatedTitle;
     }
 
+    // === التعديل هنا ===
     const curLangEl = document.getElementById("curLang");
-    if(curLangEl) curLangEl.innerHTML = available_langs[target_lang]["name"];
+    if(curLangEl) {
+        // لو اللغة اللي حملناها هي العربي، نعرض زر "English" والعكس
+        if (target_lang === 'ar_ar') {
+            curLangEl.innerHTML = "English";
+        } else {
+            curLangEl.innerHTML = "العربية";
+        }
+    }
 
   } catch (error) {
     console.error("Failed to load translation file:", target_file, error);
