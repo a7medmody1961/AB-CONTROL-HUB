@@ -123,6 +123,18 @@ function gboot() {
       setDisplay('cookie-consent', false);
     };
 
+    // === ضيف الكود ده هنا ===
+    const cookieConsent = readCookie('cookie_consent');
+    if (!cookieConsent) {
+        // نظهر البانر بعد ثانية ونص عشان الزائر يلحق ياخد نفسه
+        setTimeout(() => {
+            $('#cookie-consent').fadeIn(); 
+            // أو لو مش شغال معاك الـ fadeIn استخدم:
+            // setDisplay('cookie-consent', true);
+        }, 1500);
+    }
+    // ========================
+
     document.querySelectorAll("input[name='displayMode']").forEach(el => {
         el.addEventListener('change', on_stick_mode_change);
     });
@@ -978,5 +990,43 @@ const model = controller.getModel();
   
   controller.setAdaptiveTriggerPreset(params);
 }
+
+// ==========================================
+// ===  New Features & Logic (What's New) ===
+// ==========================================
+
+const CURRENT_VERSION = 1; // ⚠️ غير الرقم ده لـ 2 لما تنزل تحديث جديد عشان الجرس ينور تاني
+
+window.openWhatsNew = () => {
+  const modal = new bootstrap.Modal(document.getElementById('whatsNewModal'));
+  modal.show();
+  localStorage.setItem('last_seen_version', CURRENT_VERSION);
+  $('#whatsNewBtn').removeClass('has-updates');
+  $('#notifyDot').hide();
+};
+
+// تشغيل الفحوصات عند اكتمال تحميل الصفحة
+$(document).ready(() => {
+  
+  // 1. فحص تحديثات "What's New"
+  const lastSeen = localStorage.getItem('last_seen_version');
+  if (!lastSeen || parseInt(lastSeen) < CURRENT_VERSION) {
+      $('#whatsNewBtn').addClass('has-updates');
+      $('#notifyDot').show();
+  }
+
+  // 2. فحص الكوكيز (عشان نضمن إنه يشتغل)
+  // تأكد إن دالة readCookie موجودة عندك فوق في الملف، لو مش موجودة قولي
+  if (typeof readCookie === 'function') {
+      const cookieConsent = readCookie('cookie_consent');
+      if (!cookieConsent) {
+          setTimeout(() => { 
+             $('#cookie-consent').fadeIn(); 
+          }, 1500);
+      }
+  }
+});
+
+// ==========================================
 
 gboot();

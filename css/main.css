@@ -1490,3 +1490,78 @@ body.ds-i18n-ar ul li {
     display: flex;      /* عشان الأيقونة والكلام يبقوا على سطر واحد مظبوط */
     align-items: center;
 }
+/* --- Floating Action Buttons --- */
+.fab-container {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 15px;
+    z-index: 9999; /* فوق كل حاجة */
+}
+
+.fab-btn {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: none;
+    color: white;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-decoration: none;
+}
+
+.fab-btn:hover {
+    transform: scale(1.1);
+    color: white;
+}
+
+/* WhatsApp Style */
+.fab-whatsapp {
+    background: #25D366;
+    border: 2px solid #128C7E;
+}
+.fab-whatsapp:hover {
+    box-shadow: 0 0 20px #25D366;
+}
+
+/* Notification Bell Style */
+.fab-notify {
+    background: #333;
+    border: 2px solid var(--glow-cyan);
+    color: var(--glow-cyan);
+    position: relative;
+}
+
+/* النقطة الحمراء */
+.notification-dot {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 10px;
+    height: 10px;
+    background-color: #ff3b30;
+    border-radius: 50%;
+    border: 2px solid #333;
+    display: none; /* مخفية افتراضياً */
+}
+
+/* تأثير النبض (Glow Animation) */
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 0 0 rgba(0, 240, 240, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(0, 240, 240, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 240, 240, 0); }
+}
+
+.fab-notify.has-updates {
+    animation: pulse-glow 2s infinite;
+}
+.fab-notify.has-updates .notification-dot {
+    display: block;
+}

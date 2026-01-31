@@ -2,13 +2,13 @@
 // Strategy: Network First, falling back to Cache
 // This ensures Ads/Analytics run fresh when online, but app works offline.
 
-const CACHE_NAME = 'ab-control-hub-v3'; // غيرنا الرقم لـ 3 عشان المتصفح يحس بالتغيير
+const CACHE_NAME = 'ab-control-hub-v2.1'; // غيرنا الرقم لـ 2.1 عشان المتصفح يحس بالتغيير
 const urlsToCache = [
   './',
   './index.html',
   './terms.html',
   './privacy.html',
-  './Support%20&%20Feedback.html', // لاحظ الترميز %20 للمسافات
+  './support.html',
   './guide.html',
   './css/main.css',
   './css/finetune.css',
@@ -46,7 +46,6 @@ const urlsToCache = [
   './templates/range-modal.html',
   './templates/finetune-modal.html',
   './templates/popup-modal.html',
-  './templates/faq-modal.html',
   './templates/edge-modal.html',
   './templates/edge-progress-modal.html'
 ];

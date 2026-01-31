@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://ab-control-hub.site/sitemap.xml
