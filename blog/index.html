@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.google https://*.gstatic.com https://*.googlesyndication.com https://*.googleadservices.com https://*.googletagmanager.com https://*.doubleclick.net https://*.googleapis.com https://cdn.jsdelivr.net https://code.jquery.com;
+        style-src 'self' 'unsafe-inline' https://*.googleapis.com https://cdn.jsdelivr.net https://*.google.com;
+        img-src 'self' data: https://*.google.com https://*.google https://*.googleapis.com https://*.gstatic.com https://*.googlesyndication.com https://*.google-analytics.com https://*.doubleclick.net https://*.googleadservices.com;
+        font-src 'self' data: https://*.gstatic.com https://cdn.jsdelivr.net https://*.googleapis.com;
+        connect-src 'self' https://*.google.com https://*.google https://*.googleapis.com https://*.gstatic.com https://*.google-analytics.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://the.al https://cdn.jsdelivr.net;
+        frame-src 'self' https://*.google.com https://*.google https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com;
+    ">
+
+    <title>AB Control Hub Blog | Controller Tech & Fixes</title>
+    
+    <meta name="description" content="Technical guides, tutorials, and deep dives into PlayStation controller repair, WebHID technology, and drift calibration.">
+    <meta name="author" content="Ahmed Badawy">
+    <meta name="robots" content="index, follow">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="icon" type="image/png" href="../favicon-96x96.png" sizes="96x96">
+    <link rel="shortcut icon" href="../favicon.ico" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link id="bootstrap-css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css" crossorigin="anonymous">
+    
+    <link rel="stylesheet" href="../css/main.css">
+    
+    <style>
+        .blog-hero {
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(13,110,253,0.1) 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 4rem 0;
+            margin-bottom: 3rem;
+        }
+        .article-card {
+            background: rgba(25, 25, 25, 0.95);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4), 0 0 15px rgba(13, 202, 240, 0.2);
+            border-color: var(--glow-cyan);
+        }
+        .article-img-wrapper {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: #111; /* Fallback color */
+        }
+        .article-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .article-card:hover .article-img-wrapper img {
+            transform: scale(1.05);
+        }
+        .article-body {
+            padding: 2rem;
+            flex-grow: 1;
+        }
+        .article-meta {
+            font-size: 0.85rem;
+            color: var(--glow-cyan);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .article-title {
+            color: #fff;
+            font-family: var(--font-hud);
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+        }
+        .article-text {
+            color: #ccc;
+            line-height: 1.7;
+            font-size: 1.05rem;
+            margin-bottom: 1.5rem;
+        }
+        /* Override specifically for blog text readability */
+        h3, h4 { color: #fff; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        ul { color: #ccc; padding-left: 1.2rem; }
+        li { margin-bottom: 0.5rem; }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script type="module" src="../js/core.js"></script> 
+</head>
+
+<body class="d-flex flex-column min-vh-100">  
+  
+  <nav class="navbar navbar-expand-md sticky-top bg-dark border-bottom border-secondary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="../index.html">
+        <i class="fas fa-gamepad me-2 text-info"></i> AB CONTROL HUB
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+        <ul class="navbar-nav align-items-center">
+            <li class="nav-item mb-2 mb-md-0 me-md-2" id="lang-switcher">
+                <a class="nav-link" id="langSwitchButton" role="button" href="#" onclick="toggle_lang()">
+                  <i class="fas fa-language fa-lg"></i>&nbsp;<span id="curLang">English</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="../index.html">
+                    <i class="fas fa-home me-2"></i> <span class="ds-i18n">Home</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="#">
+                    <i class="fas fa-rss me-2"></i> <span class="ds-i18n">Blog</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../guide/">
+                    <i class="fas fa-book-open me-2"></i> <span class="ds-i18n">Guide</span>
+                </a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="blog-hero text-center">
+      <div class="container">
+          <h1 class="display-4 fw-bold text-white mb-3" style="font-family: var(--font-hud);">
+              <span class="ds-i18n">Engineering Blog</span>
+          </h1>
+          <p class="lead text-white-50 mb-4 mx-auto" style="max-width: 700px;">
+              <span class="ds-i18n">Deep dives into gamepad architecture, WebHID protocols, and firmware calibration techniques.</span>
+          </p>
+          <a href="../index.html" class="btn btn-outline-info rounded-pill px-4 ds-i18n">
+              <i class="fas fa-arrow-left me-2"></i> Back to Home
+          </a>
+      </div>
+  </header>
+
+  <main class="container my-5 flex-grow-1">
+      
+      <div class="row g-5">
+          
+          <div class="col-lg-12">
+              <article class="article-card">
+                  <div class="article-img-wrapper">
+                      <img src="../assets/simple1.jpg" alt="Stick Drift Analysis" onerror="this.style.display='none'">
+                  </div>
+                  <div class="article-body">
+                      <div class="article-meta">
+                          <i class="fas fa-calendar-alt me-2"></i> <span class="ds-i18n">Feb 8, 2026</span> &nbsp;|&nbsp; 
+                          <i class="fas fa-wrench me-2"></i> <span class="ds-i18n">Hardware Repair</span>
+                      </div>
+                      <h2 class="article-title ds-i18n">The Physics of Stick Drift: Why It Happens & The Real Fix</h2>
+                      <div class="article-text">
+                          <p class="ds-i18n">Stick drift is the plague of modern gaming. You're in a heated match, and suddenly your camera pans left without you touching the controller. But what is actually happening inside the hardware?</p>
+                          
+                          <h4 class="ds-i18n">The Potentiometer Problem</h4>
+                          <p class="ds-i18n">Most modern controllers, including the DualSense and DualShock 4, use <strong>ALPS analog stick modules</strong>. These rely on potentiometers—variable resistors that use a physical wiper sliding across a carbon track to measure position. It is a friction-based system.</p>
+                          <p class="ds-i18n">Over time, two things inevitably happen:</p>
+                          <ul>
+                              <li class="ds-i18n"><strong>Carbon Wear:</strong> The wiper physically scrapes off the resistive carbon layer, changing the electrical resistance values. The controller expects "0 Volts" at the center, but now receives "0.2 Volts", interpreting it as movement.</li>
+                              <li class="ds-i18n"><strong>Debris Buildup:</strong> The scraped-off carbon dust is conductive. It accumulates inside the sensor housing, creating erratic electrical jumps (jitter).</li>
+                          </ul>
+
+                          <h4 class="ds-i18n">Why Software Deadzones Fail</h4>
+                          <p class="ds-i18n">Increasing the deadzone in your game settings acts as a band-aid. It tells the game to ignore the first 10-15% of stick movement. While this hides the drift, it destroys your precision. You lose the ability to make subtle movements, which is fatal in competitive FPS or racing games.</p>
+
+                          <h4 class="ds-i18n">The Solution: NVS Calibration</h4>
+                          <p class="ds-i18n">AB Control Hub takes a different approach. Instead of ignoring the input, we access the controller's <strong>Non-Volatile Storage (NVS)</strong>. By measuring the exact error offset of your worn stick, we can write a new "center point" directly to the controller's firmware. The controller then does the math internally, sending a perfect (0,0) signal to the console. This restores full dynamic range without sacrificing precision.</p>
+                      </div>
+                  </div>
+              </article>
+          </div>
+
+          <div class="col-md-6">
+              <article class="article-card">
+                   <div class="article-img-wrapper">
+                        <img src="../assets/simple2.jpg" alt="WebHID Tech" onerror="this.style.display='none'">
+                   </div>
+                  <div class="article-body">
+                      <div class="article-meta">
+                          <i class="fas fa-code me-2"></i> <span class="ds-i18n">Tech Explained</span>
+                      </div>
+                      <h2 class="article-title ds-i18n">How WebHID Revolutionizes Hardware Tools</h2>
+                      <div class="article-text">
+                          <p class="ds-i18n">Traditionally, calibrating a controller required downloading shady .exe files or installing unsigned drivers. The <strong>WebHID API</strong> changes everything.</p>
+                          <p class="ds-i18n">WebHID allows Google Chrome (and Edge) to communicate directly with Human Interface Devices over USB or Bluetooth. It is strictly permission-based—the website cannot see your device until you explicitly click "Connect" in the browser popup.</p>
+                          <p class="ds-i18n">For AB Control Hub, this allows us to send <strong>Feature Reports</strong> (Byte arrays) to the DualSense to trigger calibration modes that were previously only accessible to factory technicians. All of this runs locally in your browser memory; no data ever leaves your computer.</p>
+                      </div>
+                  </div>
+              </article>
+          </div>
+
+          <div class="col-md-6">
+              <article class="article-card">
+                   <div class="article-img-wrapper">
+                        <img src="../assets/simple3.jpg" alt="Fake Controller Test" onerror="this.style.display='none'">
+                   </div>
+                  <div class="article-body">
+                      <div class="article-meta">
+                          <i class="fas fa-search-dollar me-2"></i> <span class="ds-i18n">Buyer's Guide</span>
+                      </div>
+                      <h2 class="article-title ds-i18n">Spotting a Fake: The Circularity Test</h2>
+                      <div class="article-text">
+                          <p class="ds-i18n">The market is flooded with "High Copy" DualShock 4 controllers. They look identical to the original, but the internals are vastly inferior.</p>
+                          <h4 class="ds-i18n">The Square vs. Circle Test</h4>
+                          <p class="ds-i18n">Original Sony controllers have high-fidelity analog to digital converters (ADCs). When you rotate the stick, it draws a near-perfect circle. Fake controllers often use cheap components that result in a "Square" input boundary. They physically cannot reach the diagonal corners effectively, or they snap to the axes too aggressively.</p>
+                          <p class="ds-i18n">Use the <strong>"Circularity Test"</strong> on our homepage. A genuine controller typically has an average error rate of 8-12%. If you see error rates above 20% or a square shape in the visualizer, you likely have a counterfeit device.</p>
+                      </div>
+                  </div>
+              </article>
+          </div>
+
+          <div class="col-lg-12">
+              <article class="article-card">
+                   <div class="article-img-wrapper">
+                        <img src="../assets/simple4.jpg" alt="Battery Tips" onerror="this.style.display='none'">
+                   </div>
+                  <div class="article-body">
+                      <div class="article-meta">
+                          <i class="fas fa-battery-half me-2"></i> <span class="ds-i18n">Maintenance</span>
+                      </div>
+                      <h2 class="article-title ds-i18n">Optimizing DualSense Battery Life</h2>
+                      <div class="article-text">
+                          <p class="ds-i18n">The DualSense is a power-hungry beast, thanks to its haptic motors and adaptive triggers. Here are the most effective ways to squeeze extra hours out of your charge:</p>
+                          <ol>
+                              <li class="ds-i18n"><strong>Dim the Light Bar:</strong> Set the brightness to "Dim" in your PS5 settings. This simple change reduces heat and power draw.</li>
+                              <li class="ds-i18n"><strong>Microphone Mute:</strong> The built-in mic is always listening by default. Muting it (orange light on) actually saves battery because the audio processing chip goes into a lower power state.</li>
+                              <li class="ds-i18n"><strong>Haptic Intensity:</strong> Unless you are playing a single-player immersion game, set vibration to "Weak" or "Off" for competitive multiplayer. The motors draw significant current.</li>
+                              <li class="ds-i18n"><strong>Proper Charging:</strong> Avoid using "Fast Chargers" meant for phones directly into the controller's USB-C port. The high voltage negotiation can sometimes damage the power management IC (PMIC). Stick to the console's USB ports or a certified dock.</li>
+                          </ol>
+                      </div>
+                  </div>
+              </article>
+          </div>
+
+      </div>
+
+  </main>
+
+  <footer class="page-footer border-top mt-auto bg-dark">
+      <div class="container">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center py-3">
+            <p class="mb-0 footer-text">
+            <span class="ds-i18n">Developed by</span> <a href="#" style="color: var(--glow-cyan); text-decoration: none;"><b class="ds-i18n">Ahmed Badawy</b></a>
+            </p>
+            <ul class="list-unstyled d-none d-md-flex mb-0">
+            <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="../terms/">Terms of Use</a></li>
+            <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="../privacy/">Privacy Policy</a></li>
+            <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="../support/">Support & Feedback</a></li>
+            </ul>
+        </div>
+        <div class="row mt-2 border-top border-secondary pt-3 pb-3">
+            <div class="col-12 text-center">
+                <p class="text-white-50 small mb-0 ds-i18n" style="font-size: 0.75rem;">
+                    PlayStation, DualSense, and DualShock are registered trademarks of Sony Interactive Entertainment Inc. 
+                    <br>
+                    AB Control Hub is an unofficial open-source project and is not affiliated with, endorsed, or sponsored by Sony.
+                </p>
+            </div>
+        </div>
+      </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

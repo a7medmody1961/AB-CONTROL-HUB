@@ -1,15 +1,11 @@
-// Service Worker for AB Control Hub
-// Strategy: Network First, falling back to Cache
-// This ensures Ads/Analytics run fresh when online, but app works offline.
-
-const CACHE_NAME = 'ab-control-hub-v3'; // غيرنا الرقم لـ 3 عشان المتصفح يحس بالتغيير
+const CACHE_NAME = 'ab-control-hub-v4';
 const urlsToCache = [
   './',
-  './index.html',
-  './terms.html',
-  './privacy.html',
-  './support.html',
-  './guide.html',
+  './terms/index.html',    
+  './privacy/index.html',  
+  './support/index.html',  
+  './guide/index.html',    
+  './blog/index.html',     
   './css/main.css',
   './css/finetune.css',
   './fa.min.css',

@@ -16,8 +16,8 @@
 
     <title>AB Control Hub | PS4/PS5 Controller Calibration & Test | معايرة وفحص دراعات بلايستيشن</title>
     
-    <meta name="description" content="The ultimate Web-Based tool to test and calibrate PlayStation controllers (DualSense & DualShock 4). Fix analog stick drift permanently, measure input latency, and test buttons online without installing software. Powered by WebHID technology.">
-    <meta name="keywords" content="gamepad tester, controller calibration, dualsense drift fix, dualshock 4 calibration, ps5 controller test, input lag test, analog stick repair, معايرة الانالوج, فحص دراعات, potentiometer calibration, webhid api">
+    <meta name="description" content="The ultimate Web-Based tool to test and calibrate PlayStation controllers (DualSense & DualShock 4). Fix analog stick drift permanently via NVS, measure input latency, and test buttons online using WebHID.">
+    <meta name="keywords" content="gamepad tester, controller calibration, dualsense drift fix, dualshock 4 calibration, ps5 controller test, input lag test, analog stick repair, معايرة الانالوج, فحص دراعات, potentiometer calibration, webhid api, nvs calibration">
     <meta name="author" content="Ahmed Badawy">
     <meta name="robots" content="index, follow">
 
@@ -92,8 +92,8 @@
         .content-section {
             background: rgba(20, 20, 20, 0.6);
             border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 2.5rem; /* Increased padding for better readability */
+            margin-bottom: 2.5rem;
             border: 1px solid rgba(255,255,255,0.05);
         }
         .feature-icon {
@@ -104,9 +104,15 @@
             -webkit-text-fill-color: transparent;
         }
         .tech-text {
-            color: #ccc;
-            line-height: 1.7;
+            color: #d0d0d0; /* Slightly brighter text */
+            line-height: 1.8;
             font-size: 1.05rem;
+        }
+        .section-title {
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
         .table-custom {
             --bs-table-bg: transparent;
@@ -168,23 +174,29 @@
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="guide.html">
+            <a class="nav-link" href="blog/">
+                <i class="fas fa-rss me-2"></i> <span class="ds-i18n">Blog</span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="guide/">
                 <i class="fas fa-book-open me-2"></i> <span class="ds-i18n">Guide</span>
             </a>
           </li>
           
           <li class="nav-item d-md-none">
-            <a class="nav-link" href="terms.html">
+            <a class="nav-link" href="terms/">
               <i class="fas fa-file-alt me-2 text-white"></i> Terms of Use
             </a>
           </li>
           <li class="nav-item d-md-none">
-            <a class="nav-link" href="privacy.html">
+            <a class="nav-link" href="privacy/">
               <i class="fas fa-user-shield me-2 text-white"></i> Privacy Policy
             </a>
           </li>
           <li class="nav-item d-md-none">
-            <a class="nav-link" href="support.html">
+            <a class="nav-link" href="support/">
               <i class="fas fa-headset me-2 text-white"></i> Support & Feedback
             </a>
           </li>
@@ -413,7 +425,7 @@
                                 </div>
                             </div>
                             <div id="trigger-test-group" class="test-group">
-                                <label class="text-white-50 small mb-1 ms-1 ds-i18n">Triggers (PS5 Only)</label>
+                                <label class="text-white-50 small mb-1 ms-1 ds-i18n">Adaptive Triggers (PS5 Only)</label>
                                 <div class="btn-group w-100 btn-group-lg" role="group">
                                     <button type="button" class="btn-glow-secondary" onclick="test_trigger('left', 'medium')">L Trig</button>
                                     <button type="button" class="btn-glow-secondary" onclick="test_trigger('right', 'medium')">R Trig</button>
@@ -538,7 +550,24 @@
             </div>
         </div>
 
-      </div> </div> <div class="container my-5">
+      </div> </div> 
+      
+      <div class="container my-5">
+        
+        <div class="content-section">
+            <h2 class="section-title ds-i18n"><i class="fas fa-info-circle me-2 text-info"></i>How AB Control Hub Works</h2>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p class="tech-text ds-i18n">
+                        AB Control Hub utilizes the advanced <strong>WebHID API</strong> (Human Interface Device) available in modern browsers like Google Chrome and Microsoft Edge. This technology allows the website to communicate directly with your game controller's firmware without requiring you to download or install any external drivers or executable files.
+                    </p>
+                    <p class="tech-text ds-i18n">
+                        When you connect your DualSense or DualShock 4, the tool reads the raw data reports sent by the controller via USB. This includes analog stick coordinates, button states, battery levels, and sensor data. By bypassing the operating system's standard input processing, we can offer features that are typically restricted to official development kits, such as writing calibration data directly to the controller's permanent memory.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <div class="row g-4 mb-5">
             <div class="col-md-4">
                 <div class="content-section text-center h-100">
@@ -564,7 +593,25 @@
         </div>
 
         <div class="content-section">
-            <h2 class="text-white border-bottom border-secondary pb-2 mb-4 ds-i18n"><i class="fas fa-book me-2 text-info"></i>Understanding Analog Stick Drift</h2>
+             <h2 class="section-title ds-i18n"><i class="fas fa-cogs me-2 text-warning"></i>Hardware Calibration vs. Software Deadzones</h2>
+             <div class="row">
+                 <div class="col-lg-6">
+                     <h4 class="text-white mb-3 ds-i18n">The Problem with Software Fixes</h4>
+                     <p class="tech-text ds-i18n">
+                         Most drift "fixes" found online or in game settings rely on increasing the <strong>Deadzone</strong>. This software-based approach simply ignores the input from the center of the stick. While it hides the drift, it reduces the responsive range of your analog stick, making precise aiming in FPS games or subtle steering in racing simulators impossible. It is a temporary band-aid, not a cure.
+                     </p>
+                 </div>
+                 <div class="col-lg-6">
+                     <h4 class="text-white mb-3 ds-i18n">The NVS Solution</h4>
+                     <p class="tech-text ds-i18n">
+                         AB Control Hub performs <strong>Hardware-Level Calibration</strong>. By accessing the controller's Non-Volatile Storage (NVS), we calculate the exact error offset caused by potentiometer wear. We then update the controller's internal zero-point. This means the correction happens <em>inside</em> the controller itself. When you plug your controller into a PS5, PS4, or PC, it reports a perfectly centered signal with zero deadzone required.
+                     </p>
+                 </div>
+             </div>
+        </div>
+
+        <div class="content-section">
+            <h2 class="section-title ds-i18n"><i class="fas fa-book me-2 text-info"></i>Understanding Analog Stick Drift</h2>
             <div class="row">
                 <div class="col-lg-8">
     <h4 class="text-info ds-i18n">What causes Stick Drift?</h4>
@@ -578,14 +625,19 @@
     <div class="mt-3 pt-2 border-top border-secondary">
         <i class="fas fa-wrench text-info me-2"></i>
         <span class="text-white-50 small ds-i18n">Need a step-by-step fix?</span>
-        <a href="guide.html" class="text-info text-decoration-none fw-bold ms-1 ds-i18n" style="font-size: 0.95rem;">
+        <a href="guide/" class="text-info text-decoration-none fw-bold ms-1 ds-i18n" style="font-size: 0.95rem;">
             Check our Troubleshooting Guide <i class="fas fa-arrow-right small ms-1"></i>
         </a>
     </div>
 </div>
+<div class="col-lg-4 d-flex align-items-center justify-content-center">
+    <i class="fas fa-gamepad fa-10x text-white-50" style="opacity: 0.1;"></i>
+</div>
+</div>
+</div>
 
         <div class="content-section">
-            <h2 class="text-white border-bottom border-secondary pb-2 mb-4 ds-i18n"><i class="fas fa-check-circle me-2 text-success"></i>Supported Controllers</h2>
+            <h2 class="section-title ds-i18n"><i class="fas fa-check-circle me-2 text-success"></i>Supported Controllers</h2>
             <div class="table-responsive">
                 <table class="table table-custom table-hover">
                     <thead>
@@ -621,7 +673,7 @@
         </div>
 
         <div class="content-section">
-            <h2 class="text-white border-bottom border-secondary pb-2 mb-4 ds-i18n"><i class="fas fa-question-circle me-2 text-warning"></i>Frequently Asked Questions</h2>
+            <h2 class="section-title ds-i18n"><i class="fas fa-question-circle me-2 text-warning"></i>Frequently Asked Questions</h2>
             <div class="accordion accordion-flush" id="faqAccordion">
                 <div class="accordion-item bg-transparent">
                     <h2 class="accordion-header">
@@ -644,6 +696,18 @@
                     <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                         <div class="accordion-body text-white-50 ds-i18n">
                             Currently, the advanced calibration features (writing to NVS) are exclusive to Sony DualShock 4 and DualSense controllers due to their specific firmware architecture. You can still test buttons on Xbox controllers, but calibration is not supported.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item bg-transparent border-top border-secondary">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed bg-transparent text-white shadow-none ds-i18n" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            What is the Circularity Test?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-white-50 ds-i18n">
+                            The Circularity Test measures how accurately your analog stick traces a perfect circle. Official Sony controllers typically have an average error rate of 8-12%. Counterfeit or "High Copy" controllers often fail this test, showing square-shaped boundaries or high error rates (above 20%). This tool helps you verify the authenticity of your gamepad.
                         </div>
                     </div>
                 </div>
@@ -731,9 +795,9 @@
             </p>
 
             <ul class="list-unstyled d-none d-md-flex mb-0">
-            <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="terms.html">Terms of Use</a></li>
-            <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="privacy.html">Privacy Policy</a></li>
-            <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="support.html">Support &amp; Feedback</a></li>
+            <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="terms/">Terms of Use</a></li>
+            <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="privacy/">Privacy Policy</a></li>
+            <li class="ms-3"><a class="link-body-emphasis ds-i18n" href="support/">Support &amp; Feedback</a></li>
             </ul>
         </div>
 

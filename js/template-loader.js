@@ -9,6 +9,16 @@
 // Cache for loaded templates
 const templateCache = new Map();
 
+// Helper to determine root path
+function getRootPath() {
+    const path = window.location.pathname;
+    // Simple check: if we are in a subfolder (like /blog/), go back one level
+    if (path.includes('/blog/') || path.includes('/guide/') || path.includes('/privacy/') || path.includes('/terms/') || path.includes('/support/')) {
+        return "../";
+    }
+    return "./";
+}
+
 /**
 * Load a template from the templates directory or bundled assets
 * @param {string} templateName - Name of the template file without extension
@@ -31,7 +41,10 @@ async function loadTemplate(templateName) {
 
   // Fallback to fetching from server (development mode)
   const hasExtension = templateName.includes('.');
-  const templatePath = hasExtension ? `templates/${templateName}` : `templates/${templateName}.html`;
+  
+  // === التعديل الجوهري: إضافة المسار الصحيح ===
+  const rootPath = getRootPath();
+  const templatePath = hasExtension ? `${rootPath}templates/${templateName}` : `${rootPath}templates/${templateName}.html`;
 
   try {
     const response = await fetch(templatePath);
@@ -64,7 +77,10 @@ async function loadSvgAsset(assetPath) {
 
   // Fallback to fetching from server (development mode)
   try {
-    const response = await fetch(`assets/${assetPath}`);
+    // === التعديل الجوهري: إضافة المسار الصحيح ===
+    const rootPath = getRootPath();
+    const response = await fetch(`${rootPath}assets/${assetPath}`);
+    
     if (!response.ok) {
       throw new Error(`Failed to load SVG asset: ${assetPath} (${response.status})`);
     }

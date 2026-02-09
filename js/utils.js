@@ -4,7 +4,14 @@
 * Utility functions for DualShock controller operations
 * Refactored to Vanilla JS (ES6+)
 */
-
+export function getRootPath() {
+    const path = window.location.pathname;
+    // لو إحنا في صفحة فرعية، نرجع خطوة لورا
+    if (path.includes('/blog/') || path.includes('/guide/') || path.includes('/privacy/') || path.includes('/terms/') || path.includes('/support/')) {
+        return "../";
+    }
+    return "./";
+}
 /**
 * Sleep for specified milliseconds
 * @param {number} ms Milliseconds to sleep

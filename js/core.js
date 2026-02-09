@@ -112,28 +112,18 @@ function gboot() {
     initAnalyticsApi(app);
     lang_init(app, handleLanguageChange, show_welcome_modal);
     
-    // Cookie consent check
-    if (!readCookie('cookie_consent')) {
-      setDisplay('cookie-consent', true);
-    }
-
-    // Modal exposure for global access
+    // تعريف دالة قبول الكوكيز
     window.acceptCookies = () => {
       createCookie('cookie_consent', 'true', 365);
       setDisplay('cookie-consent', false);
     };
 
-    // === ضيف الكود ده هنا ===
-    const cookieConsent = readCookie('cookie_consent');
-    if (!cookieConsent) {
-        // نظهر البانر بعد ثانية ونص عشان الزائر يلحق ياخد نفسه
+    // فحص وتشغيل بانر الكوكيز
+    if (!readCookie('cookie_consent')) {
         setTimeout(() => {
             $('#cookie-consent').fadeIn(); 
-            // أو لو مش شغال معاك الـ fadeIn استخدم:
-            // setDisplay('cookie-consent', true);
         }, 1500);
     }
-    // ========================
 
     document.querySelectorAll("input[name='displayMode']").forEach(el => {
         el.addEventListener('change', on_stick_mode_change);
@@ -1014,18 +1004,15 @@ $(document).ready(() => {
       $('#whatsNewBtn').addClass('has-updates');
       $('#notifyDot').show();
   }
-
-  // 2. فحص الكوكيز (عشان نضمن إنه يشتغل)
-  // تأكد إن دالة readCookie موجودة عندك فوق في الملف، لو مش موجودة قولي
-  if (typeof readCookie === 'function') {
-      const cookieConsent = readCookie('cookie_consent');
-      if (!cookieConsent) {
-          setTimeout(() => { 
-             $('#cookie-consent').fadeIn(); 
-          }, 1500);
-      }
-  }
 });
+
+// New Language Toggle Logic (LocalStorage)
+window.toggle_lang = function() {
+    let currentLang = localStorage.getItem('app_lang') || 'en_us';
+    let newLang = (currentLang === 'en_us') ? 'ar_ar' : 'en_us';
+    localStorage.setItem('app_lang', newLang);
+    location.reload(); 
+};
 
 // ==========================================
 
