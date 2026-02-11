@@ -985,7 +985,7 @@ const model = controller.getModel();
 // ===  New Features & Logic (What's New) ===
 // ==========================================
 
-const CURRENT_VERSION = 1; // ⚠️ غير الرقم ده لـ 2 لما تنزل تحديث جديد عشان الجرس ينور تاني
+const CURRENT_VERSION = 10; 
 
 window.openWhatsNew = () => {
   const modal = new bootstrap.Modal(document.getElementById('whatsNewModal'));

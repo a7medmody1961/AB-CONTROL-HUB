@@ -883,5 +883,9 @@
 "Technical Guides Library": "Technical Guides Library",
 "Added comprehensive guides on <a href=\"blog/fake-controller-detection.html\" class=\"text-info\">Fake Controller Detection</a>, <a href=\"blog/stick-drift-science.html\" class=\"text-info\">Stick Drift Science</a>, and <a href=\"blog/dualsense-battery-optimization.html\" class=\"text-info\">Battery Optimization</a>.": "Added comprehensive guides on <a href=\"blog/fake-controller-detection.html\" class=\"text-info\">Fake Controller Detection</a>, <a href=\"blog/stick-drift-science.html\" class=\"text-info\">Stick Drift Science</a>, and <a href=\"blog/dualsense-battery-optimization.html\" class=\"text-info\">Battery Optimization</a>.",
 "Fix": "Fix",
-"Resolved Content Security Policy (CSP) warnings for a cleaner experience.": "Resolved Content Security Policy (CSP) warnings for a cleaner experience."
+"Resolved Content Security Policy (CSP) warnings for a cleaner experience.": "Resolved Content Security Policy (CSP) warnings for a cleaner experience.",
+"V10 Security Update": "V10 Security Update",
+  "Fixed": "Fixed",
+  "Offline Mode Support": "Offline Mode Support",
+  "Fixed navigation issues in Offline Mode. Sub-pages like Guide and Blog now load correctly without internet.": "Fixed navigation issues in Offline Mode. Sub-pages like Guide and Blog now load correctly without internet."
 }

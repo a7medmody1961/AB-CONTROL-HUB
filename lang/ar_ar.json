@@ -883,5 +883,9 @@
 "Technical Guides Library": "مكتبة الشروحات التقنية",
 "Added comprehensive guides on <a href=\"blog/fake-controller-detection.html\" class=\"text-info\">Fake Controller Detection</a>, <a href=\"blog/stick-drift-science.html\" class=\"text-info\">Stick Drift Science</a>, and <a href=\"blog/dualsense-battery-optimization.html\" class=\"text-info\">Battery Optimization</a>.": "تمت إضافة أدلة شاملة حول <a href=\"blog/fake-controller-detection.html\" class=\"text-info\">كشف الدراعات المقلدة</a>، <a href=\"blog/stick-drift-science.html\" class=\"text-info\">علم انحراف الأنالوج</a>، و <a href=\"blog/dualsense-battery-optimization.html\" class=\"text-info\">تحسين البطارية</a>.",
 "Fix": "إصلاح",
-"Resolved Content Security Policy (CSP) warnings for a cleaner experience.": "تم حل تحذيرات سياسة الأمان (CSP) لتجربة استخدام أكثر استقراراً."
+"Resolved Content Security Policy (CSP) warnings for a cleaner experience.": "تم حل تحذيرات سياسة الأمان (CSP) لتجربة استخدام أكثر استقراراً.",
+"V10 Security Update": "تحديث أمني V10",
+  "Fixed": "تم إصلاح",
+  "Offline Mode Support": "دعم وضع الأوفلاين",
+  "Fixed navigation issues in Offline Mode. Sub-pages like Guide and Blog now load correctly without internet.": "تم حل مشاكل التنقل أثناء انقطاع الإنترنت. الصفحات الفرعية مثل الدليل والمدونة تعمل الآن بشكل صحيح أوفلاين."
 }
