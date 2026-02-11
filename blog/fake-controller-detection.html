@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Detecting Fake PS4/PS5 Controllers: The Circularity Test | AB Control Hub</title>
+    <meta name="description" content="How to spot 'High Copy' fake controllers using data. Compare Circularity error rates, polling rates, and potentiometer linearity to distinguish originals from counterfeits.">
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/main.css">
+    
+    <style>
+        .article-container { max-width: 800px; margin: 0 auto; }
+        .article-body { font-size: 1.1rem; line-height: 1.8; color: #d0d0d0; }
+        
+        /* تحسينات العناوين */
+        .article-body h2 {
+            color: #fff;
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--glow-cyan);
+            padding-left: 15px;
+        }
+
+        /* تنسيق خاص للغة العربية */
+        [dir="rtl"] .article-body h2 {
+            border-left: none;
+            border-right: 4px solid var(--glow-cyan);
+            padding-left: 0;
+            padding-right: 15px;
+            text-align: right;
+        }
+
+        [dir="rtl"] .breadcrumb-item + .breadcrumb-item::before {
+            float: right; padding-left: 0.5rem; padding-right: 0.5rem;
+        }
+        
+        [dir="rtl"] .breadcrumb { direction: rtl; }
+
+        [lang="ar"] body, [lang="ar"] h1, [lang="ar"] h2, [lang="ar"] h3, [lang="ar"] p, [lang="ar"] li {
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        /* تنسيق جدول المقارنة */
+        .comparison-table {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 30px 0;
+        }
+        .comparison-table th { background: rgba(0,0,0,0.3); color: var(--glow-cyan); border: none; padding: 15px; }
+        .comparison-table td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 15px; color: #eee; }
+        
+        .good-val { color: #2ecc71; font-weight: bold; }
+        .bad-val { color: #e74c3c; font-weight: bold; }
+
+        .img-caption { text-align: center; font-size: 0.9rem; color: #888; margin-top: 10px; font-style: italic; }
+        .breadcrumb-item a { color: var(--glow-cyan); text-decoration: none; }
+        .breadcrumb-item.active { color: #888; }
+    </style>
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+
+<body class="d-flex flex-column min-vh-100 bg-dark text-white">   
+  
+  <nav class="navbar navbar-expand-md sticky-top bg-dark border-bottom border-secondary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="../index.html"><i class="fas fa-gamepad me-2 text-info"></i> AB CONTROL HUB</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"><i class="fas fa-bars"></i></button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+        <ul class="navbar-nav align-items-center">
+            <li class="nav-item me-2 d-none d-md-block">
+                <a class="btn btn-glow-gold rounded-pill btn-sm" href="#" onclick="show_donate_modal()"><i class="fas fa-heart me-2"></i> <span class="ds-i18n">Support</span></a>
+            </li>
+            <li class="nav-item me-3" id="lang-switcher">
+                <a class="nav-link" href="#" onclick="toggle_lang()"><i class="fas fa-language"></i> <span id="curLang">English</span></a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="../index.html"><i class="fas fa-home"></i> <span class="ds-i18n">Home</span></a></li>
+            <li class="nav-item"><a class="nav-link active text-info" href="index.html"><i class="fas fa-rss"></i> <span class="ds-i18n">Blog</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero-section text-center mt-5 pb-5">
+      <div class="container">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb justify-content-center mb-4">
+                  <li class="breadcrumb-item"><a href="../index.html" class="ds-i18n">Home</a></li>
+                  <li class="breadcrumb-item"><a href="index.html" class="ds-i18n">Blog</a></li>
+                  <li class="breadcrumb-item active ds-i18n" aria-current="page">Data Analysis</li>
+              </ol>
+          </nav>
+          <h1 class="display-4 fw-bold text-white mb-3 ds-i18n">Detecting Fake Controllers with Data</h1>
+          <p class="lead text-white-50 mb-0 ds-i18n text-center" style="text-align: center !important;">Don't get scammed. Use Math to spot the fakes.</p>
+          <div class="mt-4 text-white-50 small">
+              <span class="me-3"><i class="far fa-clock me-1"></i> <span class="ds-i18n">4 Min Read</span></span>
+              <span><i class="far fa-chart-bar me-1"></i> <span class="ds-i18n">Forensic Guide</span></span>
+          </div>
+      </div>
+  </header>
+
+  <main class="container py-4 flex-grow-1 article-container">
+      <article class="article-body">
+          
+          <p class="lead ds-i18n">The market is flooded with "High Copy" controllers. They look exactly like the original Sony DualSense/DualShock 4, have the same weight, and even the same logos. But inside, they use cheap components. Here is how to expose them using the AB Control Hub test.</p>
+
+          <h2 class="ds-i18n">1. The Circularity Test</h2>
+          <p class="ds-i18n">An original analog stick is designed to move in a perfect circle. However, cheap potentiometers often struggle to reach the corners or overshoot them, creating a "Square" input shape.</p>
+          <p class="ds-i18n"><strong>Circularity</strong> calculates the average error deviation from a perfect circle. We measure thousands of points as you rotate the stick.</p>
+
+          <div class="text-center my-4">
+              <img src="../assets/blog_images/circularity-test-comparison.webp" class="img-fluid rounded border border-secondary shadow" alt="Circularity Test Result" onerror="this.src='https://placehold.co/800x450/1a1a1a/FFF?text=Circularity+Test+Comparison'">
+              <div class="img-caption ds-i18n">Fig 1. Left: Original Sony (Round). Right: Fake Copy (Square).</div>
+          </div>
+
+          <h2 class="ds-i18n">2. The Numbers Don't Lie</h2>
+          <p class="ds-i18n">You don't need to be an expert. Just look at the "Avg Error" number in our tool:</p>
+
+          <div class="comparison-table">
+              <table class="table table-dark table-borderless mb-0 text-center">
+                  <thead>
+                      <tr>
+                          <th class="ds-i18n">Metric</th>
+                          <th class="ds-i18n">Original Sony</th>
+                          <th class="ds-i18n">Fake / High Copy</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td class="ds-i18n">Avg Error</td>
+                          <td class="good-val">8% - 12%</td>
+                          <td class="bad-val">18% - 25%+</td>
+                      </tr>
+                      <tr>
+                          <td class="ds-i18n">Shape</td>
+                          <td class="ds-i18n">Circle</td>
+                          <td class="ds-i18n">Square / Diamond</td>
+                      </tr>
+                      <tr>
+                          <td class="ds-i18n">Polling Rate</td>
+                          <td class="good-val">250Hz (Stable)</td>
+                          <td class="bad-val">&lt; 150Hz (Laggy)</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+
+          <h2 class="ds-i18n">3. Why does it matter?</h2>
+          <p class="ds-i18n">You might think: <em>"It's cheap, so what?"</em>. Using a fake controller affects your gameplay severely:</p>
+          <div class="vstack gap-3 mt-3">
+    
+    <div class="p-3 border border-danger rounded" style="background: rgba(220, 53, 69, 0.1);">
+        <h5 class="text-danger fw-bold mb-2 ds-i18n">Deadzone Issues</h5>
+        <p class="mb-0 text-white-50 ds-i18n">Fakes have massive built-in deadzones to hide their poor quality. You can't aim precisely.</p>
+    </div>
+
+    <div class="p-3 border border-danger rounded" style="background: rgba(220, 53, 69, 0.1);">
+        <h5 class="text-danger fw-bold mb-2 ds-i18n">No Calibration</h5>
+        <p class="mb-0 text-white-50 ds-i18n">Our NVS calibration tools usually CANNOT fix fake controllers because they use non-standard memory chips.</p>
+    </div>
+
+</div>
+
+          <h2 class="ds-i18n">4. How to check yours?</h2>
+          <ol>
+              <li class="ds-i18n">Connect your controller via USB.</li>
+              <li class="ds-i18n">Go to the "Joystick Info" section on the dashboard.</li>
+              <li class="ds-i18n">Select <strong>"Circularity"</strong> mode.</li>
+              <li class="ds-i18n">Rotate your stick slowly 3-4 times.</li>
+          </ol>
+
+      </article>
+
+      <div class="content-section text-center mt-5 p-5">
+          <h3 class="text-white mb-3 ds-i18n">Is your controller Real or Fake?</h3>
+          <p class="text-white-50 mb-4 ds-i18n">Run the test now and find out the truth.</p>
+          <a href="../index.html" class="btn btn-glow-connect btn-lg px-5 ds-i18n">Start Circularity Test</a>
+      </div>
+  </main>
+
+  <footer class="page-footer border-top mt-auto bg-dark">
+      <div class="container">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center py-3">
+            <p class="mb-0 footer-text text-white-50"><span class="ds-i18n">Developed by</span> <b style="color: var(--glow-cyan);">Ahmed Badawy</b></p>
+            <ul class="list-unstyled d-none d-md-flex mb-0">
+            <li class="ms-3"><a class="link-body-emphasis text-white-50 text-decoration-none ds-i18n" href="../terms/">Terms of Use</a></li>
+            <li class="ms-3"><a class="link-body-emphasis text-white-50 text-decoration-none ds-i18n" href="../privacy/">Privacy Policy</a></li>
+            <li class="ms-3"><a class="link-body-emphasis text-white-50 text-decoration-none ds-i18n" href="../support/">Support</a></li>
+            </ul>
+        </div>
+      </div>
+  </footer>
+
+  <div id="modal-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module">
+      import { lang_init } from '../js/translations.js';
+      const blogAppState = { lang_orig_text: {}, lang_cur: {}, lang_cur_direction: 'ltr', lang_disabled: true };
+      window.toggle_lang = function() {
+          const currentLang = localStorage.getItem('app_lang') || 'en_us';
+          const newLang = (currentLang === 'en_us') ? 'ar_ar' : 'en_us';
+          localStorage.setItem('app_lang', newLang);
+          window.location.reload(); 
+      };
+      window.show_donate_modal = async function() {
+        if(!document.getElementById('donateModal')) {
+            try {
+                const response = await fetch('../templates/donate-modal.html');
+                if(response.ok) {
+                    const d = document.createElement('div');
+                    d.innerHTML = await response.text();
+                    document.body.appendChild(d.firstChild);
+                }
+            } catch(e) {}
+        }
+        const modalEl = document.getElementById('donateModal');
+        if(modalEl) new bootstrap.Modal(modalEl).show();
+      };
+      $(document).ready(function() {
+          lang_init(blogAppState, null, null);
+          const savedLang = localStorage.getItem('app_lang') || 'en_us';
+          document.getElementById("curLang").innerHTML = (savedLang === 'ar_ar') ? "English" : "العربية";
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>WebHID API Explained: Driverless USB for the Web | AB Control Hub</title>
+    <meta name="description" content="A deep dive into the WebHID API. How JavaScript communicates directly with USB devices (DualSense/DualShock) without drivers using navigator.hid.">
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/main.css">
+    
+    <style>
+        .article-container { max-width: 800px; margin: 0 auto; }
+        .article-body { font-size: 1.1rem; line-height: 1.8; color: #d0d0d0; }
+        
+        /* تحسينات العناوين */
+        .article-body h2 {
+            color: #fff;
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--glow-cyan);
+            padding-left: 15px;
+        }
+
+        /* تنسيق خاص للغة العربية */
+        [dir="rtl"] .article-body h2 {
+            border-left: none;
+            border-right: 4px solid var(--glow-cyan);
+            padding-left: 0;
+            padding-right: 15px;
+            text-align: right;
+        }
+
+        [dir="rtl"] .breadcrumb-item + .breadcrumb-item::before {
+            float: right;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        
+        [dir="rtl"] .breadcrumb {
+            direction: rtl;
+        }
+
+        /* تحسين الخط العربي */
+        [lang="ar"] body, [lang="ar"] h1, [lang="ar"] h2, [lang="ar"] h3, [lang="ar"] p, [lang="ar"] li {
+            font-family: 'Cairo', sans-serif !important;
+        }
+
+        /* تنسيق بلوك الكود - يظل دائماً LTR */
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #333;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+            position: relative;
+            direction: ltr !important; /* مهم جداً للكود */
+            text-align: left !important;
+        }
+        .code-block::before {
+            content: "JavaScript";
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #333;
+            color: #fff;
+            padding: 2px 10px;
+            font-size: 0.8rem;
+            border-bottom-left-radius: 8px;
+        }
+        .keyword { color: #c678dd; } 
+        .function { color: #61afef; } 
+        .string { color: #98c379; } 
+        .comment { color: #7f848e; font-style: italic; }
+        
+        .img-caption { text-align: center; font-size: 0.9rem; color: #888; margin-top: 10px; font-style: italic; }
+        .breadcrumb-item a { color: var(--glow-cyan); text-decoration: none; }
+        .breadcrumb-item.active { color: #888; }
+    </style>
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+
+<body class="d-flex flex-column min-vh-100 bg-dark text-white">   
+  
+  <nav class="navbar navbar-expand-md sticky-top bg-dark border-bottom border-secondary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="../index.html"><i class="fas fa-gamepad me-2 text-info"></i> AB CONTROL HUB</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"><i class="fas fa-bars"></i></button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+        <ul class="navbar-nav align-items-center">
+            <li class="nav-item me-2 d-none d-md-block">
+                <a class="btn btn-glow-gold rounded-pill btn-sm" href="#" onclick="show_donate_modal()"><i class="fas fa-heart me-2"></i> <span class="ds-i18n">Support</span></a>
+            </li>
+            <li class="nav-item me-3" id="lang-switcher">
+                <a class="nav-link" href="#" onclick="toggle_lang()"><i class="fas fa-language"></i> <span id="curLang">English</span></a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="../index.html"><i class="fas fa-home"></i> <span class="ds-i18n">Home</span></a></li>
+            <li class="nav-item"><a class="nav-link active text-info" href="index.html"><i class="fas fa-rss"></i> <span class="ds-i18n">Blog</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero-section text-center mt-5 pb-5">
+      <div class="container">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb justify-content-center mb-4">
+                  <li class="breadcrumb-item"><a href="../index.html" class="ds-i18n">Home</a></li>
+                  <li class="breadcrumb-item"><a href="index.html" class="ds-i18n">Blog</a></li>
+                  <li class="breadcrumb-item active ds-i18n" aria-current="page">WebHID API</li>
+              </ol>
+          </nav>
+          <h1 class="display-4 fw-bold text-white mb-3 ds-i18n">WebHID: How Browsers Talk to Hardware</h1>
+          <p class="lead text-white-50 mb-0 ds-i18n text-center" style="text-align: center !important;">No drivers. No installation. Just pure JavaScript magic.</p>
+          <div class="mt-4 text-white-50 small">
+              <span class="me-3"><i class="far fa-clock me-1"></i> <span class="ds-i18n">6 Min Read</span></span>
+              <span><i class="far fa-code me-1"></i> <span class="ds-i18n">Tech Deep Dive</span></span>
+          </div>
+      </div>
+  </header>
+
+  <main class="container py-4 flex-grow-1 article-container">
+      <article class="article-body">
+          
+          <p class="lead ds-i18n">For decades, accessing hardware like game controllers required installing heavy drivers or third-party software (like DS4Windows). The <strong>WebHID API</strong> changed everything. It allows a website to communicate directly with Human Interface Devices (HID) securely.</p>
+
+          <h2 class="ds-i18n">1. What is WebHID?</h2>
+          <p class="ds-i18n">WebHID (Human Interface Device) is a modern browser API that gives JavaScript access to USB devices that were previously inaccessible. This is the technology powering <strong>AB Control Hub</strong>, allowing us to read your analog stick data and write calibration fixes directly to the controller's firmware.</p>
+
+          <div class="text-center my-4">
+              <img src="../assets/blog_images/webhid-api-architecture.webp" class="img-fluid rounded border border-secondary shadow" alt="WebHID Architecture" onerror="this.src='https://placehold.co/800x450/1a1a1a/FFF?text=WebHID+Architecture'">
+              <div class="img-caption ds-i18n">Fig 1. The browser acts as a bridge between the USB Hardware and the Web Page.</div>
+          </div>
+
+          <h2 class="ds-i18n">2. How it Works (The Code)</h2>
+          <p class="ds-i18n">Connecting to a device is surprisingly simple. Here is the actual logic used in our tool to find a Sony DualSense controller:</p>
+
+          <div class="code-block">
+<span class="keyword">const</span> filters = [
+    { <span class="string">vendorId</span>: <span class="function">0x054C</span>, <span class="string">productId</span>: <span class="function">0x0CE6</span> } <span class="comment">// DualSense ID</span>
+];
+
+<span class="keyword">try</span> {
+    <span class="keyword">const</span> [device] = <span class="keyword">await</span> navigator.hid.<span class="function">requestDevice</span>({ filters });
+    
+    <span class="keyword">if</span> (device) {
+        <span class="keyword">await</span> device.<span class="function">open</span>();
+        console.<span class="function">log</span>(<span class="string">`Connected to: ${device.productName}`</span>);
+        
+        <span class="comment">// Listen for input reports (Stick data, Buttons)</span>
+        device.<span class="function">addEventListener</span>(<span class="string">"inputreport"</span>, handleInputReport);
+    }
+} <span class="keyword">catch</span> (error) {
+    console.<span class="function">error</span>(<span class="string">"Connection failed"</span>, error);
+}
+          </div>
+          
+          <p class="ds-i18n">Once connected, we receive "Input Reports" (Hexadecimal data) 250 times per second. We parse these bytes to draw the visualizer you see on the screen.</p>
+
+          <h2 class="ds-i18n">3. Is it Safe? (The Sandbox)</h2>
+          <p class="ds-i18n">Security is the #1 priority. The WebHID API operates in a strict <strong>Sandbox</strong>:</p>
+          <div class="vstack gap-3 mt-3">
+    
+    <div class="p-3 border border-success rounded" style="background: rgba(25, 135, 84, 0.1);">
+        <h5 class="text-success fw-bold mb-2 ds-i18n">User Gesture Required</h5>
+        <p class="mb-0 text-white-50 ds-i18n">The code above <em>cannot</em> run automatically. It must be triggered by a click (like the "Connect" button).</p>
+    </div>
+
+    <div class="p-3 border border-success rounded" style="background: rgba(25, 135, 84, 0.1);">
+        <h5 class="text-success fw-bold mb-2 ds-i18n">Explicit Permission</h5>
+        <p class="mb-0 text-white-50 ds-i18n">The browser opens a system prompt asking you to select a specific device. The website cannot see any other USB devices connected to your PC.</p>
+    </div>
+
+    <div class="p-3 border border-success rounded" style="background: rgba(25, 135, 84, 0.1);">
+        <h5 class="text-success fw-bold mb-2 ds-i18n">No OS Access</h5>
+        <p class="mb-0 text-white-50 ds-i18n">The site can only talk to the specific device you chose, it cannot access your files or webcam.</p>
+    </div>
+
+</div>
+
+          <h2 class="ds-i18n">4. Why use this tool?</h2>
+          <p class="ds-i18n">By using WebHID, AB Control Hub offers:</p>
+          <ul>
+              <li class="ds-i18n"><strong>Zero Latency:</strong> No middleware. Raw data comes straight from USB to Chrome.</li>
+              <li class="ds-i18n"><strong>Cross-Platform:</strong> Works on Windows, Mac, Linux, and Android instantly.</li>
+          </ul>
+
+      </article>
+
+      <div class="content-section text-center mt-5 p-5">
+          <h3 class="text-white mb-3 ds-i18n">Test the API yourself</h3>
+          <p class="text-white-50 mb-4 ds-i18n">See the raw input data from your controller in real-time.</p>
+          <a href="../index.html" class="btn btn-glow-connect btn-lg px-5 ds-i18n">Launch Controller Tester</a>
+      </div>
+  </main>
+
+  <footer class="page-footer border-top mt-auto bg-dark">
+      <div class="container">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center py-3">
+            <p class="mb-0 footer-text text-white-50"><span class="ds-i18n">Developed by</span> <b style="color: var(--glow-cyan);">Ahmed Badawy</b></p>
+            <ul class="list-unstyled d-none d-md-flex mb-0">
+            <li class="ms-3"><a class="link-body-emphasis text-white-50 text-decoration-none ds-i18n" href="../terms/">Terms of Use</a></li>
+            <li class="ms-3"><a class="link-body-emphasis text-white-50 text-decoration-none ds-i18n" href="../privacy/">Privacy Policy</a></li>
+            <li class="ms-3"><a class="link-body-emphasis text-white-50 text-decoration-none ds-i18n" href="../support/">Support</a></li>
+            </ul>
+        </div>
+      </div>
+  </footer>
+
+  <div id="modal-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module">
+      import { lang_init } from '../js/translations.js';
+      const blogAppState = { lang_orig_text: {}, lang_cur: {}, lang_cur_direction: 'ltr', lang_disabled: true };
+      window.toggle_lang = function() {
+          const currentLang = localStorage.getItem('app_lang') || 'en_us';
+          const newLang = (currentLang === 'en_us') ? 'ar_ar' : 'en_us';
+          localStorage.setItem('app_lang', newLang);
+          window.location.reload(); 
+      };
+      window.show_donate_modal = async function() {
+        if(!document.getElementById('donateModal')) {
+            try {
+                const response = await fetch('../templates/donate-modal.html');
+                if(response.ok) {
+                    const d = document.createElement('div');
+                    d.innerHTML = await response.text();
+                    document.body.appendChild(d.firstChild);
+                }
+            } catch(e) {}
+        }
+        const modalEl = document.getElementById('donateModal');
+        if(modalEl) new bootstrap.Modal(modalEl).show();
+      };
+      $(document).ready(function() {
+          lang_init(blogAppState, null, null);
+          const savedLang = localStorage.getItem('app_lang') || 'en_us';
+          document.getElementById("curLang").innerHTML = (savedLang === 'ar_ar') ? "English" : "العربية";
+      });
+  </script>
+</body>
+</html>

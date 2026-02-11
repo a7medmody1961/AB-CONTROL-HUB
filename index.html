@@ -8,7 +8,7 @@
         default-src 'self';
         script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.google https://*.gstatic.com https://*.googlesyndication.com https://*.googleadservices.com https://*.googletagmanager.com https://*.doubleclick.net https://*.googleapis.com https://cdn.jsdelivr.net https://code.jquery.com;
         style-src 'self' 'unsafe-inline' https://*.googleapis.com https://cdn.jsdelivr.net https://*.google.com;
-        img-src 'self' data: https://*.google.com https://*.google https://*.googleapis.com https://*.gstatic.com https://*.googlesyndication.com https://*.google-analytics.com https://*.doubleclick.net https://*.googleadservices.com;
+        img-src 'self' data: https://*.google.com https://*.google https://*.googleapis.com https://*.gstatic.com https://*.googlesyndication.com https://*.google-analytics.com https://*.doubleclick.net https://*.googleadservices.com https://*.googletagmanager.com;
         font-src 'self' data: https://*.gstatic.com https://cdn.jsdelivr.net https://*.googleapis.com;
         connect-src 'self' https://*.google.com https://*.google https://*.googleapis.com https://*.gstatic.com https://*.google-analytics.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://the.al https://cdn.jsdelivr.net;
         frame-src 'self' https://*.google.com https://*.google https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com;
@@ -97,13 +97,16 @@
             border: 1px solid rgba(255,255,255,0.05);
         }
         .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            background: -webkit-linear-gradient(45deg, var(--glow-cyan), var(--glow-magenta));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .tech-text {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: -webkit-linear-gradient(45deg, var(--glow-cyan), var(--glow-magenta));
+    
+    /* ضيف السطر ده عشان التحذير يختفي */
+    background-clip: text;
+    
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    }ech-text {
             color: #d0d0d0; /* Slightly brighter text */
             line-height: 1.8;
             font-size: 1.05rem;
@@ -860,26 +863,34 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="update-item mb-3 pb-3 border-bottom border-secondary">
-                    <span class="badge bg-success mb-2 ds-i18n">V2.0 Update</span>
-                    <span class="text-white-50 small ms-2">Jan 31, 2026</span>
-                    <h6 class="text-white ds-i18n">Complete Redesign & New Guides</h6>
-                    <p class="text-white-50 small mb-0 ds-i18n">
-                        We have revamped the entire website layout for a modern look and added detailed technical guides to help you understand stick drift better.
-                    </p>
-                </div>
-                
-                <div class="update-item">
-                    <span class="badge bg-warning text-dark mb-2 ds-i18n">Feature</span>
-                    <h6 class="text-white ds-i18n">Circularity Test</h6>
-                    <p class="text-white-50 small mb-0 ds-i18n">
-                        Added advanced circularity testing to detect fake controllers.
-                    </p>
-                </div>
-            </div>
-            <div class="modal-footer border-secondary">
-                <button type="button" class="btn btn-sm btn-outline-light ds-i18n" data-bs-dismiss="modal">Got it</button>
-            </div>
+    <div class="update-item mb-3 pb-3 border-bottom border-secondary">
+        <span class="badge bg-danger mb-2 ds-i18n">V7 Security Update</span>
+        <span class="text-white-50 small ms-2">Feb 11, 2026</span>
+        <h6 class="text-white ds-i18n">Advanced Clone Protection</h6>
+        <p class="text-white-50 small mb-0 ds-i18n">
+            We've upgraded our detection system to identify "High Copy" and "Super Clone" controllers (specifically JDM-055 clones) to prevent damage during calibration.
+        </p>
+    </div>
+
+    <div class="update-item mb-3 pb-3 border-bottom border-secondary">
+        <span class="badge bg-success mb-2 ds-i18n">New Content</span>
+        <h6 class="text-white ds-i18n">Technical Guides Library</h6>
+        <p class="text-white-50 small mb-0 ds-i18n">
+            Added comprehensive guides on <a href="blog/fake-controller-detection.html" class="text-info">Fake Controller Detection</a>, <a href="blog/stick-drift-science.html" class="text-info">Stick Drift Science</a>, and <a href="blog/dualsense-battery-optimization.html" class="text-info">Battery Optimization</a>.
+        </p>
+    </div>
+    
+    <div class="update-item">
+        <span class="badge bg-info text-dark mb-2 ds-i18n">Fix</span>
+        <h6 class="text-white ds-i18n">Console & Performance Fixes</h6>
+        <p class="text-white-50 small mb-0 ds-i18n">
+            Resolved Content Security Policy (CSP) warnings for a cleaner experience.
+        </p>
+    </div>
+</div>
+<div class="modal-footer border-secondary">
+    <button type="button" class="btn btn-sm btn-outline-light ds-i18n" data-bs-dismiss="modal">Got it</button>
+</div>
         </div>
     </div>
 </div>

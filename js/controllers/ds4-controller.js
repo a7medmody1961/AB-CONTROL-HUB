@@ -139,8 +139,8 @@ class DS4Controller extends BaseController {
       let deviceTypeText = l("unknown");
       let is_clone = false;
 
+      // 1. Basic check via 0xA3 (Standard Info)
       const view = await this.receiveFeatureReport(0xa3);
-
       const cmd = view.getUint8(0, true);
 
       if(cmd != 0xa3 || view.buffer.byteLength < 49) {
@@ -157,16 +157,44 @@ class DS4Controller extends BaseController {
       const hw_ver_minor = view.getUint16(0x23, true);
       const sw_ver_major = view.getUint32(0x25, true);
       const sw_ver_minor = view.getUint16(0x25+4, true);
-      try {
-        if(!is_clone) {
-          // If this feature report succeeds, it's an original device
+
+      // Check for Known Clone FW Versions (JDM-055 Super Clones)
+      // HW: 0100:B40C, SW: 00000001:A00A are typical High-Copy signatures
+      if (hw_ver_minor === 0xB40C && sw_ver_minor === 0xA00A) {
+          console.warn("Clone detection: Known Fake FW Version detected (B40C/A00A)");
+          is_clone = true;
+          deviceTypeText = l("clone");
+      }
+
+      // 2. Strict Check for Originality
+      if(!is_clone) {
+        try {
+          // Check 1: Must support standard feature report 0x81
           await this.receiveFeatureReport(0x81);
+          
+          // Check 2: Must support System Report 0x02
+          try {
+             const r02 = await this.receiveFeatureReport(0x02);
+             if (!r02 || r02.buffer.byteLength < 10) throw new Error("Invalid Report 0x02");
+          } catch(err02) {
+             throw new Error("Clone detected (Failed System Report)");
+          }
+
           deviceTypeText = l("original");
+        } catch(e) {
+          la("clone");
+          is_clone = true;
+          deviceTypeText = l("clone");
         }
-      } catch(e) {
-        la("clone");
-        is_clone = true;
-        deviceTypeText = l("clone");
+      }
+
+      // 3. NVS Status Check (The Final Filter)
+      // Even if it passed above, if NVS query fails, it's a clone/broken.
+      const nv = await this.queryNvStatus();
+      if (nv.status === 'error') {
+          console.warn("Clone detection: NVS Query failed");
+          is_clone = true;
+          deviceTypeText = l("clone");
       }
 
       const infoItems = [
@@ -184,13 +212,11 @@ class DS4Controller extends BaseController {
         infoItems.push({ key: "Bluetooth Address", value: bd_addr, cat: "hw" });
       }
 
-      const nv = await this.queryNvStatus();
       const rare = this.isRare(hw_ver_minor);
       const disable_bits = is_clone ? 1 : 0; // 1: clone
 
       return { ok: true, infoItems, nv, disable_bits, rare };
     } catch(error) {
-      // Return error but do not touch DOM
       return { ok: false, error, disable_bits: 1 };
     }
   }

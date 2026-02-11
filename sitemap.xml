@@ -2,42 +2,70 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://ab-control-hub.site/</loc>
-    <lastmod>2026-02-10</lastmod>
+    <lastmod>2026-02-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.00</priority>
   </url>
 
   <url>
     <loc>https://ab-control-hub.site/guide/</loc>
-    <lastmod>2026-02-10</lastmod>
+    <lastmod>2026-02-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
 
   <url>
     <loc>https://ab-control-hub.site/blog/</loc>
-    <lastmod>2026-02-10</lastmod>
+    <lastmod>2026-02-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
   </url>
 
   <url>
+    <loc>https://ab-control-hub.site/blog/fake-controller-detection.html</loc>
+    <lastmod>2026-02-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+
+  <url>
+    <loc>https://ab-control-hub.site/blog/stick-drift-science.html</loc>
+    <lastmod>2026-02-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+
+  <url>
+    <loc>https://ab-control-hub.site/blog/dualsense-battery-optimization.html</loc>
+    <lastmod>2026-02-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+
+  <url>
+    <loc>https://ab-control-hub.site/blog/webhid-technology.html</loc>
+    <lastmod>2026-02-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+  </url>
+
+  <url>
     <loc>https://ab-control-hub.site/support/</loc>
-    <lastmod>2026-02-10</lastmod>
+    <lastmod>2026-02-11</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.50</priority>
   </url>
 
   <url>
     <loc>https://ab-control-hub.site/privacy/</loc>
-    <lastmod>2026-02-10</lastmod>
+    <lastmod>2026-02-11</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.50</priority>
   </url>
 
   <url>
     <loc>https://ab-control-hub.site/terms/</loc>
-    <lastmod>2026-02-10</lastmod>
+    <lastmod>2026-02-11</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.50</priority>
   </url>

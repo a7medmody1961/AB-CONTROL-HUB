@@ -1,21 +1,32 @@
 {
   "name": "AB Control Hub",
   "short_name": "AB Control Hub",
+  "description": "The ultimate Web-Based tool to test and calibrate PlayStation controllers (DualSense & DualShock 4).",
+  "start_url": "./index.html",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a1a",
+  "theme_color": "#0a0a1a",
   "icons": [
     {
       "src": "web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
       "src": "web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
-  "display": "standalone"
+  "categories": [
+    "utilities",
+    "productivity",
+    "games"
+  ],
+  "lang": "en-US",
+  "dir": "ltr"
 }
