@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ab-control-hub-v10';
+const CACHE_NAME = 'ab-control-hub-v10'; // Updated to V10
 const urlsToCache = [
   '/',
   '/index.html',
@@ -106,7 +106,6 @@ self.addEventListener('install', (event) => {
 
 // Fetch Event
 self.addEventListener('fetch', (event) => {
-  // Ignore non-http requests
   if (!event.request.url.startsWith('http')) return;
 
   const url = new URL(event.request.url);
@@ -121,14 +120,21 @@ self.addEventListener('fetch', (event) => {
 
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
+      // 1. لو الملف في الكاش، هاته
       if (cachedResponse) return cachedResponse;
       
-      // Fallback for Navigation (Important for sub-pages offline)
-      if (event.request.mode === 'navigate') {
-         return caches.match('/index.html');
-      }
+      // 2. لو مش في الكاش، حاول تجيبه من النت
+      return fetch(event.request).catch(() => {
+          // 3. لو النت قطع أو الرابط باظ (شبكة الأمان الجديدة)
+          
+          // لو المستخدم بيحاول يفتح صفحة HTML (زي Guide أو Blog) والنت قاطع
+          if (event.request.mode === 'navigate') {
+              return caches.match('/index.html');
+          }
 
-      return fetch(event.request);
+          // لأي حاجة تانية (صور، سكربتات)، رجع رد فاضي بدل ما تضرب Error أحمر
+          return new Response('', { status: 408, statusText: 'Request Timed Out' });
+      });
     })
   );
 });
