@@ -872,7 +872,7 @@
   "No Calibration": "لا يمكن معايرتها",
   "Avoid Deep Discharge": "تجنب التفريغ العميق",
   "Heat is the Enemy": "الحرارة هي العدو",
-  "V5 Security Update": "تحديث أمني V5",
+  "V7 Security Update": "تحديث أمني الاصدار السابع",
 "Advanced Clone Protection": "حماية متطورة ضد النسخ المقلدة",
 "We've upgraded our detection system to identify \"High Copy\" and \"Super Clone\" controllers (specifically JDM-055 clones) that previously bypassed checks. These devices are now automatically blocked from dangerous calibration operations to prevent damage.": "قمنا بتطوير نظام الكشف للتعرف على أذرع التحكم 'High Copy' و 'Super Clone' (تحديداً نسخ JDM-055) التي كانت تتخطى الفحص سابقاً. يتم الآن حظر هذه الأجهزة تلقائياً من عمليات المعايرة الخطرة لمنع تلفها.",
 "Console & Performance Fixes": "إصلاحات الأداء والكونسول",
