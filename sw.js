@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ab-control-hub-v7'; // Updated to V7
+const CACHE_NAME = 'ab-control-hub-v7'; // Updated to V7 to force update
 const urlsToCache = [
   './',
   './index.html',
@@ -107,10 +107,19 @@ self.addEventListener('install', (event) => {
 self.addEventListener('fetch', (event) => {
   // Ignore non-http requests (like chrome-extension://)
   if (!event.request.url.startsWith('http')) return;
-  
-  // NOTE: We REMOVED the check that ignores cross-origin requests
-  // so that CDN files (Bootstrap/jQuery) can be served from cache when offline.
 
+  const url = new URL(event.request.url);
+
+  // --- FIX START: Ignore Google Ads & Analytics Domains ---
+  // This prevents the "Failed to convert value to Response" error in Console
+  if (url.hostname.includes('google') || 
+      url.hostname.includes('doubleclick') || 
+      url.hostname.includes('adtrafficquality') ||
+      url.hostname.includes('googlesyndication')) {
+    return; // Let it go to network directly without SW interference
+  }
+  // --- FIX END ---
+  
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
