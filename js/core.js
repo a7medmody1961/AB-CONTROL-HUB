@@ -985,7 +985,7 @@ const model = controller.getModel();
 // ===  New Features & Logic (What's New) ===
 // ==========================================
 
-const CURRENT_VERSION = 10; 
+const CURRENT_VERSION = 11; 
 
 window.openWhatsNew = () => {
   const modal = new bootstrap.Modal(document.getElementById('whatsNewModal'));

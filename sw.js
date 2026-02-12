@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ab-control-hub-v10'; // Updated to V10
+const CACHE_NAME = 'ab-control-hub-v11';
 const urlsToCache = [
   '/',
   '/index.html',
