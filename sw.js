@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ab-control-hub-v11';
+const CACHE_NAME = 'ab-control-hub-v12';
 const urlsToCache = [
   '/',
   '/index.html',

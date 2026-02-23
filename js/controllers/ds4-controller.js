@@ -159,11 +159,19 @@ class DS4Controller extends BaseController {
       const sw_ver_minor = view.getUint16(0x25+4, true);
 
       // Check for Known Clone FW Versions (JDM-055 Super Clones)
-      // HW: 0100:B40C, SW: 00000001:A00A are typical High-Copy signatures
       if (hw_ver_minor === 0xB40C && sw_ver_minor === 0xA00A) {
-          console.warn("Clone detection: Known Fake FW Version detected (B40C/A00A)");
-          is_clone = true;
-          deviceTypeText = l("clone");
+          try {
+              const mac_test = await this.getBdAddr();
+              if (!mac_test || mac_test === "00:00:00:00:00:00") {
+                  console.warn("Clone detection: Fake B40C detected via invalid MAC");
+                  is_clone = true;
+                  deviceTypeText = l("clone");
+              }
+          } catch(e) {
+              console.warn("Clone detection: Fake B40C failed MAC request");
+              is_clone = true;
+              deviceTypeText = l("clone");
+          }
       }
 
       // 2. Strict Check for Originality

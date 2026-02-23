@@ -889,5 +889,9 @@
   "Offline Mode Support": "دعم وضع الأوفلاين",
   "Fixed navigation issues in Offline Mode. Sub-pages like Guide and Blog now load correctly without internet.": "تم حل مشاكل التنقل أثناء انقطاع الإنترنت. الصفحات الفرعية مثل الدليل والمدونة تعمل الآن بشكل صحيح أوفلاين.",
   "Blog Navigation Fix": "إصلاح روابط المدونة",
-  "The issue of blog page links has been resolved to ensure the correct routing of technical articles.": "تم حل مشكلة روابط صفحات المدونة لضمان التوجيه الصحيح للمقالات التقنية."
+  "The issue of blog page links has been resolved to ensure the correct routing of technical articles.": "تم حل مشكلة روابط صفحات المدونة لضمان التوجيه الصحيح للمقالات التقنية.",
+  "V12 Update": "تحديث V12",
+  "Improved Clone Detection": "تحسين دقة اكتشاف الدراعات الكوبي",
+  "Fixed an issue where some genuine PlayStation 4 controllers (JDM-055) were incorrectly identified as clones. The detection system is now smarter and accurately distinguishes between \"Super Clones\" and original controllers.": "تم حل مشكلة كانت بتخلي الموقع يقرا بعض دراعات بلايستيشن 4 الأصلية (JDM-055) على إنها كوبي بالغلط. نظام الفحص بقى أذكى دلوقتي وبيقدر يفرق بدقة بين الدراعات الـ Super Clone والأصلية."
+  
 }

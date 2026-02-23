@@ -889,5 +889,9 @@
   "Offline Mode Support": "Offline Mode Support",
   "Fixed navigation issues in Offline Mode. Sub-pages like Guide and Blog now load correctly without internet.": "Fixed navigation issues in Offline Mode. Sub-pages like Guide and Blog now load correctly without internet.",
   "Blog Navigation Fix": "Blog Navigation Fix",
-  "The issue of blog page links has been resolved to ensure the correct routing of technical articles.": "The issue of blog page links has been resolved to ensure the correct routing of technical articles."
+  "The issue of blog page links has been resolved to ensure the correct routing of technical articles.": "The issue of blog page links has been resolved to ensure the correct routing of technical articles.",
+  "V12 Update": "V12 Update",
+  "Improved Clone Detection": "Improved Clone Detection Accuracy",
+  "Fixed an issue where some genuine PlayStation 4 controllers (JDM-055) were incorrectly identified as clones. The detection system is now smarter and accurately distinguishes between \"Super Clones\" and original controllers.": "Fixed an issue where some genuine PlayStation 4 controllers (JDM-055) were incorrectly identified as clones. The detection system is now smarter and accurately distinguishes between \"Super Clones\" and original controllers."
+
 }
