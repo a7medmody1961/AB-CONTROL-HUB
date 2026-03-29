@@ -12,7 +12,7 @@ importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw');
 // ==========================================
 // 2. AB Control Hub PWA & Caching Logic
 // ==========================================
-const CACHE_NAME = 'ab-control-hub-v13';
+const CACHE_NAME = 'ab-control-hub-v14';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -124,12 +124,13 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Ignore Google Ads, Analytics & Monetag (3nbf4.com)
+  // Ignore Google Ads, Analytics & Monetag domains
   if (url.hostname.includes('google') || 
       url.hostname.includes('doubleclick') || 
       url.hostname.includes('adtrafficquality') ||
       url.hostname.includes('googlesyndication') ||
-      url.hostname.includes('3nbf4.com')) { // <== تمت إضافة دومين Monetag هنا
+      url.hostname.includes('3nbf4.com') ||    // <== حطينا || هنا
+      url.hostname.includes('izcle.com')) {    // <== وقفلنا القوس هنا في الآخر
     return;
   }
 
