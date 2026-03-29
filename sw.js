@@ -1,4 +1,18 @@
-const CACHE_NAME = 'ab-control-hub-v12';
+// ==========================================
+// 1. Monetag Service Worker Configuration
+// ==========================================
+self.options = {
+    "domain": "3nbf4.com",
+    "zoneId": 10802278
+};
+self.lary = "";
+importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw');
+
+
+// ==========================================
+// 2. AB Control Hub PWA & Caching Logic
+// ==========================================
+const CACHE_NAME = 'ab-control-hub-v13';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -110,11 +124,12 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Ignore Google Ads & Analytics
+  // Ignore Google Ads, Analytics & Monetag (3nbf4.com)
   if (url.hostname.includes('google') || 
       url.hostname.includes('doubleclick') || 
       url.hostname.includes('adtrafficquality') ||
-      url.hostname.includes('googlesyndication')) {
+      url.hostname.includes('googlesyndication') ||
+      url.hostname.includes('3nbf4.com')) { // <== تمت إضافة دومين Monetag هنا
     return;
   }
 
