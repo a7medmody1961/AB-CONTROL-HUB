@@ -6,8 +6,13 @@ self.options = {
     "zoneId": 10802278
 };
 self.lary = "";
-importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw');
 
+// غلاف الحماية عشان لو الزائر مشغل AdBlocker الموقع ميبوظش
+try {
+    importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw');
+} catch (error) {
+    console.warn('تم حظر سكريبت الإعلانات (غالباً بسبب AdBlocker). أداة AB Control Hub ستعمل بشكل طبيعي.', error);
+}
 
 // ==========================================
 // 2. AB Control Hub PWA & Caching Logic
