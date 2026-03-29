@@ -12,7 +12,7 @@ importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw');
 // ==========================================
 // 2. AB Control Hub PWA & Caching Logic
 // ==========================================
-const CACHE_NAME = 'ab-control-hub-v14';
+const CACHE_NAME = 'ab-control-hub-v15';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -129,8 +129,11 @@ self.addEventListener('fetch', (event) => {
       url.hostname.includes('doubleclick') || 
       url.hostname.includes('adtrafficquality') ||
       url.hostname.includes('googlesyndication') ||
-      url.hostname.includes('3nbf4.com') ||    // <== حطينا || هنا
-      url.hostname.includes('izcle.com')) {    // <== وقفلنا القوس هنا في الآخر
+      url.hostname.includes('3nbf4.com') ||
+      url.hostname.includes('izcle.com') ||
+      url.hostname.includes('rtmark.net') ||
+      url.hostname.includes('jhnwr.com') ||
+      url.hostname.includes('ohffs.com')) {
     return;
   }
 
