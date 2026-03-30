@@ -17,7 +17,7 @@ try {
 // ==========================================
 // 2. AB Control Hub PWA & Caching Logic
 // ==========================================
-const CACHE_NAME = 'ab-control-hub-v15';
+const CACHE_NAME = 'ab-control-hub-v16';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -129,17 +129,11 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Ignore Google Ads, Analytics & Monetag domains
-  if (url.hostname.includes('google') || 
-      url.hostname.includes('doubleclick') || 
-      url.hostname.includes('adtrafficquality') ||
-      url.hostname.includes('googlesyndication') ||
-      url.hostname.includes('3nbf4.com') ||
-      url.hostname.includes('izcle.com') ||
-      url.hostname.includes('rtmark.net') ||
-      url.hostname.includes('jhnwr.com') ||
-      url.hostname.includes('ohffs.com')) {
-    return;
+  // السحر هنا: لو الرابط مش تبع موقعنا، ولا تبع الـ CDNs بتاعة التصميم، تجاهله تماماً!
+  if (!url.hostname.includes(self.location.hostname) && 
+      !url.hostname.includes('cdn.jsdelivr.net') && 
+      !url.hostname.includes('code.jquery.com')) {
+    return; // كده الـ Service Worker هيطنش كل دومينات الإعلانات الحالية والمستقبلية
   }
 
   event.respondWith(
@@ -149,14 +143,10 @@ self.addEventListener('fetch', (event) => {
       
       // 2. لو مش في الكاش، حاول تجيبه من النت
       return fetch(event.request).catch(() => {
-          // 3. لو النت قطع أو الرابط باظ (شبكة الأمان الجديدة)
-          
-          // لو المستخدم بيحاول يفتح صفحة HTML (زي Guide أو Blog) والنت قاطع
+          // 3. لو النت قطع
           if (event.request.mode === 'navigate') {
               return caches.match('/index.html');
           }
-
-          // لأي حاجة تانية (صور، سكربتات)، رجع رد فاضي بدل ما تضرب Error أحمر
           return new Response('', { status: 408, statusText: 'Request Timed Out' });
       });
     })
