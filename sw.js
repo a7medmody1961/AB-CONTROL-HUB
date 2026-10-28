@@ -17,7 +17,7 @@ try {
 // ==========================================
 // 2. AB Control Hub PWA & Caching Logic
 // ==========================================
-const CACHE_NAME = 'ab-control-hub-v16';
+const CACHE_NAME = 'ab-control-hub-v17';
 const urlsToCache = [
   '/',
   '/index.html',

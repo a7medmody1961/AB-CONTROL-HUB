@@ -4,7 +4,7 @@
 
 **The Ultimate Web-Based Calibration & Testing Tool for PlayStation Controllers**
 
-[Live Demo](https://ab-control-hub.site/) | [Report Bug](https://github.com/a7medmody1961/ab-control-hub/issues) | [Request Feature](https://github.com/a7medmody1961/ab-control-hub/issues)
+[Live Demo](https://ab-control-hub.online/) | [Report Bug](https://github.com/a7medmody1961/ab-control-hub/issues) | [Request Feature](https://github.com/a7medmody1961/ab-control-hub/issues)
 
 </div>
 
